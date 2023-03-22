@@ -1,0 +1,114 @@
+{
+    "components": [
+        {
+            "id": "runtime-local",
+            "alias": "local",
+            "type": "runtime",
+            "programs": [
+                {
+                    "id": "ensure-dapr",
+                    "executable": "./runtime-local/src/ensure-dapr.sh"
+                },
+                {
+                    "id": "run-mosquitto",
+                    "executable": "./runtime-local/src/run-mosquitto.sh"
+                },
+                {
+                    "id": "run-vehicledatabroker",
+                    "executable": "./runtime-local/src/run-vehicledatabroker.sh"
+                },
+                {
+                    "id": "run-vehicledatabroker-cli",
+                    "executable": "./runtime-local/src/run-vehicledatabroker-cli.sh"
+                },
+                {
+                    "id": "run-feedercan",
+                    "executable": "./runtime-local/src/run-feedercan.sh"
+                },
+                {
+                    "id": "run-vehicleservices",
+                    "executable": "./runtime-local/src/run-vehicleservices.sh"
+                }
+            ],
+            "start": [
+                {
+                    "id": "ensure-dapr"
+                },
+                {
+                    "id": "run-mosquitto",
+                    "dependsOn": "ensure-dapr",
+                    "startupLine": "mosquitto version 2.0.14 running"
+                },
+                {
+                    "id": "run-vehicledatabroker",
+                    "dependsOn": "run-mosquitto",
+                    "startupLine": "You're up and running! Dapr logs will appear here."
+                },
+                {
+                    "id": "run-feedercan",
+                    "dependsOn": "run-vehicledatabroker"
+                },
+                {
+                    "id": "run-vehicleservices",
+                    "dependsOn": "run-vehicledatabroker"
+                }
+            ]
+        },
+        {
+            "id": "runtime-k3d",
+            "alias": "k3d",
+            "type": "runtime",
+            "programs": [
+                {
+                    "id": "configure_controlplane",
+                    "executable": "./runtime-k3d/src/runtime/configure_controlplane.sh"
+                },
+                {
+                    "id": "deploy_runtime",
+                    "executable": "./runtime-k3d/src/runtime/deploy_runtime.sh"
+                },
+                {
+                    "id": "reset_controlplane",
+                    "executable": "./runtime-k3d/src/runtime/reset_controlplane.sh"
+                },
+                {
+                    "id": "uninstall_runtime",
+                    "executable": "./runtime-k3d/src/runtime/uninstall_runtime.sh"
+                }
+            ],
+            "start": [
+                {
+                    "id": "configure_controlplane"
+                },
+                {
+                    "id": "deploy_runtime",
+                    "dependsOn": "configure_controlplane"
+                }
+            ]
+        },
+        {
+            "id": "deployment-k3d",
+            "alias": "k3d",
+            "type": "deployment",
+            "programs": [
+                {
+                    "id": "build_vehicleapp",
+                    "executable": "./runtime-k3d/src/deployment/build_vehicleapp.sh"
+                },
+                {
+                    "id": "deploy_vehicleapp",
+                    "executable": "./runtime-k3d/src/deployment/deploy_vehicleapp.sh"
+                }
+            ],
+            "start": [
+                {
+                    "id": "build_vehicleapp"
+                },
+                {
+                    "id": "deploy_vehicleapp",
+                    "dependsOn": "build_vehicleapp"
+                }
+            ]
+        }
+    ]
+}
