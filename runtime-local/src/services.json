@@ -1,0 +1,134 @@
+[
+    {
+        "id": "mqtt",
+        "interfaces":[
+            "mqtt"
+        ],
+        "config": [
+            {
+                "key": "no-dapr",
+                "value": true
+            },
+            {
+                "key": "image",
+                "value": "eclipse-mosquitto:latest"
+            },
+            {
+                "key": "port-forward",
+                "value": "1883:1883"
+            },
+            {
+                "key": "port-forward",
+                "value": "9001:9001"
+            },
+            {
+                "key": "arg",
+                "value": "mosquitto"
+            },
+            {
+                "key": "arg",
+                "value": "-c"
+            },
+            {
+                "key": "arg",
+                "value": "/mosquitto-no-auth.conf"
+            }
+        ]
+    },
+    {
+        "id": "vehicledatabroker",
+        "interfaces": [
+            "grpc://sdv.databroker.v1.Broker/GetDatapoints",
+            "grpc://sdv.databroker.v1.Broker/Subscribe",
+            "grpc://sdv.databroker.v1.Broker/SetDatapoints"
+        ],
+        "config": [
+            {
+                "key": "image",
+                "value": "ghcr.io/eclipse/kuksa.val/databroker:0.3.0"
+            },
+            {
+                "key": "port",
+                "value": "55555"
+            },
+            {
+                "key": "env",
+                "value": "KUKSA_DATA_BROKER_METADATA_FILE=/vss.json"
+            },
+            {
+                "key": "env",
+                "value": "KUKSA_DATA_BROKER_PORT=55555"
+            },
+            {
+                "key": "mount",
+                "value": "${{ builtin.cache.vspec_file_path }}:/vss.json"
+            }
+        ]
+    },
+    {
+        "id": "seatservice",
+        "interfaces":[
+            "grpc://sdv.edge.comfort.seats.v1.Seats/MoveComponent"
+        ],
+        "config": [
+            {
+                "key": "image",
+                "value": "ghcr.io/eclipse/kuksa.val.services/seat_service:v0.2.0"
+            },
+            {
+                "key": "port",
+                "value": "50051"
+            },
+            {
+                "key": "env",
+                "value": "VEHICLEDATABROKER_DAPR_APP_ID=vehicledatabroker"
+            },
+            {
+                "key": "env",
+                "value": "CAN=cansim"
+            },
+            {
+                "key": "env",
+                "value": "SERVICE_PORT=50051"
+            }
+        ]
+    },
+    {
+        "id": "feedercan",
+        "interfaces":[],
+        "config": [
+            {
+                "key": "image",
+                "value": "ghcr.io/eclipse/kuksa.val.feeders/dbc2val:v0.1.1"
+            },
+            {
+                "key": "mount",
+                "value": "${{ builtin.script_dir }}/data:/data"
+            },
+            {
+                "key": "env",
+                "value": "VEHICLEDATABROKER_DAPR_APP_ID=vehicledatabroker"
+            },
+            {
+                "key": "env",
+                "value": "LOG_LEVEL=info,databroker=info,dbcfeeder.broker_client=info,dbcfeeder=info"
+            },
+            {
+                "key": "env",
+                "value": "USECASE=databroker"
+            },
+            {
+                "key": "env",
+                "value": "CANDUMP_FILE=/data/candumpDefault.log"
+            },
+            {
+                "key": "env",
+                "value": "DBC_FILE=/data/dbcfileDefault.dbc"
+            },
+            {
+                "key": "env",
+                "value": "MAPPING_FILE=/data/mappingDefault.yml"
+            }
+        ]
+    }
+]

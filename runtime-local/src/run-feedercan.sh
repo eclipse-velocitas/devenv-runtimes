@@ -40,8 +40,8 @@ fi
 dapr run \
     --app-id feedercan \
     --app-protocol grpc \
-    --components-path $VELOCITAS_WORKSPACE_DIR/.dapr/components \
-    --config $VELOCITAS_WORKSPACE_DIR/.dapr/config.yaml \
+    --components-path $SCRIPT_DIR/.dapr/components \
+    --config $SCRIPT_DIR/.dapr/config.yaml \
 -- docker run \
     -v ${CONFIG_DIR}:/data \
     -e VEHICLEDATABROKER_DAPR_APP_ID \

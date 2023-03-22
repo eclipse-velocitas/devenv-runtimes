@@ -17,6 +17,8 @@ echo "#######################################################"
 echo "### Running VehicleServices                         ###"
 echo "#######################################################"
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
 # Configure Service Specific Requirements
 configure_service() {
     case $1 in
@@ -50,8 +52,8 @@ run_service() {
         --app-id $SERVICE_NAME \
         --app-protocol grpc \
         --app-port $SERVICE_PORT \
-        --components-path $VELOCITAS_WORKSPACE_DIR/.dapr/components \
-        --config $VELOCITAS_WORKSPACE_DIR/.dapr/config.yaml \
+        --components-path $SCRIPT_DIR/.dapr/components \
+        --config $SCRIPT_DIR/.dapr/config.yaml \
     -- docker run $DOCKER_NET_CONFIG $DOCKER_ENVS $SERVICE_IMAGE:$SERVICE_TAG &
 }
 

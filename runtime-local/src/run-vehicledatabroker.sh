@@ -33,8 +33,8 @@ dapr run \
     --app-id vehicledatabroker \
     --app-protocol grpc \
     --app-port $KUKSA_DATA_BROKER_PORT \
-    --components-path $VELOCITAS_WORKSPACE_DIR/.dapr/components \
-    --config $VELOCITAS_WORKSPACE_DIR/.dapr/config.yaml \
+    --components-path $SCRIPT_DIR/.dapr/components \
+    --config $SCRIPT_DIR/.dapr/config.yaml \
 -- docker run \
     `if [ ! "$VSPEC_FILE_PATH" == null ] && [ -n "$VSPEC_FILE_PATH" ]; then echo "-v $VSPEC_FILE_PATH:$VSPEC_FILE_PATH -e KUKSA_DATA_BROKER_METADATA_FILE=$VSPEC_FILE_PATH"; fi` \
     -e KUKSA_DATA_BROKER_PORT \
