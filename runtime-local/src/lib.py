@@ -70,7 +70,7 @@ def get_cache_data():
 
 def get_services():
     """Return all specified services as Python object."""
-    return json.load(open(f"{get_script_path()}/services.json", encoding="utf-8"))
+    return json.load(open(f"{get_script_path()}/../../runtime.json", encoding="utf-8"))
 
 
 def replace_variables(input_str: str, variables: dict[str, str]) -> str:
