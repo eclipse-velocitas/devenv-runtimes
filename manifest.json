@@ -40,9 +40,14 @@
                     "args": ["./runtime-local/src/install_deps.py"]
                 },
                 {
+                    "id": "run-vehicle-app",
+                    "executable": "python3",
+                    "args": ["./runtime-local/src/run-vehicle-app.py"]
+                },
+                {
                     "id": "run-dapr-sidecar",
                     "executable": "python3",
-                    "args": ["./runtime-local/src/run-dapr-sidecar.py", "vehicleapp", "--dapr-grpc-port", "50001", "--dapr-http-port", "3500"]
+                    "args": ["./runtime-local/src/run-dapr-sidecar.py"]
                 }
             ],
             "onPostInit": [
