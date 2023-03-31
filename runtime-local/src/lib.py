@@ -81,12 +81,10 @@ def replace_variables(input_str: str, variables: dict[str, str]) -> str:
 
 
 def get_dapr_sidecar_args(
-    app_id: str, app_port: Optional[str]
+    app_id: str, app_port: Optional[str] = None, grpc_port: Optional[str] = None, http_port: Optional[str] = None
 ) -> Tuple[list[str], dict[str, Optional[str]]]:
     """Return all arguments to spawn a dapr sidecar for the given app."""
     env = dict()
-    env["DAPR_GRPC_PORT"] = None
-    env["DAPR_HTTP_PORT"] = None
 
     args = [
         "dapr",
@@ -99,7 +97,13 @@ def get_dapr_sidecar_args(
         f"{get_script_path()}/.dapr/components",
         "--config",
         f"{get_script_path()}/.dapr/config.yaml",
-    ] + (["--app-port", str(app_port)] if app_port else [])
+    ] + (
+        ["--app-port", str(app_port)] if app_port else []
+    ) + (
+        ["--dapr-grpc-port", str(grpc_port)] if grpc_port else []
+    ) + (
+        ["--dapr-http-port", str(http_port)] if http_port else []
+    )
 
     return (args, env)
 
