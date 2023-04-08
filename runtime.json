@@ -1,6 +1,6 @@
 [
     {
-        "id": "mqtt",
+        "id": "mqtt-broker",
         "interfaces":[
             "mqtt"
         ],
@@ -12,6 +12,10 @@
             {
                 "key": "image",
                 "value": "eclipse-mosquitto:latest"
+            },
+            {
+                "key": "port",
+                "value": "1883"
             },
             {
                 "key": "port-forward",
@@ -52,6 +56,10 @@
                 "value": "55555"
             },
             {
+                "key": "port-forward",
+                "value": "55555:55555"
+            },
+            {
                 "key": "env",
                 "value": "KUKSA_DATA_BROKER_METADATA_FILE=/vss.json"
             },
@@ -78,6 +86,10 @@
             {
                 "key": "port",
                 "value": "50051"
+            },
+            {
+                "key": "port-forward",
+                "value": "50051:50051"
             },
             {
                 "key": "env",

@@ -16,22 +16,22 @@ imageSeatService:
   name: seatservice
   repository: k3d-registry.localhost:12345/seatservice
   pullPolicy: Always
-  port: 50051
+  daprAppid: seatservice
+  daprAppPort: 50051
   daprLogLevel: debug
   tag: latest
-  targetPort: 50051
   nodePort: 30051
----
+
 imageVehicleDataBroker:
   name: vehicledatabroker
   repository: k3d-registry.localhost:12345/vehicledatabroker
   pullPolicy: Always
-  port: 55555
+  daprAppid: vehicledatabroker
+  daprAppPort: 55555
   daprLogLevel: debug
   tag: latest
-  targetPort: 55555
   nodePort: 30555
----
+
 imageMosquitto:
   name: mqtt-broker
   repository: eclipse-mosquitto
@@ -42,16 +42,21 @@ imageMosquitto:
     - /mosquitto-no-auth.conf
   tag: 2.0.14
   port: 1883
-  targetPort: 1883
   nodePort: 31883
   websocketPort: 9001
----
+
 imageFeederCan:
   name: feedercan
   repository: k3d-registry.localhost:12345/feedercan
   pullPolicy: Always
+  daprAppid: feedercan
   daprLogLevel: debug
   candumpfile: "/data/candumpDefault.log"
   dbcfile: "/data/dbcfileDefault.dbc"
   mapping: "/data/mappingDefault.yml"
   tag: latest
+
+nameOverride: ""
+fullnameOverride: ""
+
+vspecFilePath: ""

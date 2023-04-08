@@ -15,21 +15,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{.Values.imageFeederCan.name}}
+  name: "{{.Values.imageFeederCan.name}}"
   labels:
-    app: {{.Values.imageFeederCan.name}}
+    app: "{{.Values.imageFeederCan.name}}"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{.Values.imageFeederCan.name}}
+      app: "{{.Values.imageFeederCan.name}}"
   template:
     metadata:
       labels:
-        app: {{.Values.imageFeederCan.name}}
+        app: "{{.Values.imageFeederCan.name}}"
       annotations:
         dapr.io/enabled: "true"
-        dapr.io/app-id: "{{.Values.imageFeederCan.daprAppid}}"
+        dapr.io/app-id: "{{.Values.imageFeederCan.name}}"
+        dapr.io/app-port: "{{.Values.imageFeederCan.port}}"
         dapr.io/log-level: "{{.Values.imageFeederCan.daprLogLevel}}"
         dapr.io/config: "config"
         dapr.io/app-protocol: "grpc"
@@ -40,21 +41,8 @@ spec:
             claimName: pv-claim
       containers:
         - name: feedercan
-          image: {{.Values.imageFeederCan.repository}}:{{.Values.imageFeederCan.tag}}
-          imagePullPolicy: {{.Values.imageFeederCan.pullPolicy}}
-          env:
-            - name: VEHICLEDATABROKER_DAPR_APP_ID
-              value: {{.Values.imageVehicleDataBroker.daprAppid}}
-            - name: LOG_LEVEL
-              value: "info,databroker=info,dbcfeeder.broker_client=info,dbcfeeder=info"
-            - name: USECASE
-              value: "databroker"
-            - name: CANDUMP_FILE
-              value: {{.Values.imageFeederCan.candumpfile}}
-            - name: MAPPING_FILE
-              value: {{.Values.imageFeederCan.mapping}}
-            - name: DBC_FILE
-              value: {{.Values.imageFeederCan.dbcfile}}
+          image: "{{.Values.imageFeederCan.repository}}:{{.Values.imageFeederCan.tag}}"
+          imagePullPolicy: "{{.Values.imageFeederCan.pullPolicy}}"
           volumeMounts:
           - mountPath: "/data"
             name: pv-storage
