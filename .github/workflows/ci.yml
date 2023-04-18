@@ -62,6 +62,7 @@ jobs:
       - name: Init velocitas project
         run: |
           cd runtime-local/test
+          velocitas
           velocitas init
 
       - name: Run integration test
