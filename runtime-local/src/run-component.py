@@ -12,29 +12,37 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import argparse
+import signal
 import subprocess
 import time
-import signal
 
 from yaspin import yaspin
 
-from lib import get_services, run_service, stop_service
+from lib import get_specific_services, run_service, stop_service
 
 
 spawned_processes = list[subprocess.Popen]()
 
 
-def run_services() -> None:
-    """Run all required services."""
+def run_specific_service(service_id: str) -> None:
+    """Run specified service."""
 
-    with yaspin(text="Starting runtime") as spinner:
+    with yaspin(text=f"Starting service {service_id}") as spinner:
         try:
-            for service in get_services():
+            services = get_specific_services(service_id)
+            if len(services) == 1:
+                service = services[0]
                 stop_service(service)
                 spawned_processes.append(run_service(service))
                 time.sleep(3)
-                spinner.write(f"> {service['id']} running")
-            spinner.ok("✔ ")
+                spinner.ok("✔ ")
+            elif len(services) == 0:
+                spinner.write("Service not defined")
+                spinner.fail("💥 ")
+            else:
+                spinner.write("Multiple service definitions found, which to take?")
+                spinner.fail("💥 ")
         except RuntimeError as error:
             spinner.write(error.with_traceback())
             spinner.fail("💥 ")
@@ -62,6 +70,17 @@ def handler(_signum, _frame):
 
 
 if __name__ == "__main__":
+    # The arguments we accept
+    parser = argparse.ArgumentParser(
+        description="Start the specified service as defined in runtime.json."
+    )
+    parser.add_argument(
+        "service_id",
+        type=str,
+        help="Id of the service to start - refers to 'id' key in runtime.json"
+    )
+    args = parser.parse_args()
+
     signal.signal(signal.SIGINT, handler)
-    run_services()
+    run_specific_service(args.service_id)
     wait_while_processes_are_running()

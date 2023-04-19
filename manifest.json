@@ -11,11 +11,13 @@
                 },
                 {
                     "id": "run-mosquitto",
-                    "executable": "./runtime-local/src/run-mosquitto.sh"
+                    "executable": "python3",
+                    "args": ["./runtime-local/src/run-component.py", "mqtt"]
                 },
                 {
                     "id": "run-vehicledatabroker",
-                    "executable": "./runtime-local/src/run-vehicledatabroker.sh"
+                    "executable": "python3",
+                    "args": ["./runtime-local/src/run-component.py", "vehicledatabroker"]
                 },
                 {
                     "id": "run-vehicledatabroker-cli",
@@ -23,11 +25,13 @@
                 },
                 {
                     "id": "run-feedercan",
-                    "executable": "./runtime-local/src/run-feedercan.sh"
+                    "executable": "python3",
+                    "args": ["./runtime-local/src/run-component.py", "feedercan"]
                 },
                 {
                     "id": "run-vehicleservices",
-                    "executable": "./runtime-local/src/run-vehicleservices.sh"
+                    "executable": "python3",
+                    "args": ["./runtime-local/src/run-component.py", "seatservice"]
                 },
                 {
                     "id": "up",
