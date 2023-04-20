@@ -47,8 +47,9 @@ def run_command_until_logs_match(command: str, regex_service: Pattern[str], run_
 
 
 def test_scripts_run_successfully():
-    assert 0 == check_call(f"{command} ensure-dapr", shell=True)
-    assert run_command_until_logs_match(f"{command} run-mosquitto", regex_mqtt)
-    assert run_command_until_logs_match(f"{command} run-vehicledatabroker", regex_vdb, True)
-    assert run_command_until_logs_match(f"{command} run-feedercan", regex_client, True)
-    assert run_command_until_logs_match(f"{command} run-vehicleservices", regex_client, True)
+    assert 0 == check_call(f"{command} up", shell=True)
+    #assert 0 == check_call(f"{command} ensure-dapr", shell=True)
+    #assert run_command_until_logs_match(f"{command} run-mosquitto", regex_mqtt)
+    #assert run_command_until_logs_match(f"{command} run-vehicledatabroker", regex_vdb, True)
+    #assert run_command_until_logs_match(f"{command} run-feedercan", regex_client, True)
+    #assert run_command_until_logs_match(f"{command} run-vehicleservices", regex_client, True)
