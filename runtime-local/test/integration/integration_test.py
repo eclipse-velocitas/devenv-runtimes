@@ -17,6 +17,7 @@ from threading import Timer
 from subprocess import PIPE, Popen, check_call
 
 command: str = "velocitas exec runtime-local"
+regex_runtime_up: Pattern[str] = compile(r"$.*✔  Starting runtime")
 regex_dapr_app: Pattern[str] = compile(r".*You\'re up and running! Both Dapr and your app logs will appear here\.\n")
 regex_mqtt: Pattern[str] = compile(r".*mosquitto version \d+\.\d+\.\d+ running\n")
 regex_vdb: Pattern[str] = compile(r".*Listening on \d+\.\d+\.\d+\.\d+:\d+")
@@ -47,7 +48,7 @@ def run_command_until_logs_match(command: str, regex_service: Pattern[str], run_
 
 
 def test_scripts_run_successfully():
-    assert 0 == check_call(f"{command} up", shell=True)
+    assert run_command_until_logs_match(f"{command} up", regex_runtime_up)
     #assert 0 == check_call(f"{command} ensure-dapr", shell=True)
     #assert run_command_until_logs_match(f"{command} run-mosquitto", regex_mqtt)
     #assert run_command_until_logs_match(f"{command} run-vehicledatabroker", regex_vdb, True)
