@@ -14,14 +14,15 @@
 
 from re import compile, Pattern
 from threading import Timer
-from subprocess import PIPE, Popen, check_call
+from subprocess import PIPE, Popen
 
 command: str = "velocitas exec runtime-local"
-regex_runtime_up: Pattern[str] = compile(r"$.*✔  Starting runtime")
+regex_runtime_up: Pattern[str] = compile(r"✔.* Starting runtime")
 regex_dapr_app: Pattern[str] = compile(r".*You\'re up and running! Both Dapr and your app logs will appear here\.\n")
-regex_mqtt: Pattern[str] = compile(r".*mosquitto version \d+\.\d+\.\d+ running\n")
-regex_vdb: Pattern[str] = compile(r".*Listening on \d+\.\d+\.\d+\.\d+:\d+")
-regex_client: Pattern[str]= compile(r".*[cC]onnected to data broker.*")
+regex_mqtt: Pattern[str] = compile(r"✔.* Starting service mqtt")
+regex_vdb: Pattern[str] = compile(r"✔.* Starting service vehicledatabroker")
+regex_seatservice: Pattern[str]= compile(r"✔.* Starting service seatservice")
+regex_feedercan: Pattern[str]= compile(r"✔.* Starting service feedercan")
 timeout_sec: float = 180
 
 
@@ -47,10 +48,12 @@ def run_command_until_logs_match(command: str, regex_service: Pattern[str], run_
     return True
 
 
-def test_scripts_run_successfully():
+def test_runtime_up_successfully():
     assert run_command_until_logs_match(f"{command} up", regex_runtime_up)
-    #assert 0 == check_call(f"{command} ensure-dapr", shell=True)
-    #assert run_command_until_logs_match(f"{command} run-mosquitto", regex_mqtt)
-    #assert run_command_until_logs_match(f"{command} run-vehicledatabroker", regex_vdb, True)
-    #assert run_command_until_logs_match(f"{command} run-feedercan", regex_client, True)
-    #assert run_command_until_logs_match(f"{command} run-vehicleservices", regex_client, True)
+
+
+def test_run_sevices_separately_successfully():
+    assert run_command_until_logs_match(f"{command} run-mosquitto", regex_mqtt)
+    assert run_command_until_logs_match(f"{command} run-vehicledatabroker", regex_vdb)
+    assert run_command_until_logs_match(f"{command} run-vehicleservices", regex_seatservice)
+    assert run_command_until_logs_match(f"{command} run-feedercan", regex_feedercan)
