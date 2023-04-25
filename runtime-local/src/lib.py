@@ -16,8 +16,12 @@ import json
 import os
 import subprocess
 import sys
+import time
 from enum import Enum
 from io import TextIOWrapper
+from itertools import filterfalse
+from re import compile, Pattern
+from threading import Timer
 from typing import Optional, Tuple
 
 
@@ -75,10 +79,15 @@ def get_services():
     return json.load(open(f"{get_script_path()}/../../runtime.json", encoding="utf-8"))
 
 
-def get_specific_services(service_id: str):
+def get_specific_service(service_id: str):
     """Return the specified service as Python object."""
     services = get_services()
-    return list(filter(lambda service: service['id'] == service_id, services))
+    services = list(filter(lambda service: service['id'] == service_id, services))
+    if len(services) == 0:
+        raise RuntimeError("Service not defined")
+    if len(services) > 1:
+        raise RuntimeError("Multiple service definitions found, which to take?")
+    return services[0]
 
 
 def replace_variables(input_str: str, variables: dict[str, str]) -> str:
@@ -140,6 +149,20 @@ def json_obj_to_flat_map(obj, prefix: str = "", separator: str = ".") -> dict[st
     return result
 
 
+def get_log_file_name(service_id: str) -> str:
+    """Builds the log file name for the given service.
+
+    Args:
+        service_id (str): The ID of the service to log.
+
+    Returns:
+        str: The log file name.
+    """
+    log_path = os.path.join(get_workspace_dir(), "logs")
+    os.makedirs(log_path, exist_ok=True)
+    return os.path.join(log_path, f"{service_id}.txt")
+
+
 def create_log_file(service_id: str) -> TextIOWrapper:
     """Create a log file for the given service.
 
@@ -149,9 +172,11 @@ def create_log_file(service_id: str) -> TextIOWrapper:
     Returns:
         TextIOWrapper: The log file.
     """
-    log_path = os.path.join(get_workspace_dir(), "logs")
-    os.makedirs(log_path, exist_ok=True)
-    return open(os.path.join(log_path, f"{service_id}.txt"), "w", encoding="utf-8")
+    log_file_name = get_log_file_name(service_id)
+    return open(log_file_name, "w", encoding="utf-8")
+
+
+dapr_pattern: Pattern[str] = compile(r".*You\'re up and running! Both Dapr and your app logs will appear here\.\n")
 
 
 def run_service(service_spec) -> subprocess.Popen:
@@ -173,6 +198,7 @@ def run_service(service_spec) -> subprocess.Popen:
     port_forwards = []
     mounts = []
     args = []
+    patterns = []
 
     variables = json_obj_to_flat_map(get_cache_data(), "builtin.cache")
     variables["builtin.script_dir"] = get_script_path()
@@ -195,12 +221,15 @@ def run_service(service_spec) -> subprocess.Popen:
             port_forwards.append(replace_variables(config_entry["value"], variables))
         elif config_entry["key"] == "mount":
             mounts.append(replace_variables(config_entry["value"], variables))
+        elif config_entry["key"] == "start-pattern":
+            patterns.append(compile(config_entry["value"]))
 
     dapr_args = []
     if not no_dapr and get_middleware_type() == MiddlewareType.DAPR:
         dapr_args, dapr_env = get_dapr_sidecar_args(service_id, service_port)
         dapr_args = dapr_args + ["--"]
         env_vars.update(dapr_env)
+        patterns.append(dapr_pattern)
 
     port_forward_args = []
     for port_forward in port_forwards:
@@ -225,6 +254,7 @@ def run_service(service_spec) -> subprocess.Popen:
         get_container_runtime_executable(),
         "run",
         "--rm",
+        "--init",
         "--name",
         service_id,
         *env_forward_args,
@@ -236,10 +266,43 @@ def run_service(service_spec) -> subprocess.Popen:
         *args,
     ]
 
-    log.write(" ".join(docker_args) + "\n")
-    return subprocess.Popen(
-        docker_args,
-        start_new_session=True,
+    return spawn_process(docker_args, log, patterns, timeout_sec=60)
+
+
+def spawn_process(
+        args: list[str], log: TextIOWrapper, patterns: list[Pattern[str]], timeout_sec: int
+):
+    with open(log.name, "r", encoding="utf-8") as monitor:
+        log.write(" ".join(args) + "\n\n")
+        log.flush()
+        process = subprocess.Popen(
+            args,
+            start_new_session=True,
+            stderr=subprocess.STDOUT,
+            stdout=log,
+        )
+
+        timer: Timer = Timer(timeout_sec, process.kill)
+        timer.start()
+        for line in iter(monitor.readline, b""):
+            if not timer.is_alive():
+                raise RuntimeError("Timeout reached after {timeout_sec} seconds, service killed!")
+            if process.poll() is not None:
+                raise RuntimeError("Service unexpectedly terminated")
+            if line == "":
+                time.sleep(0.1)
+                continue
+            patterns[:] = filterfalse(lambda regex: regex.search(line), patterns)
+            if len(patterns) == 0:
+                timer.cancel()
+                break
+
+    return process
+
+
+def stop_container(service_id, log=None):
+    subprocess.call(
+        [get_container_runtime_executable(), "stop", service_id],
         stderr=subprocess.STDOUT,
         stdout=log,
     )
@@ -268,8 +331,4 @@ def stop_service(service_spec):
             stdout=log,
         )
 
-    subprocess.call(
-        [get_container_runtime_executable(), "stop", service_id],
-        stderr=subprocess.STDOUT,
-        stdout=log,
-    )
+    stop_container(service_id, log)

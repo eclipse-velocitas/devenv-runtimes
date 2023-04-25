@@ -12,16 +12,17 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import signal
 import subprocess
 import time
-import signal
 
+from typing import Dict
 from yaspin import yaspin
 
-from lib import get_services, run_service, stop_service
+from lib import get_services, run_service, stop_container, stop_service
 
 
-spawned_processes = list[subprocess.Popen]()
+spawned_processes: Dict[str, subprocess.Popen] = {}
 
 
 def run_services() -> None:
@@ -30,13 +31,13 @@ def run_services() -> None:
     with yaspin(text="Starting runtime") as spinner:
         try:
             for service in get_services():
+                service_id = service['id']
                 stop_service(service)
-                spawned_processes.append(run_service(service))
-                time.sleep(3)
-                spinner.write(f"> {service['id']} running")
+                spawned_processes[service_id] = run_service(service)
+                spinner.write(f"> {service_id} running")
             spinner.ok("✔ ")
         except RuntimeError as error:
-            spinner.write(error.with_traceback())
+            spinner.write(error.args)
             spinner.fail("💥 ")
             terminate_spawned_processes()
 
@@ -44,16 +45,17 @@ def run_services() -> None:
 def wait_while_processes_are_running():
     while len(spawned_processes) > 0:
         time.sleep(1)
-        for process in spawned_processes:
+        for process in spawned_processes.values():
             process.poll()
 
 
 def terminate_spawned_processes():
     with yaspin(text="Stopping runtime") as spinner:
         while len(spawned_processes) > 0:
-            process = spawned_processes.pop()
+            (service_id, process) = spawned_processes.popitem()
             process.terminate()
-            spinner.write(f"> {process.args[0]} terminated")
+            stop_container(service_id, subprocess.DEVNULL)
+            spinner.write(f"> {process.args[0]} (service_id='{service_id}') terminated")
         spinner.ok("✔")
 
 
@@ -63,5 +65,6 @@ def handler(_signum, _frame):
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, handler)
+    signal.signal(signal.SIGTERM, handler)
     run_services()
     wait_while_processes_are_running()
