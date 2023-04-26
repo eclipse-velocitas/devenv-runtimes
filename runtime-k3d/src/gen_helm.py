@@ -20,7 +20,8 @@ import os
 from lib import (
     get_services,
     get_script_path,
-    create_nodeport,
+    create_nodeport_spec,
+    create_cluster_ip_spec,
     get_template
 )
 
@@ -36,6 +37,7 @@ def find_service_spec_index(lst, name):
         dict_keys = list(lst[i].keys())
         if elem[dict_keys[0]]['name'] == name:
             return i    
+
 
 def generate_values_and_templates(values_template, service_spec):
     """Generates values specification from the given templates and service specification and generates helm templates for each service spec.
@@ -78,48 +80,50 @@ def generate_values_and_templates(values_template, service_spec):
     value_spec_key = list(value_spec.keys())[0]
     value_spec[value_spec_key]['repository'] = container_image.split(':')[0]
     value_spec[value_spec_key]['tag'] = container_image.split(':')[1]
+    
     for env in env_vars.items():
         if "FILE" in env[0]:
             value_spec[value_spec_key][env[0].replace('_', '').lower()] = env[1]
+    
     if args:
         value_spec[value_spec_key]['args'] = args
+    
     if service_port:
         value_spec[value_spec_key]['port'] = int(service_port)
-    if port_forwards:
-        i = 1
-        for port in port_forwards:
-            source_target_ports = port.split(':')
-            if int(source_target_ports[0]) == int(service_port):
-                value_spec[value_spec_key]['targetPort'] = int(source_target_ports[1])
-                value_spec[value_spec_key]['nodePort'] = int(node_port)
-            else:
-                value_spec[value_spec_key]['port' + str(i)] = int(source_target_ports[0])
-                value_spec[value_spec_key]['targetPort' + str(i)] = int(source_target_ports[1])
-                value_spec[value_spec_key]['nodePort' + str(i)] = int(node_port)
-                i = i + 1
-            node_port = node_port + 1 
             
     template = get_template()
     template['metadata']['name'] = f"{{{{.Values.{value_spec_key}.name}}}}"
     template['metadata']['labels']['app'] = template['metadata']['name']
     template['spec']['selector']['matchLabels']['app'] = template['metadata']['name']
     template['spec']['template']['metadata']['labels']['app'] = template['metadata']['name']
-    if no_dapr:
-        del template['spec']['template']['metadata']['annotations']
-    else:
-        template['spec']['template']['metadata']['annotations']['dapr.io/app-id'] = f"{{{{.Values.{value_spec_key}.name}}}}"
-        template['spec']['template']['metadata']['annotations']['dapr.io/app-port'] = f"{{{{.Values.{value_spec_key}.port}}}}"
-    template['spec']['template']['spec']['containers'][0]['name'] = f"{{{{.Values.{value_spec_key}.name}}}}"
-    template['spec']['template']['spec']['containers'][0]['image'] = f"{{{{.Values.{value_spec_key}.repository}}}}:{{{{.Values.{value_spec_key}.tag}}}}"
-    template['spec']['template']['spec']['containers'][0]['imagePullPolicy'] = f"{{{{.Values.{value_spec_key}.pullPolicy}}}}"
+    
+    if not no_dapr:
+        template['spec']['template']['metadata']['annotations'] = {
+            "dapr.io/enabled": "true",
+            "dapr.io/config": "config",
+            "dapr.io/app-protocol": "grpc",
+            "dapr.io/app-id": f"{{{{.Values.{value_spec_key}.name}}}}",
+            "dapr.io/app-port": f"{{{{.Values.{value_spec_key}.port}}}}",
+            "dapr.io/log-level": f"{{{{.Values.{value_spec_key}.daprLogLevel}}}}"
+        }
+    
+    container_spec = {
+        "name": f"{{{{.Values.{value_spec_key}.name}}}}",
+        "image": f"{{{{.Values.{value_spec_key}.repository}}}}:{{{{.Values.{value_spec_key}.tag}}}}",
+        "imagePullPolicy": f"{{{{.Values.{value_spec_key}.pullPolicy}}}}"
+        }
+    template['spec']['template']['spec']['containers'].append(container_spec)
+   
     if args:
         template['spec']['template']['spec']['containers'][0]['args'] = f"{{{{- range .Values.{value_spec_key}.args}}}}- {{{{.}}}}{{{{- end }}}}"
+    
     if service_port:
         template['spec']['template']['spec']['containers'][0]['ports'] = [{
             'name': 'default',
-            'containerPort': int(service_port),
+            'containerPort': f"{{{{.Values.{value_spec_key}.port}}}}",
             'protocol': 'TCP' 
         }]
+
     if env_vars:
         template['spec']['template']['spec']['containers'][0]['env'] = []
         for env in env_vars.items():
@@ -131,21 +135,56 @@ def generate_values_and_templates(values_template, service_spec):
                 env_var['value'] = f"{{{{.Values.{value_spec_key}.{env[0].replace('_', '').lower()}}}}}"
             template['spec']['template']['spec']['containers'][0]['env'].append(env_var)    
     
+    if mounts:
+        template['spec']['template']['spec']['containers'][0]['volumeMounts'] = []
+        template['spec']['template']['spec']['volumes'] = []
+        for mount in mounts:
+            mount_value = mount.split("/")[-1]
+            if "." in mount_value:
+                mount_dict = {
+                    "name": mount_value.split(".")[0],
+                    "mountPath": f"""/{mount_value}"""
+                }     
+            else:
+                mount_dict = {
+                    "mountPath": f"""/{mount_value}""",
+                    "name": "pv-storage"
+                }
+                if not template['spec']['template']['spec']['volumes']:
+                    volume_dict = {
+                        "name": "pv-storage",
+                        "persistentVolumeClaim": {
+                            "claimName": "pv-claim"
+                        }
+                    }
+                    template['spec']['template']['spec']['volumes'].append(volume_dict)
+            template['spec']['template']['spec']['containers'][0]['volumeMounts'].append(mount_dict)
+    
     service_spec_lst = []
     service_spec_lst.append(template)
-    if port_forwards:
-        nodeport_spec = create_nodeport(f"{{{{.Values.{value_spec_key}.name}}}}")
+    if port_forwards:  
+        nodeport_spec = create_nodeport_spec(f"{{{{.Values.{value_spec_key}.name}}}}")
         i = 1
         nodeport_spec['ports'] = []
         for port in port_forwards:
             source_target_ports = port.split(':')
             if int(source_target_ports[0]) == int(service_port):
+                value_spec[value_spec_key]['targetPort'] = f"{{{{.Values.{value_spec_key}.targetPort}}}}"
+                value_spec[value_spec_key]['nodePort'] = f"{{{{.Values.{value_spec_key}.nodePort}}}}"
                 port_spec = {
                     'port': f"{{.Values.{value_spec_key}.port}}",
                     'targetPort': f"{{{{.Values.{value_spec_key}.targetPort}}}}",
                     'nodePort': f"{{{{.Values.{value_spec_key}.nodePort}}}}"
                 }
             else:
+                value_spec[value_spec_key]['port' + str(i)] = f"{{{{.Values.{value_spec_key}.port{i}}}}}"
+                value_spec[value_spec_key]['targetPort' + str(i)] = f"{{{{.Values.{value_spec_key}.targetPort{i}}}}}"
+                value_spec[value_spec_key]['nodePort' + str(i)] = f"{{{{.Values.{value_spec_key}.nodePort{i}}}}}"
+                template['spec']['template']['spec']['containers'][0]['ports'].append({
+                    'name': f"""port{i}""",
+                    'containerPort': f"{{{{.Values.{value_spec_key}.port{i}}}}}",
+                    'protocol': 'TCP' 
+                })
                 port_spec = {
                     'port': f"{{{{.Values.{value_spec_key}.port{i}}}}}",
                     'targetPort': f"{{{{.Values.{value_spec_key}.targetPort{i}}}}}",
@@ -155,12 +194,24 @@ def generate_values_and_templates(values_template, service_spec):
             nodeport_spec['ports'].append(port_spec)
             node_port = node_port + 1
         service_spec_lst.append(nodeport_spec)
+    
+    # create cluster ip if needed
+    if service_id == "mqtt-broker":
+        cluster_ip_port_spec = nodeport_spec['ports']
+        for port in cluster_ip_port_spec:
+            port_spec = port.copy()
+            del port_spec['nodePort']
+            port_spec['protocol'] = "TCP"
+        cluster_ip_port_spec = create_cluster_ip_spec(f"{{{{.Values.{value_spec_key}.name}}}}", port_spec)
+        service_spec_lst.append(cluster_ip_port_spec)
+    
     if not os.path.exists(f"{get_script_path()}/runtime/config/helm/templates_generated/"):
         os.mkdir(f"{get_script_path()}/runtime/config/helm/templates_generated/")
     with open(f"{get_script_path()}/runtime/config/helm/templates_generated/{service_id}.yaml", 'w') as f:
         yaml.dump_all(service_spec_lst, f)
             
     return value_spec    
+
 
 if __name__ == "__main__":
     with open(f"{get_script_path()}/runtime/config/helm/values.yaml", 'r') as f:
@@ -170,5 +221,7 @@ if __name__ == "__main__":
     for service in get_services():
         services.append(generate_values_and_templates(values_template, service_spec=service))
     
-    with open(f"{get_script_path()}/runtime/config/helm/values_generated.yaml", 'w') as f:
+    with open(f"{get_script_path()}/runtime/config/helm/values.yaml", 'w') as f:
         yaml.dump_all(services, f)
+    
+    print("Generation has been finished!")

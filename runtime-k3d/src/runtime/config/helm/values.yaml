@@ -1,57 +1,47 @@
-# Copyright (c) 2022 Robert Bosch GmbH and Microsoft Corporation
-#
-# This program and the accompanying materials are made available under the
-# terms of the Apache License, Version 2.0 which is available at
-# https://www.apache.org/licenses/LICENSE-2.0.
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-# License for the specific language governing permissions and limitations
-# under the License.
-#
-# SPDX-License-Identifier: Apache-2.0
-
-imageSeatService:
-  name: seatservice
-  repository: k3d-registry.localhost:12345/seatservice
-  pullPolicy: Always
-  port: 50051
-  daprLogLevel: debug
+imageMosquitto:
+  args:
+  - mosquitto
+  - -c
+  - /mosquitto-no-auth.conf
+  name: mqtt-broker
+  nodePort: '{{.Values.imageMosquitto.nodePort}}'
+  nodePort1: '{{.Values.imageMosquitto.nodePort1}}'
+  port: 1883
+  port1: '{{.Values.imageMosquitto.port1}}'
+  pullPolicy: IfNotPresent
+  repository: eclipse-mosquitto
   tag: latest
-  targetPort: 50051
-  nodePort: 30051
+  targetPort: '{{.Values.imageMosquitto.targetPort}}'
+  targetPort1: '{{.Values.imageMosquitto.targetPort1}}'
 ---
 imageVehicleDataBroker:
-  name: vehicledatabroker
-  repository: k3d-registry.localhost:12345/vehicledatabroker
-  pullPolicy: Always
-  port: 55555
   daprLogLevel: debug
-  tag: latest
-  targetPort: 55555
-  nodePort: 30555
+  kuksadatabrokermetadatafile: /vss.json
+  name: vehicledatabroker
+  nodePort: '{{.Values.imageVehicleDataBroker.nodePort}}'
+  port: 55555
+  pullPolicy: Always
+  repository: ghcr.io/eclipse/kuksa.val/databroker
+  tag: 0.3.0
+  targetPort: '{{.Values.imageVehicleDataBroker.targetPort}}'
 ---
-imageMosquitto:
-  name: mqtt-broker
-  repository: eclipse-mosquitto
-  pullPolicy: IfNotPresent
-  args:
-    - mosquitto
-    - -c
-    - /mosquitto-no-auth.conf
-  tag: 2.0.14
-  port: 1883
-  targetPort: 1883
-  nodePort: 31883
-  websocketPort: 9001
+imageSeatService:
+  daprLogLevel: debug
+  name: seatservice
+  nodePort: '{{.Values.imageSeatService.nodePort}}'
+  port: 50051
+  pullPolicy: Always
+  repository: ghcr.io/eclipse/kuksa.val.services/seat_service
+  tag: v0.2.0
+  targetPort: '{{.Values.imageSeatService.targetPort}}'
 ---
 imageFeederCan:
-  name: feedercan
-  repository: k3d-registry.localhost:12345/feedercan
-  pullPolicy: Always
+  candumpfile: /data/candumpDefault.log
   daprLogLevel: debug
-  candumpfile: "/data/candumpDefault.log"
-  dbcfile: "/data/dbcfileDefault.dbc"
-  mapping: "/data/mappingDefault.yml"
-  tag: latest
+  dbcfile: /data/dbcfileDefault.dbc
+  mapping: /data/mappingDefault.yml
+  mappingfile: /data/mappingDefault.yml
+  name: feedercan
+  pullPolicy: Always
+  repository: ghcr.io/eclipse/kuksa.val.feeders/dbc2val
+  tag: v0.1.1
