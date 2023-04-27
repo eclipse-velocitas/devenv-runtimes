@@ -292,7 +292,6 @@ def spawn_process(
             if line == "":
                 time.sleep(0.1)
                 continue
-            print(line, end="")
             patterns[:] = filterfalse(lambda regex: regex.search(line), patterns)
             if len(patterns) == 0:
                 timer.cancel()
