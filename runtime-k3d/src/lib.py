@@ -15,7 +15,8 @@
 import json
 import os
 import sys
-from typing import List
+from collections import namedtuple
+from typing import List, Optional
 
 
 def get_script_path() -> str:
@@ -38,15 +39,8 @@ def create_nodeport_spec(service_id: str):
     return {
         "apiVersion": "v1",
         "kind": "Service",
-        "metadata": {
-            "name": service_id + "-nodeport"
-        },
-        "spec": {
-            "type": "NodePort",
-            "selector": {
-                "app": service_id
-            }
-        }
+        "metadata": {"name": f"{service_id}-nodeport"},
+        "spec": {"type": "NodePort", "selector": {"app": service_id}},
     }
 
 
@@ -59,19 +53,8 @@ def create_cluster_ip_spec(service_id: str, ports: List[dict]):
     return {
         "apiVersion": "v1",
         "kind": "Service",
-        "metadata": {
-            "name": service_id,
-            "labels": {
-                "app": service_id
-            }
-        },
-        "spec": {
-            "type": "ClusterIp",
-            "selector": {
-                "app": service_id
-            },
-            "ports": ports
-        }
+        "metadata": {"name": service_id, "labels": {"app": service_id}},
+        "spec": {"type": "ClusterIp", "selector": {"app": service_id}, "ports": ports},
     }
 
 
@@ -80,28 +63,65 @@ def get_template():
     return {
         "apiVersion": "apps/v1",
         "kind": "Deployment",
-        "metadata": {
-            "name": "",
-            "labels": {
-                "app": ""
-            }
-        },
+        "metadata": {"name": "", "labels": {"app": ""}},
         "spec": {
             "replicas": 1,
-            "selector": {
-                "matchLabels": {
-                    "app": ""
-                }
-            },
+            "selector": {"matchLabels": {"app": ""}},
             "template": {
-                "metadata": {
-                    "labels": {
-                        "app": ""
-                    } 
-                },
-                "spec": {
-                    "containers": []
-                }
-            }
-        }
+                "metadata": {"labels": {"app": ""}},
+                "spec": {"containers": []},
+            },
+        },
     }
+
+
+def parse_service_spec_config(service_spec_config: dict):
+    """Parses service spec configuration and returns it as an named tuple.
+
+    Args:
+        service_spec_config: The specificon of the services from config file.
+    """
+    ServiceSpecConfig = namedtuple(
+        "ServiceSpecConfig",
+        [
+            "image",
+            "env_vars",
+            "service_port",
+            "no_dapr",
+            "args",
+            "port_forwards",
+            "mounts",
+        ],
+    )
+
+    no_dapr = False
+    container_image = None
+    service_port = None
+    env_vars = dict[str, Optional[str]]()
+    port_forwards = []
+    mounts = []
+    args = []
+
+    for config_entry in service_spec_config:
+        match config_entry["key"]:
+            case "image":
+                container_image = config_entry["value"]
+            case "env":
+                pair = config_entry["value"].split("=", 1)
+                env_vars[pair[0].strip()] = None
+                if len(pair) > 1:
+                    env_vars[pair[0].strip()] = pair[1].strip()
+            case "port":
+                    service_port = config_entry["value"]
+            case "no-dapr":
+                    no_dapr = config_entry["value"]
+            case "arg":
+                    args.append(config_entry["value"])
+            case "port-forward":
+                port_forwards.append(config_entry["value"])
+            case "mount":
+                mounts.append(config_entry["value"])
+
+    return ServiceSpecConfig(
+        container_image, env_vars, service_port, no_dapr, args, port_forwards, mounts
+    )

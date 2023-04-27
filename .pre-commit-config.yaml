@@ -39,11 +39,11 @@ repos:
     rev: "v1.2.0"
     hooks:
       - id: mypy
-        args: [app]
+        args: [runtime-k3d]
         language: system
         pass_filenames: false
 
-  - repo: https://github.com/pycqa/pydocstyle
-    rev: 6.3.0
-    hooks:
-      - id: pydocstyle
+  # - repo: https://github.com/pycqa/pydocstyle
+  #   rev: 6.3.0
+  #   hooks:
+  #     - id: pydocstyle

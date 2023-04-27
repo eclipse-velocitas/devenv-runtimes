@@ -4,36 +4,36 @@ imageMosquitto:
   - -c
   - /mosquitto-no-auth.conf
   name: mqtt-broker
-  nodePort: '{{.Values.imageMosquitto.nodePort}}'
-  nodePort1: '{{.Values.imageMosquitto.nodePort1}}'
+  nodePort: 30050
+  nodePort1: 30051
   port: 1883
-  port1: '{{.Values.imageMosquitto.port1}}'
+  port1: 9001
   pullPolicy: IfNotPresent
   repository: eclipse-mosquitto
   tag: latest
-  targetPort: '{{.Values.imageMosquitto.targetPort}}'
-  targetPort1: '{{.Values.imageMosquitto.targetPort1}}'
+  targetPort: 1883
+  targetPort1: 9001
 ---
 imageVehicleDataBroker:
   daprLogLevel: debug
   kuksadatabrokermetadatafile: /vss.json
   name: vehicledatabroker
-  nodePort: '{{.Values.imageVehicleDataBroker.nodePort}}'
+  nodePort: 30052
   port: 55555
   pullPolicy: Always
   repository: ghcr.io/eclipse/kuksa.val/databroker
   tag: 0.3.0
-  targetPort: '{{.Values.imageVehicleDataBroker.targetPort}}'
+  targetPort: 55555
 ---
 imageSeatService:
   daprLogLevel: debug
   name: seatservice
-  nodePort: '{{.Values.imageSeatService.nodePort}}'
+  nodePort: 30053
   port: 50051
   pullPolicy: Always
   repository: ghcr.io/eclipse/kuksa.val.services/seat_service
   tag: v0.2.0
-  targetPort: '{{.Values.imageSeatService.targetPort}}'
+  targetPort: 50051
 ---
 imageFeederCan:
   candumpfile: /data/candumpDefault.log
