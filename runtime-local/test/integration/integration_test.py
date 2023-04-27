@@ -12,9 +12,30 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import json
+from pathlib import Path
 from re import compile, Pattern
-from threading import Timer
 from subprocess import PIPE, Popen
+from threading import Timer
+
+
+def create_dummy_vspec_file():
+    """Creates an empty vspec json file in the project's cache directory
+    plus the respective 'vspec_file_path' cache variable pointing to it.
+    !!! Todo: Replace this workaround solution making assumptions about
+              the cache location.
+    """
+    cache_paths = Path("~/.velocitas/projects").expanduser().rglob("cache.json")
+    for cache_path in cache_paths:
+        vspec_path = cache_path.parent / "dummy_vspec.json"
+        with open(vspec_path, "w") as dummy_vspec_file:
+            dummy_vspec_file.write("{}\n")
+        with open(cache_path, mode="r", encoding="utf-8") as cache_file:
+            cache = json.load(cache_file)
+        cache["vspec_file_path"] = str(vspec_path)
+        with open(cache_path, mode="w", encoding="utf-8") as cache_file:
+            json.dump(cache, cache_file)
+
 
 command: str = "velocitas exec runtime-local"
 regex_runtime_up: Pattern[str] = compile(r"✔.* Starting runtime")
@@ -43,10 +64,12 @@ def run_command_until_logs_match(command: str, regex_service: Pattern[str]) -> b
 
 
 def test_runtime_up_successfully():
+    create_dummy_vspec_file()
     assert run_command_until_logs_match(f"{command} up", regex_runtime_up)
 
 
 def test_run_sevices_separately_successfully():
+    create_dummy_vspec_file()
     assert run_command_until_logs_match(f"{command} run-mosquitto", regex_mqtt)
     assert run_command_until_logs_match(f"{command} run-vehicledatabroker", regex_vdb)
     assert run_command_until_logs_match(f"{command} run-vehicleservices", regex_seatservice)
