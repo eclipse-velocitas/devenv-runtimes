@@ -84,9 +84,9 @@ def get_specific_service(service_id: str):
     services = get_services()
     services = list(filter(lambda service: service['id'] == service_id, services))
     if len(services) == 0:
-        raise RuntimeError("Service not defined")
+        raise RuntimeError(f"Service with id '{service_id}' not defined")
     if len(services) > 1:
-        raise RuntimeError("Multiple service definitions found, which to take?")
+        raise RuntimeError(f"Multiple service definitions of id '{service_id}' found, which to take?")
     return services[0]
 
 
@@ -150,7 +150,7 @@ def json_obj_to_flat_map(obj, prefix: str = "", separator: str = ".") -> dict[st
 
 
 def get_log_file_name(service_id: str) -> str:
-    """Builds the log file name for the given service.
+    """Build the log file name for the given service.
 
     Args:
         service_id (str): The ID of the service to log.
@@ -158,9 +158,7 @@ def get_log_file_name(service_id: str) -> str:
     Returns:
         str: The log file name.
     """
-    log_path = os.path.join(get_workspace_dir(), "logs")
-    os.makedirs(log_path, exist_ok=True)
-    return os.path.join(log_path, f"{service_id}.txt")
+    return os.path.join(get_workspace_dir(), "logs", f"{service_id}.txt")
 
 
 def create_log_file(service_id: str) -> TextIOWrapper:
@@ -173,6 +171,7 @@ def create_log_file(service_id: str) -> TextIOWrapper:
         TextIOWrapper: The log file.
     """
     log_file_name = get_log_file_name(service_id)
+    os.makedirs(os.path.dirname(log_file_name), exist_ok=True)
     return open(log_file_name, "w", encoding="utf-8")
 
 
@@ -184,6 +183,9 @@ def run_service(service_spec) -> subprocess.Popen:
 
     Args:
         service_spec: The specification of the service.
+
+    Returns:
+       The Popen object representing the root process running the required service
     """
     service_id = service_spec["id"]
 
@@ -266,12 +268,32 @@ def run_service(service_spec) -> subprocess.Popen:
         *args,
     ]
 
-    return spawn_process(docker_args, log, patterns, timeout_sec=60)
+    return spawn_process(docker_args, log, patterns, startup_timeout_sec=60)
 
 
 def spawn_process(
-        args: list[str], log: TextIOWrapper, patterns: list[Pattern[str]], timeout_sec: int
-):
+    args: list[str], log: TextIOWrapper, patterns: list[Pattern[str]], startup_timeout_sec: int
+) -> subprocess.Popen:
+    """Spawn the process defined by the passed args.
+
+    Args:
+        args:
+            The executable name to be spawned and its arguments
+        log:
+            Log file to receive the outputs (stdout + stderr) of the spawned process
+        patterns:
+            List of patterns, which match the lines in the log file to rate the
+            process being started up successfully.
+            All of the patterns need to match in any order.
+            If the list is empty, startup will be rated successfully without
+            doing any pattern matching.
+        startup_timeout_sec:
+            Timeout [in seconds] after which the spawned process gets killed,
+            if not all patterns did match so far
+
+    Returns:
+       The created Popen object
+    """
     with open(log.name, "r", encoding="utf-8") as monitor:
         log.write(" ".join(args) + "\n\n")
         log.flush()
@@ -282,17 +304,17 @@ def spawn_process(
             stdout=log,
         )
 
-        timer: Timer = Timer(timeout_sec, process.kill)
+        timer: Timer = Timer(startup_timeout_sec, process.kill)
         timer.start()
         for line in iter(monitor.readline, b""):
             if not timer.is_alive():
-                raise RuntimeError("Timeout reached after {timeout_sec} seconds, service killed!")
+                raise RuntimeError("Timeout reached after {startup_timeout_sec} seconds, service killed!")
             if process.poll() is not None:
                 raise RuntimeError("Service unexpectedly terminated")
             if line == "":
                 time.sleep(0.1)
                 continue
-            patterns[:] = filterfalse(lambda regex: regex.search(line), patterns)
+            patterns[:] = filterfalse(lambda pattern: pattern.search(line), patterns)
             if len(patterns) == 0:
                 timer.cancel()
                 break
@@ -301,6 +323,12 @@ def spawn_process(
 
 
 def stop_container(service_id, log=None):
+    """Stop the container representing the specified service.
+
+    Args:
+        service_id: The service_id of the container to stop.
+        log: Log stream to forward the outputs to.
+    """
     subprocess.call(
         [get_container_runtime_executable(), "stop", service_id],
         stderr=subprocess.STDOUT,
