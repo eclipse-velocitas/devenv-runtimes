@@ -41,20 +41,6 @@ def generate_ports_spec(service_spec_config):
         
     return ports
 
-def generate_port_forwarding_spec(service_spec_config):
-    port_forwards = []
-    i = 1
-    for port in service_spec_config.ports:
-        port_forwards.append(
-            {
-                f"sourcePort{i}": int(port),
-                f"targetPort{i}": int(port),
-            }
-        )
-        i = i + 1
-
-    return port_forwards
-
 
 def generate_values(service_spec):
     """Generates values specification from the given service spec.
@@ -82,7 +68,6 @@ def generate_values(service_spec):
 
     if service_spec_config.ports:
         value_spec[value_spec_key]["ports"] = generate_ports_spec(service_spec_config)
-        value_spec[value_spec_key]["port_forwards"] = generate_port_forwarding_spec(service_spec_config)
 
     return value_spec
 
