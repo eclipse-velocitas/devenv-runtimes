@@ -106,6 +106,35 @@
         ]
     },
     {
+        "id": "hvacservice",
+        "interfaces":[
+            "grpc://sdv.edge.comfort.hvac.v1.Hvac/SetAcStatus",
+            "grpc://sdv.edge.comfort.hvac.v1.Hvac/SetTemperature"
+        ],
+        "config": [
+            {
+                "key": "image",
+                "value": "ghcr.io/eclipse/kuksa.val.services/hvac_service:v0.2.0"
+            },
+            {
+                "key": "port",
+                "value": "50052"
+            },
+            {
+                "key": "env",
+                "value": "HVAC_ADDR=0.0.0.0:50052"
+            },
+            {
+                "key": "env",
+                "value": "VEHICLEDATABROKER_DAPR_APP_ID=vehicledatabroker"
+            },
+            {
+                "key": "start-pattern",
+                "value": ".*[cC]onnected to data broker.*"
+            }
+        ]
+    },
+    {
         "id": "feedercan",
         "interfaces":[],
         "config": [
