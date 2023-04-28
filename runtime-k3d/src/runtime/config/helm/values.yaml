@@ -3,13 +3,16 @@ imageMqttbroker:
   - mosquitto
   - -c
   - /mosquitto-no-auth.conf
-  nodePort: 30050
-  port: 1883
-  portForwards:
+  port_forwards:
   - sourcePort1: 1883
-    targetPort1: 18834
+    targetPort1: 1883
   - sourcePort2: 9001
     targetPort2: 9001
+  ports:
+  - nodePort1: 30883
+    port1: 1883
+  - nodePort2: 30001
+    port2: 9001
   pullPolicy: Always
   repository: eclipse-mosquitto
   tag: latest
@@ -20,11 +23,12 @@ imageVehicledatabroker:
     value: /vss.json
   - name: KUKSA_DATA_BROKER_PORT
     value: '55555'
-  nodePort: 30051
-  port: 55555
-  portForwards:
+  port_forwards:
   - sourcePort1: 55555
     targetPort1: 55555
+  ports:
+  - nodePort1: 30555
+    port1: 55555
   pullPolicy: Always
   repository: ghcr.io/eclipse/kuksa.val/databroker
   tag: 0.3.0
@@ -37,11 +41,12 @@ imageSeatservice:
     value: cansim
   - name: SERVICE_PORT
     value: '50051'
-  nodePort: 30052
-  port: 50051
-  portForwards:
+  port_forwards:
   - sourcePort1: 50051
     targetPort1: 50051
+  ports:
+  - nodePort1: 30051
+    port1: 50051
   pullPolicy: Always
   repository: ghcr.io/eclipse/kuksa.val.services/seat_service
   tag: v0.2.0
