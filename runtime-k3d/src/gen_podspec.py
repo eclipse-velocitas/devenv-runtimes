@@ -93,18 +93,22 @@ def create_podspec(templates, service_spec):
 
 
 def generate_pod_spec(template_pod, service_config):
-    pod = template_pod
-    pod["spec"]["containers"][0]["image"] = service_config.image
+    spec = template_pod["spec"]["containers"][0]
+    spec["image"] = service_config.image
     if service_config.args:
-        pod["spec"]["containers"][0]["args"] = (
-            "[ " + ", ".join(f'"{arg}"' for arg in service_config.args) + " ]"
-        )
+        spec["args"] = service_config.args
+
     if service_config.env_vars:
-        pod["spec"]["containers"][0]["env"] = get_env(service_config)
+        spec["env"] = get_env(service_config)
 
     if service_config.ports:
-        pod["spec"]["containers"][0]["ports"] = generate_port_spec(service_config)
-    return pod
+        spec["ports"] = generate_port_spec(service_config)
+    template_pod["spec"]["containers"][0] = spec
+    return template_pod
+
+
+def get_args(service_config):
+    return ", ".join(service_config.args)
 
 
 def get_env(service_config):
@@ -119,7 +123,7 @@ def generate_port_spec(service_config):
     for port in service_config.ports:
         ports.append(
             {
-                "name": "default",
+                "name": f"port{port}",
                 "containerPort": int(port),
                 "protocol": "TCP",
             }
@@ -150,7 +154,8 @@ if __name__ == "__main__":
         "--output_file_path",
         type=str,
         required=False,
-        help="Full path including name and file extension of the output file.")
+        help="Full path including name and file extension of the output file.",
+    )
     args = parser.parse_args()
 
     with open(
@@ -158,7 +163,7 @@ if __name__ == "__main__":
         "r",
         encoding="utf-8",
     ) as f:
-        templates = list(yaml.load_all(f, Loader=SafeLoader))
+        templates = list(yaml.safe_load_all(f))
 
     pods = init_template(templates)
     for service in get_services():
@@ -173,4 +178,4 @@ if __name__ == "__main__":
         "w",
         encoding="utf-8",
     ) as f:
-        yaml.dump_all(pods, f)
+        yaml.safe_dump_all(pods, f, sort_keys=False)
