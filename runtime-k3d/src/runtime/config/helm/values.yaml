@@ -1,47 +1,65 @@
-imageMosquitto:
+imageMqttbroker:
   args:
   - mosquitto
   - -c
   - /mosquitto-no-auth.conf
-  name: mqtt-broker
   nodePort: 30050
-  nodePort1: 30051
   port: 1883
-  port1: 9001
-  pullPolicy: IfNotPresent
+  portForwards:
+  - sourcePort1: 1883
+    targetPort1: 18834
+  - sourcePort2: 9001
+    targetPort2: 9001
+  pullPolicy: Always
   repository: eclipse-mosquitto
   tag: latest
-  targetPort: 1883
-  targetPort1: 9001
 ---
-imageVehicleDataBroker:
-  daprLogLevel: debug
-  kuksadatabrokermetadatafile: /vss.json
-  name: vehicledatabroker
-  nodePort: 30052
+imageVehicledatabroker:
+  environmentVariables:
+  - name: KUKSA_DATA_BROKER_METADATA_FILE
+    value: /vss.json
+  - name: KUKSA_DATA_BROKER_PORT
+    value: '55555'
+  nodePort: 30051
   port: 55555
+  portForwards:
+  - sourcePort1: 55555
+    targetPort1: 55555
   pullPolicy: Always
   repository: ghcr.io/eclipse/kuksa.val/databroker
   tag: 0.3.0
-  targetPort: 55555
 ---
-imageSeatService:
-  daprLogLevel: debug
-  name: seatservice
-  nodePort: 30053
+imageSeatservice:
+  environmentVariables:
+  - name: VEHICLEDATABROKER_DAPR_APP_ID
+    value: vehicledatabroker
+  - name: CAN
+    value: cansim
+  - name: SERVICE_PORT
+    value: '50051'
+  nodePort: 30052
   port: 50051
+  portForwards:
+  - sourcePort1: 50051
+    targetPort1: 50051
   pullPolicy: Always
   repository: ghcr.io/eclipse/kuksa.val.services/seat_service
   tag: v0.2.0
-  targetPort: 50051
 ---
-imageFeederCan:
-  candumpfile: /data/candumpDefault.log
-  daprLogLevel: debug
-  dbcfile: /data/dbcfileDefault.dbc
-  mapping: /data/mappingDefault.yml
-  mappingfile: /data/mappingDefault.yml
-  name: feedercan
+imageFeedercan:
+  environmentVariables:
+  - name: VEHICLEDATABROKER_DAPR_APP_ID
+    value: vehicledatabroker
+  - name: LOG_LEVEL
+    value: info,databroker=info,dbcfeeder.broker_client=info,dbcfeeder=info
+  - name: USECASE
+    value: databroker
+  - name: CANDUMP_FILE
+    value: /data/candumpDefault.log
+  - name: DBC_FILE
+    value: /data/dbcfileDefault.dbc
+  - name: MAPPING_FILE
+    value: /data/mappingDefault.yml
   pullPolicy: Always
   repository: ghcr.io/eclipse/kuksa.val.feeders/dbc2val
   tag: v0.1.1
