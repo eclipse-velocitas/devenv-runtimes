@@ -87,7 +87,7 @@ def create_cluster_ip_spec(service_id: str, ports: List[dict]):
         "apiVersion": "v1",
         "kind": "Service",
         "metadata": {"name": service_id, "labels": {"app": service_id}},
-        "spec": {"type": "ClusterIp", "selector": {"app": service_id}, "ports": ports},
+        "spec": {"type": "ClusterIP", "selector": {"app": service_id}, "ports": ports},
     }
 
 
