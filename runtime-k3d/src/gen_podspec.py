@@ -17,7 +17,9 @@ from lib import (
     create_nodeport_spec,
     get_script_path,
     get_services,
-    parse_service_spec_config,
+    parse_service_config,
+    generate_nodeport,
+    create_cluster_ip_spec,
 )
 from yaml.loader import SafeLoader
 
@@ -65,53 +67,76 @@ def create_podspec(templates, service_spec):
         templates: The list of the template specifications.
         service_spec: The specification of the service.
     """
-    global node_port
-
     service_id = service_spec["id"]
 
-    service_spec_config = parse_service_spec_config(service_spec["config"])
+    service_config = parse_service_config(service_spec["config"])
 
     template_pod = templates[find_service_spec(templates, "Pod", service_id)[0]]
-    template_pod["spec"]["containers"][0]["image"] = service_spec_config.image
-    if service_spec_config.args:
-        template_pod["spec"]["containers"][0]["args"] = (
-            "[ " + ", ".join(f'"{arg}"' for arg in service_spec_config.args) + " ]"
+
+    pod = generate_pod_spec(template_pod, service_config)
+    pods.append(pod)
+
+    for port in service_config.ports:
+        pods.append(generate_nodeport_service(service_id, port))
+
+    if "mosquitto" in service_config.image:
+        pods.append(
+            create_cluster_ip_spec(service_id, pod["spec"]["containers"][0]["ports"])
         )
-    if service_spec_config.env_vars:
-        template_pod["spec"]["containers"][0]["env"] = []
-        for key, value in service_spec_config.env_vars.items():
-            template_pod["spec"]["containers"][0]["env"].append(
-                {"name": key, "value": value}
-            )
-
-    pods.append(template_pod)
-    if service_spec_config.service_port:
-        template_pod["spec"]["containers"][0]["ports"] = [
-            {
-                "name": "default",
-                "containerPort": int(service_spec_config.service_port),
-                "protocol": "TCP",
-            }
-        ]
-
-    if service_spec_config.port_forwards:
-        nodeport_spec = create_nodeport_spec(service_id)
-        nodeport_spec["spec"]["ports"] = []
-        for port in service_spec_config.port_forwards:
-            source_target_ports = port.split(":")
-            nodeport_spec["spec"]["ports"].append(
-                {
-                    "port": int(source_target_ports[0]),
-                    "targetPort": int(source_target_ports[1]),
-                    "nodePort": node_port,
-                }
-            )
-            node_port = node_port + 1
-        pods.append(nodeport_spec)
 
     # TBD: mounts
 
     return pods
+
+
+def generate_pod_spec(template_pod, service_config):
+    pod = template_pod
+    pod["spec"]["containers"][0]["image"] = service_config.image
+    if service_config.args:
+        pod["spec"]["containers"][0]["args"] = (
+            "[ " + ", ".join(f'"{arg}"' for arg in service_config.args) + " ]"
+        )
+    if service_config.env_vars:
+        pod["spec"]["containers"][0]["env"] = get_env(service_config)
+
+    if service_config.ports:
+        pod["spec"]["containers"][0]["ports"] = generate_port_spec(service_config)
+    return pod
+
+
+def get_env(service_config):
+    env = []
+    for key, value in service_config.env_vars.items():
+        env.append({"name": key, "value": value})
+
+
+def generate_port_spec(service_config):
+    ports = []
+    for port in service_config.ports:
+        ports.append(
+            {
+                "name": "default",
+                "containerPort": int(port),
+                "protocol": "TCP",
+            }
+        )
+
+    return ports
+
+
+def generate_nodeport_service(service_id, port):
+    nodeport_spec = create_nodeport_spec(service_id)
+    nodeport_spec["spec"]["ports"] = []
+
+    targetPort = int(port)
+    nodeport_spec["spec"]["ports"].append(
+        {
+            "port": targetPort,
+            "targetPort": targetPort,
+            "nodePort": generate_nodeport(targetPort),
+        }
+    )
+    return nodeport_spec
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 [
     {
         "id": "mqtt-broker",
-        "interfaces":[
+        "interfaces": [
             "mqtt"
         ],
         "config": [
@@ -18,12 +18,8 @@
                 "value": "1883"
             },
             {
-                "key": "port-forward",
-                "value": "1883:1883"
-            },
-            {
-                "key": "port-forward",
-                "value": "9001:9001"
+                "key": "port",
+                "value": "9001"
             },
             {
                 "key": "arg",
@@ -75,7 +71,7 @@
     },
     {
         "id": "seatservice",
-        "interfaces":[
+        "interfaces": [
             "grpc://sdv.edge.comfort.seats.v1.Seats/MoveComponent"
         ],
         "config": [
@@ -107,7 +103,7 @@
     },
     {
         "id": "feedercan",
-        "interfaces":[],
+        "interfaces": [],
         "config": [
             {
                 "key": "image",

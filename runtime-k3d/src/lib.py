@@ -44,6 +44,16 @@ def create_nodeport_spec(service_id: str):
     }
 
 
+def generate_nodeport(port: int):
+    """Creates nodeport from the last 3 digits of the targetport in the range of 30000-32767.
+
+    Args:
+        port: The port to be used to generate the nodeport.
+    """
+    nodeport = f"{(port%1000):03d}"
+    return int(f"30{nodeport}")
+
+
 def create_cluster_ip_spec(service_id: str, ports: List[dict]):
     """Creates cluster ip spec for the given service_id.
 
@@ -75,7 +85,7 @@ def get_template():
     }
 
 
-def parse_service_spec_config(service_spec_config: dict):
+def parse_service_config(service_spec_config: dict):
     """Parses service spec configuration and returns it as an named tuple.
 
     Args:
@@ -86,19 +96,17 @@ def parse_service_spec_config(service_spec_config: dict):
         [
             "image",
             "env_vars",
-            "service_port",
             "no_dapr",
             "args",
-            "port_forwards",
+            "ports",
             "mounts",
         ],
     )
 
     no_dapr = False
     container_image = None
-    service_port = None
     env_vars = dict[str, Optional[str]]()
-    port_forwards = []
+    ports = []
     mounts = []
     args = []
 
@@ -111,17 +119,13 @@ def parse_service_spec_config(service_spec_config: dict):
                 env_vars[pair[0].strip()] = None
                 if len(pair) > 1:
                     env_vars[pair[0].strip()] = pair[1].strip()
-            case "port":
-                    service_port = config_entry["value"]
             case "no-dapr":
-                    no_dapr = config_entry["value"]
+                no_dapr = config_entry["value"]
             case "arg":
-                    args.append(config_entry["value"])
-            case "port-forward":
-                port_forwards.append(config_entry["value"])
+                args.append(config_entry["value"])
+            case "port":
+                ports.append(config_entry["value"])
             case "mount":
                 mounts.append(config_entry["value"])
 
-    return ServiceSpecConfig(
-        container_image, env_vars, service_port, no_dapr, args, port_forwards, mounts
-    )
+    return ServiceSpecConfig(container_image, env_vars, no_dapr, args, ports, mounts)

@@ -21,7 +21,7 @@ from lib import (
     get_script_path,
     get_services,
     get_template,
-    parse_service_spec_config,
+    parse_service_config,
 )
 from yaml.loader import SafeLoader
 
@@ -50,7 +50,7 @@ def generate_values_and_templates(values_spec_template, service_spec):
     global node_port
     service_id = service_spec["id"]
 
-    service_spec_config = parse_service_spec_config(service_spec["config"])
+    service_spec_config = parse_service_config(service_spec["config"])
 
     value_spec = values_spec_template[
         find_service_spec_index(values_spec_template, service_id)
