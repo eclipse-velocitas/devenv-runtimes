@@ -68,7 +68,7 @@ def create_podspec(templates, service_spec):
         service_spec: The specification of the service.
     """
     service_id = service_spec["id"]
-
+    pods = []
     service_config = parse_service_config(service_spec["config"])
 
     template_pod = templates[find_service_spec(templates, "Pod", service_id)[0]]
@@ -108,6 +108,7 @@ def get_env(service_config):
     env = []
     for key, value in service_config.env_vars.items():
         env.append({"name": key, "value": value})
+    return env
 
 
 def generate_port_spec(service_config):
