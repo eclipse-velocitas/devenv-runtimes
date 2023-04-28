@@ -19,6 +19,29 @@ from collections import namedtuple
 from typing import List, Optional
 
 
+def require_env(name: str) -> str:
+    """Require and return an environment variable.
+
+    Args:
+        name (str): The name of the variable.
+
+    Raises:
+        ValueError: In case the environment variable is not set.
+
+    Returns:
+        str: The value of the variable.
+    """
+    var = os.getenv(name)
+    if not var:
+        raise ValueError(f"Environment variable {name!r} not set!")
+    return var
+
+
+def get_workspace_dir() -> str:
+    """Return the workspace directory."""
+    return require_env("VELOCITAS_WORKSPACE_DIR")
+
+
 def get_script_path() -> str:
     """Return the absolute path to the directory the invoked Python script
     is located in."""

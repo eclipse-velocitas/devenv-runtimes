@@ -12,8 +12,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import argparse
+import os
 import yaml
 from lib import (
+    get_workspace_dir,
     create_nodeport_spec,
     get_script_path,
     get_services,
@@ -141,6 +144,15 @@ def generate_nodeport_service(service_id, port):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser("generate-podspec")
+    parser.add_argument(
+        "-o",
+        "--output_file_path",
+        type=str,
+        required=False,
+        help="Full path including name and file extension of the output file.")
+    args = parser.parse_args()
+
     with open(
         f"{get_script_path()}/runtime/config/podspec/runtime_template.yaml",
         "r",
@@ -152,8 +164,12 @@ if __name__ == "__main__":
     for service in get_services():
         pods.extend(create_podspec(templates, service_spec=service))
 
+    output_file_path = args.output_file_path
+    if output_file_path is None:
+        output_file_path = os.path.join(get_workspace_dir(), "podspec.yaml")
+
     with open(
-        f"{get_script_path()}/runtime/config/podspec/runtime_generated.yaml",
+        output_file_path,
         "w",
         encoding="utf-8",
     ) as f:
