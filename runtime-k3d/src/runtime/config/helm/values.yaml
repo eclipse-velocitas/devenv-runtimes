@@ -3,28 +3,30 @@ imageMqttbroker:
   - mosquitto
   - -c
   - /mosquitto-no-auth.conf
+  name: mqttbroker
   ports:
-  - nodePort1: 30883
-    port1: 1883
-  - nodePort2: 30001
-    port2: 9001
+  - nodePort: 30883
+    port: 1883
+  - nodePort: 30001
+    port: 9001
   pullPolicy: Always
   repository: eclipse-mosquitto
   tag: latest
----
+
 imageVehicledatabroker:
   environmentVariables:
   - name: KUKSA_DATA_BROKER_METADATA_FILE
     value: /vss.json
   - name: KUKSA_DATA_BROKER_PORT
     value: '55555'
+  name: vehicledatabroker
   ports:
-  - nodePort1: 30555
-    port1: 55555
+  - nodePort: 30555
+    port: 55555
   pullPolicy: Always
   repository: ghcr.io/eclipse/kuksa.val/databroker
   tag: 0.3.0
----
+
 imageSeatservice:
   environmentVariables:
   - name: VEHICLEDATABROKER_DAPR_APP_ID
@@ -33,13 +35,14 @@ imageSeatservice:
     value: cansim
   - name: SERVICE_PORT
     value: '50051'
+  name: seatservice
   ports:
-  - nodePort1: 30051
-    port1: 50051
+  - nodePort: 30051
+    port: 50051
   pullPolicy: Always
   repository: ghcr.io/eclipse/kuksa.val.services/seat_service
   tag: v0.2.0
----
+
 imageFeedercan:
   environmentVariables:
   - name: VEHICLEDATABROKER_DAPR_APP_ID
@@ -54,6 +57,7 @@ imageFeedercan:
     value: /data/dbcfileDefault.dbc
   - name: MAPPING_FILE
     value: /data/mappingDefault.yml
+  name: feedercan
   pullPolicy: Always
   repository: ghcr.io/eclipse/kuksa.val.feeders/dbc2val
   tag: v0.1.1

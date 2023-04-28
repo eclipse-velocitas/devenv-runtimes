@@ -11,7 +11,7 @@
 # under the License.
 #
 # SPDX-License-Identifier: Apache-2.0
-
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -32,9 +32,9 @@ spec:
           persistentVolumeClaim:
             claimName: pv-claim
       containers:
-      - image: busybox
-        name: bash
-        volumeMounts:
-          - mountPath: "/data"
-            name: pv-storage
-        command: ["ping", "127.0.0.1"]
+        - image: busybox
+          name: bash
+          volumeMounts:
+            - mountPath: "/data"
+              name: pv-storage
+          command: ["ping", "127.0.0.1"]

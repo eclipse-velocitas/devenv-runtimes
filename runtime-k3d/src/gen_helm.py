@@ -29,16 +29,18 @@ def generate_env_vars_spec(service_spec_config):
 
     return envs
 
+
 def generate_ports_spec(service_spec_config):
     ports = []
     i = 1
     for port in service_spec_config.ports:
-        ports.append({
-            f"port{i}": int(port),
-            f"nodePort{i}": generate_nodeport(int(port)),
-        })
+        ports.append(
+            {
+                "port": int(port),
+                "nodePort": generate_nodeport(int(port)),
+            }
+        )
         i = i + 1
-        
     return ports
 
 
@@ -47,13 +49,14 @@ def generate_values(service_spec):
     Args:
         service_spec: The spec of the service.
     """
-    service_id = re.sub(r'[^a-zA-Z\s]', '', service_spec["id"])
+    service_id = re.sub(r"[^a-zA-Z\s]", "", service_spec["id"])
 
     service_spec_config = parse_service_config(service_spec["config"])
 
     value_spec_key = f"image{service_id.capitalize()}"
     value_spec = {value_spec_key: {}}
 
+    value_spec[value_spec_key]["name"] = service_id
     value_spec[value_spec_key]["repository"] = service_spec_config.image.split(":")[0]
     value_spec[value_spec_key]["tag"] = service_spec_config.image.split(":")[1]
     value_spec[value_spec_key]["pullPolicy"] = "Always"
@@ -78,9 +81,9 @@ if __name__ == "__main__":
         services.append(generate_values(service))
 
     with open(
-        f"{get_script_path()}/runtime/config/helm/values.yaml", "w", 
+        f"{get_script_path()}/runtime/config/helm/values.yaml", "w",
         encoding="utf-8"
     ) as f:
-        yaml.dump_all(services, f)
+        f.write(yaml.dump_all(services).replace("---", ""))
 
     print("Generation has been finished!")

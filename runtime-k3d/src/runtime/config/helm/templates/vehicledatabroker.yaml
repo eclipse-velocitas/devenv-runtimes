@@ -56,8 +56,8 @@ spec:
               value: "{{ .value }}"
           {{- end }}
         {{- end }}
-        # TODO: This need to be checked and probably reworked again
         {{- if .Values.vspecFilePath }}
+        # TODO: This need to be checked and probably reworked again
           env:
             - name: KUKSA_DATA_BROKER_METADATA_FILE
               value: "{{.Values.vspecFilePath}}"
@@ -80,7 +80,7 @@ spec:
   selector:
     app: {{.Values.imageVehicledatabroker.name}}
   ports:
-  {{- with (index .Values.imageSeatservice.ports 0) }}
+  {{- with (index .Values.imageVehicledatabroker.ports 0) }}
     - port: {{.port}}
       targetPort: {{.port}}
       nodePort: {{.nodePort}}
