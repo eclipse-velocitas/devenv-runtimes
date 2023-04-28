@@ -93,6 +93,16 @@
                 {
                     "id": "uninstall_runtime",
                     "executable": "./runtime-k3d/src/runtime/uninstall_runtime.sh"
+                },
+                {
+                    "id": "generate-podspec",
+                    "executable": "python3",
+                    "args": [ "./runtime-k3d/src/gen_podspec.py" ]
+                },
+                {
+                    "id": "generate-helm",
+                    "executable": "python3",
+                    "args": [ "./runtime-k3d/src/gen_helm.py" ]
                 }
             ],
             "start": [
