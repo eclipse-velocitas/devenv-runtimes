@@ -102,6 +102,8 @@ def get_dapr_sidecar_args(
 ) -> Tuple[list[str], dict[str, Optional[str]]]:
     """Return all arguments to spawn a dapr sidecar for the given app."""
     env = dict()
+    env["DAPR_GRPC_PORT"] = None
+    env["DAPR_HTTP_PORT"] = None
 
     args = [
         "dapr",
