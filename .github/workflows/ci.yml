@@ -64,7 +64,7 @@ jobs:
           cd runtime-local/test
           velocitas init
 
-      - name: Run integration test
+      - name: Run integration tests for runtime-local
         run: |
           cd runtime-local/test
           pytest -s ./integration/integration_test.py
