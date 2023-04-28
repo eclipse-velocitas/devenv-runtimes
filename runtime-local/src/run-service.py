@@ -20,7 +20,7 @@ import time
 from typing import Dict
 from yaspin import yaspin
 
-from lib import get_specific_service, run_service, stop_container, stop_service
+from lib import get_log_file_name, get_specific_service, run_service, stop_container, stop_service
 
 
 spawned_processes: Dict[str, subprocess.Popen] = {}
@@ -39,6 +39,11 @@ def run_specific_service(service_id: str) -> None:
             spinner.write(error.args)
             spinner.fail("💥 ")
             terminate_spawned_processes()
+            print(f"Starting {service_id=} failed")
+            with open(get_log_file_name(service_id), mode="r", encoding="utf-8") as log:
+                print(f">>>> Start log of {service_id} >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                print(log.read(), end="")
+                print(f"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< End log of {service_id} <<<<")
 
 
 def wait_while_processes_are_running():
