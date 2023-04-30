@@ -147,17 +147,7 @@ def generate_nodeport_service(service_id, port):
     return nodeport_spec
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser("generate-podspec")
-    parser.add_argument(
-        "-o",
-        "--output_file_path",
-        type=str,
-        required=False,
-        help="Full path including name and file extension of the output file.",
-    )
-    args = parser.parse_args()
-
+def gen_podspec(output_file_path: str):
     with open(
         f"{get_script_path()}/runtime/config/podspec/runtime_template.yaml",
         "r",
@@ -169,13 +159,31 @@ if __name__ == "__main__":
     for service in get_services():
         pods.extend(create_podspec(templates, service_spec=service))
 
-    output_file_path = args.output_file_path
-    if output_file_path is None:
-        output_file_path = os.path.join(get_workspace_dir(), "podspec.yaml")
-
     with open(
         output_file_path,
         "w",
         encoding="utf-8",
     ) as f:
         yaml.safe_dump_all(pods, f, sort_keys=False)
+
+
+def main():
+    parser = argparse.ArgumentParser("generate-podspec")
+    parser.add_argument(
+        "-o",
+        "--output_file_path",
+        type=str,
+        required=False,
+        help="Full path including name and file extension of the output file.",
+    )
+    args = parser.parse_args()
+
+    output_file_path = args.output_file_path
+    if output_file_path is None:
+        output_file_path = os.path.join(get_workspace_dir(), "podspec.yaml")
+
+    gen_podspec(output_file_path)
+
+
+if __name__ == "__main__":
+    main()

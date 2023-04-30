@@ -84,7 +84,8 @@
                 },
                 {
                     "id": "deploy_runtime",
-                    "executable": "./runtime-k3d/src/runtime/deploy_runtime.sh"
+                    "executable": "python3",
+                    "args": [ "./runtime-k3d/src/deploy_runtime.py" ]
                 },
                 {
                     "id": "reset_controlplane",
