@@ -101,10 +101,8 @@ def copy_helm_chart(output_path: str):
 
 def gen_helm(output_path: str):
     os.makedirs(output_path, exist_ok=True)
-    print(f"Outputting helm to {output_path!r}")
     copy_helm_chart(output_path)
     generate_values_file(output_path)
-    print("Generation has been finished!")
 
 
 def main():
