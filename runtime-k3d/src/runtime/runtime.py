@@ -19,19 +19,32 @@ from gen_helm import gen_helm
 
 from yaspin.core import Yaspin
 
+
 def is_runtime_installed() -> bool:
-    return subprocess.call(["helm", "status", "vehicleappruntime"], stdout=subprocess.DEVNULL) == 0
+    return subprocess.call([
+        "helm",
+        "status",
+        "vehicleappruntime"
+    ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0
 
 
 def retag_docker_image(image_name: str):
-    subprocess.check_call(["docker", "pull", image_name], stdout=subprocess.DEVNULL)
+    subprocess.check_call([
+        "docker",
+        "pull",
+        image_name
+    ], stdout=subprocess.DEVNULL)
     subprocess.check_call([
         "docker",
         "tag",
         image_name,
         f"localhost:12345/{image_name}"
-        ], stdout=subprocess.DEVNULL)
-    subprocess.check_call(["docker", "push", f"localhost:12345/{image_name}"], stdout=subprocess.DEVNULL)
+    ], stdout=subprocess.DEVNULL)
+    subprocess.check_call([
+        "docker",
+        "push",
+        f"localhost:12345/{image_name}"
+    ], stdout=subprocess.DEVNULL)
 
 
 def retag_docker_images():
