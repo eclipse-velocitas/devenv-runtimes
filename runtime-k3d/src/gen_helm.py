@@ -14,6 +14,7 @@
 
 import re
 import yaml
+import os
 from lib import (
     get_script_path,
     get_services,
@@ -79,6 +80,9 @@ def gen_helm(output_path: str):
     services = []
     for service in get_services():
         services.append(generate_values(service))
+
+    os.makedirs(output_path, exist_ok=True)
+    print(f"Outputting helm to {output_path!r}")
 
     with open(
         f"{output_path}/values.yaml", "w",

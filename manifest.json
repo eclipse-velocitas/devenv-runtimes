@@ -79,21 +79,9 @@
             "type": "runtime",
             "programs": [
                 {
-                    "id": "configure_controlplane",
-                    "executable": "./runtime-k3d/src/runtime/configure_controlplane.sh"
-                },
-                {
-                    "id": "deploy_runtime",
+                    "id": "runtime-up",
                     "executable": "python3",
-                    "args": [ "./runtime-k3d/src/deploy_runtime.py" ]
-                },
-                {
-                    "id": "reset_controlplane",
-                    "executable": "./runtime-k3d/src/runtime/reset_controlplane.sh"
-                },
-                {
-                    "id": "uninstall_runtime",
-                    "executable": "./runtime-k3d/src/runtime/uninstall_runtime.sh"
+                    "args": [ "./runtime-k3d/src/runtime-up.py" ]
                 },
                 {
                     "id": "generate-podspec",
