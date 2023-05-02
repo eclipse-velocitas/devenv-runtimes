@@ -12,7 +12,20 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+# flake8: noqa: E402 module level import
 from typing import Dict, List, NamedTuple, Optional
+import os
+from pathlib import Path
+import sys
+
+sys.path.append(os.path.join(Path(__file__).parents[2], "velocitas_lib"))
+from velocitas_lib import (
+    replace_variables,
+    get_cache_data,
+    json_obj_to_flat_map,
+    replace_variables,
+    get_script_path,
+)
 
 
 def create_nodeport_spec(service_id: str):
@@ -77,7 +90,15 @@ def parse_service_config(service_spec_config: dict):
     mounts = []
     args = []
 
+    variables = json_obj_to_flat_map(get_cache_data(), "builtin.cache")
+    variables["builtin.script_dir"] = get_script_path()
+
     for config_entry in service_spec_config:
+        if not isinstance(config_entry["value"], (int, float, bool)):
+            if "builtin" in config_entry["value"]:
+                config_entry["value"] = replace_variables(
+                    config_entry["value"], variables
+                )
         match config_entry["key"]:
             case "image":
                 container_image = config_entry["value"]

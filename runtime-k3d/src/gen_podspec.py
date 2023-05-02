@@ -18,6 +18,7 @@ import os
 import ruamel.yaml as yaml
 from pathlib import Path
 import sys
+
 sys.path.append(os.path.join(Path(__file__).parents[2], "velocitas_lib"))
 from velocitas_lib import get_services, get_workspace_dir, get_script_path
 from lib import (
@@ -121,7 +122,7 @@ def generate_container_mount(service_config):
     for mount in service_config.mounts:
         mount_path = mount.split(":")[1]
         if "." in mount_path:
-            mount_path = os.path.dirname(mount_path)
+            mount_path = mount.split("/vspec.json")[0]
         mounts.append({"mountPath": f"{mount_path}", "name": "pv-storage"})
     return mounts
 
