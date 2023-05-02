@@ -12,14 +12,17 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import argparse
 import re
 import yaml
 import os
+import shutil
 from lib import (
     get_script_path,
     get_services,
     parse_service_config,
-    generate_nodeport
+    generate_nodeport,
+    get_workspace_dir,
 )
 
 
@@ -45,7 +48,7 @@ def generate_ports_spec(service_spec_config):
     return ports
 
 
-def generate_values(service_spec):
+def generate_values_by_service(service_spec):
     """Generates values specification from the given service spec.
     Args:
         service_spec: The spec of the service.
@@ -76,20 +79,51 @@ def generate_values(service_spec):
     return value_spec
 
 
-def gen_helm(output_path: str):
+def generate_values_file(output_path: str):
     services = []
     for service in get_services():
-        services.append(generate_values(service))
-
-    os.makedirs(output_path, exist_ok=True)
-    print(f"Outputting helm to {output_path!r}")
-
-    with open(
-        f"{output_path}/values.yaml", "w",
-        encoding="utf-8"
-    ) as f:
+        services.append(generate_values_by_service(service))
+    with open(f"{output_path}/values.yaml", "w", encoding="utf-8") as f:
         f.write(yaml.dump_all(services).replace("---", ""))
 
 
+def copy_helm_chart(output_path: str):
+    shutil.copytree(
+        f"{get_script_path()}/runtime/config/helm",
+        output_path,
+        symlinks=False,
+        ignore=None,
+        copy_function=shutil.copy2,
+        ignore_dangling_symlinks=False,
+        dirs_exist_ok=True,
+    )
+
+
+def gen_helm(output_path: str):
+    os.makedirs(output_path, exist_ok=True)
+    print(f"Outputting helm to {output_path!r}")
+    copy_helm_chart(output_path)
+    generate_values_file(output_path)
+    print("Generation has been finished!")
+
+
+def main():
+    parser = argparse.ArgumentParser("generate-helm")
+    parser.add_argument(
+        "-o",
+        "--output_path",
+        type=str,
+        required=False,
+        help="Destination Path for the generated Helm Chart and templates.",
+    )
+    args = parser.parse_args()
+
+    output_path = args.output_path
+    if output_path is None:
+        output_path = os.path.join(get_workspace_dir(), "./helm")
+
+    gen_helm(output_path)
+
+
 if __name__ == "__main__":
-    gen_helm(f"{get_script_path()}/runtime/config/helm")
+    main()
