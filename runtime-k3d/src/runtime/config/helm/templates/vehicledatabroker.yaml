@@ -58,9 +58,12 @@ spec:
         {{- end }}
           volumeMounts:
           - name: vspec
-            {{- $envs := .Values.imageVehicledatabroker.environmentVariables -}}
-            mountPath: {{ get $envs "KUKSA_DATA_BROKER_METADATA_FILE" }}
+            {{- range .Values.imageVehicledatabroker.environmentVariables }}
+            {{- if eq .name "KUKSA_DATA_BROKER_METADATA_FILE"}}
+            mountPath: {{ .value }}
             subPath: vspec.json
+            {{- end }}
+            {{- end }}
       volumes:
         - name: vspec
           configMap:
