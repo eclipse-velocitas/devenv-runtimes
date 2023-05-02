@@ -17,6 +17,7 @@ import subprocess
 from lib import get_services, parse_service_config
 from gen_helm import gen_helm
 
+from yaspin.core import Yaspin
 
 def is_runtime_installed() -> bool:
     return subprocess.call(["helm", "status", "vehicleappruntime"]) == 0
@@ -67,13 +68,16 @@ def uninstall_runtime():
     ])
 
 
-def deploy_runtime():
+def deploy_runtime(spinner: Yaspin):
+    status = "Deploying runtime... "
     if not is_runtime_installed():
         gen_helm("./helm")
         retag_docker_images()
         install_runtime("./helm")
+        status = status + "installed."
     else:
-        print("Runtime already installed!")
+        status = status + "already installed."
+    spinner.write(status)
 
 
 def undeploy_runtime():

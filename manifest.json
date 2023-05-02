@@ -93,6 +93,20 @@
                     "executable": "python3",
                     "args": [ "./runtime-k3d/src/gen_helm.py" ]
                 }
+            ],
+            "variables": [
+                {
+                    "name": "daprRuntimeVersion",
+                    "type": "string",
+                    "description": "Version of the dapr.io runtime to use.",
+                    "default": "1.10.3"
+                },
+                {
+                    "name": "daprCliVersion",
+                    "type": "string",
+                    "description": "Version of the dapr.io CLI to use.",
+                    "default": "1.10.0"
+                }
             ]
         },
         {
@@ -107,20 +121,6 @@
                 {
                     "id": "deploy_vehicleapp",
                     "executable": "./runtime-k3d/src/deployment/deploy_vehicleapp.sh"
-                }
-            ],
-            "variables": [
-                {
-                    "name": "daprRuntimeVersion",
-                    "type": "string",
-                    "description": "Version of the dapr.io runtime to use.",
-                    "default": "1.10.3"
-                },
-                {
-                    "name": "daprCliVersion",
-                    "type": "string",
-                    "description": "Version of the dapr.io CLI to use.",
-                    "default": "1.10.0"
                 }
             ]
         }
