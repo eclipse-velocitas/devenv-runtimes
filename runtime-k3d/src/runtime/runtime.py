@@ -20,18 +20,18 @@ from gen_helm import gen_helm
 from yaspin.core import Yaspin
 
 def is_runtime_installed() -> bool:
-    return subprocess.call(["helm", "status", "vehicleappruntime"]) == 0
+    return subprocess.call(["helm", "status", "vehicleappruntime"], stdout=subprocess.DEVNULL) == 0
 
 
 def retag_docker_image(image_name: str):
-    subprocess.check_call(["docker", "pull", image_name])
+    subprocess.check_call(["docker", "pull", image_name], stdout=subprocess.DEVNULL)
     subprocess.check_call([
         "docker",
         "tag",
         image_name,
         f"localhost:12345/{image_name}"
-        ])
-    subprocess.check_call(["docker", "push", f"localhost:12345/{image_name}"])
+        ], stdout=subprocess.DEVNULL)
+    subprocess.check_call(["docker", "push", f"localhost:12345/{image_name}"], stdout=subprocess.DEVNULL)
 
 
 def retag_docker_images():
@@ -42,7 +42,6 @@ def retag_docker_images():
 
 
 def install_runtime(helm_output_path: str):
-    print(f"reading helm from {helm_output_path!r}")
     subprocess.check_call([
         "helm",
         "install",
@@ -56,7 +55,7 @@ def install_runtime(helm_output_path: str):
         "--timeout",
         "60s",
         "--debug"
-    ])
+    ], stdout=subprocess.DEVNULL)
 
 
 def uninstall_runtime():
@@ -65,7 +64,7 @@ def uninstall_runtime():
         "uninstall",
         "vehicleappruntime",
         "--wait"
-    ])
+    ], stdout=subprocess.DEVNULL)
 
 
 def deploy_runtime(spinner: Yaspin):

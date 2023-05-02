@@ -21,8 +21,12 @@ from yaspin import yaspin
 def runtime_up():
     """Start up the K3D runtime."""
     with yaspin("Starting k3d runtime...") as spinner:
-        configure_controlplane(spinner)
-        deploy_runtime(spinner)
+        try:
+            configure_controlplane(spinner)
+            deploy_runtime(spinner)
+            spinner.ok()
+        except Exception as err:
+            spinner.fail(err)
 
 
 if __name__ == "__main__":
