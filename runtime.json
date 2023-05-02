@@ -57,7 +57,7 @@
             },
             {
                 "key": "env",
-                "value": "KUKSA_DATA_BROKER_METADATA_FILE=/vss.json"
+                "value": "KUKSA_DATA_BROKER_METADATA_FILE=/config/vss.json"
             },
             {
                 "key": "env",
@@ -65,7 +65,7 @@
             },
             {
                 "key": "mount",
-                "value": "${{ builtin.cache.vspec_file_path }}:/vss.json"
+                "value": "${{ builtin.cache.vspec_file_path }}:/config/vss.json"
             }
         ]
     },

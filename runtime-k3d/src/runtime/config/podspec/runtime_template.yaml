@@ -30,21 +30,6 @@ spec:
     command: ["ping", "127.0.0.1"]
 ---
 apiVersion: v1
-data:
-  candump: /mnt/data/candump.log
-  dbcfile: /mnt/data/dbcfile.dbc
-  mapping: /mnt/data/mapping.yml
-  usecase: /mnt/data/databroker
-kind: ConfigMap
-metadata:
-  annotations:
-    kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"v1","data":{"candump":"/mnt/data/candump.log","dbcfile":"/mnt/data/dbcfile.dbc","mapping":"/mnt/data/mapping.yml","usecase":"/mnt/data/databroker"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"feeder-config","namespace":"default"}}
-    meta.helm.sh/release-name: vehicleappruntime
-    meta.helm.sh/release-namespace: default
-  name: feeder-config
----
-apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: pv-volume

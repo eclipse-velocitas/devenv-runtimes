@@ -48,9 +48,6 @@ def init_template(templates):
     template = []
     template.append(templates[find_service_spec(templates, "Pod", "bash")[0]])
     template.append(
-        templates[find_service_spec(templates, "ConfigMap", "feeder-config")[0]]
-    )
-    template.append(
         templates[find_service_spec(templates, "PersistentVolume", "pv-volume")[0]]
     )
     template.append(
