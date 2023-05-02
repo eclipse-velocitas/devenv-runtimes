@@ -85,9 +85,11 @@ def deploy_runtime(spinner: Yaspin):
     spinner.write(status)
 
 
-def undeploy_runtime():
+def undeploy_runtime(spinner: Yaspin):
+    status = "> Undeploying runtime... "
     if is_runtime_installed():
-        print("Uninstalling runtime...")
         uninstall_runtime()
+        status = status + "uninstalled!"
     else:
-        print("Runtime is not installed.")
+        status = status + "runtime is not installed."
+    spinner.write(status)

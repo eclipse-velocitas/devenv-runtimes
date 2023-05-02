@@ -84,6 +84,11 @@
                     "args": [ "./runtime-k3d/src/runtime-up.py" ]
                 },
                 {
+                    "id": "runtime-down",
+                    "executable": "python3",
+                    "args": [ "./runtime-k3d/src/runtime-down.py" ]
+                },
+                {
                     "id": "generate-podspec",
                     "executable": "python3",
                     "args": [ "./runtime-k3d/src/gen_podspec.py" ]

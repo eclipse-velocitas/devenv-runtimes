@@ -193,12 +193,13 @@ def configure_controlplane(spinner: Yaspin):
     spinner.write(status)
 
 
-def reset_controlplane():
+def reset_controlplane(spinner: Yaspin):
+    status = "> Checking K3D cluster... "
     if cluster_exists():
-        print("Uninstalling runtime...")
         delete_cluster()
+        status = status + "deleted"
     else:
-        print("Control plane is not configured, skipping cluster deletion.")
+        status = status + "skipped, cluster does not exist"
 
     if registry_exists():
         print("Uninstalling runtime...")
