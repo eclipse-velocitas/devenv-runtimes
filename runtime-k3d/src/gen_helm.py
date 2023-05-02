@@ -12,18 +12,17 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+# flake8: noqa: E402 module level import
 import argparse
 import re
 import yaml
 import os
 import shutil
-from lib import (
-    get_script_path,
-    get_services,
-    parse_service_config,
-    generate_nodeport,
-    get_workspace_dir,
-)
+from pathlib import Path
+import sys
+sys.path.append(os.path.join(Path(__file__).parents[2], "velocitas_lib"))
+from velocitas_lib import get_services, get_workspace_dir, get_script_path
+from lib import parse_service_config, generate_nodeport
 
 
 def generate_env_vars_spec(service_spec_config):

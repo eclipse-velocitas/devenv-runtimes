@@ -12,44 +12,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import json
-import os
-import sys
 from typing import Dict, List, NamedTuple, Optional
-
-
-def require_env(name: str) -> str:
-    """Require and return an environment variable.
-
-    Args:
-        name (str): The name of the variable.
-
-    Raises:
-        ValueError: In case the environment variable is not set.
-
-    Returns:
-        str: The value of the variable.
-    """
-    var = os.getenv(name)
-    if not var:
-        raise ValueError(f"Environment variable {name!r} not set!")
-    return var
-
-
-def get_workspace_dir() -> str:
-    """Return the workspace directory."""
-    return require_env("VELOCITAS_WORKSPACE_DIR")
-
-
-def get_script_path() -> str:
-    """Return the absolute path to the directory the invoked Python script
-    is located in."""
-    return os.path.dirname(os.path.realpath(sys.argv[0]))
-
-
-def get_services():
-    """Return all specified services as Python object."""
-    return json.load(open(f"{get_script_path()}/../../runtime.json", encoding="utf-8"))
 
 
 def create_nodeport_spec(service_id: str):

@@ -12,27 +12,30 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+# flake8: noqa: E402 module level import
 from io import TextIOWrapper
 import os
 import subprocess
 import time
 import signal
+from pathlib import Path
 import sys
-from typing import Optional
-
-from yaspin import yaspin
-
-from lib import (
-    MiddlewareType,
+sys.path.append(os.path.join(Path(__file__).parents[2], "velocitas_lib"))
+from velocitas_lib import (
     get_cache_data,
-    get_container_runtime_executable,
-    get_middleware_type,
     get_services,
     get_workspace_dir,
     json_obj_to_flat_map,
     replace_variables,
+    get_script_path,
+)
+from typing import Optional
+from yaspin import yaspin
+from lib import (
+    MiddlewareType,
+    get_container_runtime_executable,
+    get_middleware_type,
     get_dapr_sidecar_args,
-    get_script_path
 )
 
 
@@ -80,7 +83,9 @@ def run_service(service_spec) -> subprocess.Popen:
             pair = config_entry["value"].split("=", 1)
             env_vars[pair[0].strip()] = None
             if len(pair) > 1:
-                env_vars[pair[0].strip()] = replace_variables(pair[1].strip(), variables)
+                env_vars[pair[0].strip()] = replace_variables(
+                    pair[1].strip(), variables
+                )
         elif config_entry["key"] == "port":
             service_port = replace_variables(config_entry["value"], variables)
         elif config_entry["key"] == "no-dapr":

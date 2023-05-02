@@ -13,35 +13,13 @@
 # SPDX-License-Identifier: Apache-2.0
 
 """Provides methods and functions to download and install dependencies."""
-
+# flake8: noqa: E402 module level import
 import os
 import subprocess
+from pathlib import Path
 import sys
-
-
-def require_env(name: str) -> str:
-    """Require and return an environment variable.
-
-    Args:
-        name (str): The name of the variable.
-
-    Raises:
-        ValueError: In case the environment variable is not set.
-
-    Returns:
-        str: The value of the variable.
-    """
-    var = os.getenv(name)
-    if not var:
-        raise ValueError(f"environment variable {var!r} not set!")
-    return var
-
-
-def get_script_path() -> str:
-    """Return the absolute path to the directory the invoked Python script
-    is located in."""
-    return os.path.dirname(os.path.realpath(sys.argv[0]))
-
+sys.path.append(os.path.join(Path(__file__).parents[2], "velocitas_lib"))
+from velocitas_lib import get_script_path
 
 def pip(args: list[str]) -> None:
     """Invoke the pip process with the given arguments."""

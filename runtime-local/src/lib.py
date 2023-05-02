@@ -12,38 +12,14 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import json
+# flake8: noqa: E402 module level import
 import os
+from pathlib import Path
 import sys
+sys.path.append(os.path.join(Path(__file__).parents[2], "velocitas_lib"))
 from enum import Enum
 from typing import Optional, Tuple
-
-
-def require_env(name: str) -> str:
-    """Require and return an environment variable.
-
-    Args:
-        name (str): The name of the variable.
-
-    Raises:
-        ValueError: In case the environment variable is not set.
-
-    Returns:
-        str: The value of the variable.
-    """
-    var = os.getenv(name)
-    if not var:
-        raise ValueError(f"Environment variable {name!r} not set!")
-    return var
-
-
-def get_workspace_dir() -> str:
-    """Return the workspace directory."""
-    return require_env("VELOCITAS_WORKSPACE_DIR")
-
-
-def get_app_manifest() -> dict:
-    return json.loads(require_env("VELOCITAS_APP_MANIFEST"))
+from velocitas_lib import get_script_path
 
 
 class MiddlewareType(Enum):
@@ -55,29 +31,6 @@ class MiddlewareType(Enum):
 def get_middleware_type() -> MiddlewareType:
     """Return the current middleware type."""
     return MiddlewareType.DAPR
-
-
-def get_script_path() -> str:
-    """Return the absolute path to the directory the invoked Python script
-    is located in."""
-    return os.path.dirname(os.path.realpath(sys.argv[0]))
-
-
-def get_cache_data():
-    """Return the data of the cache as Python object."""
-    return json.loads(require_env("VELOCITAS_CACHE_DATA"))
-
-
-def get_services():
-    """Return all specified services as Python object."""
-    return json.load(open(f"{get_script_path()}/../../runtime.json", encoding="utf-8"))
-
-
-def replace_variables(input_str: str, variables: dict[str, str]) -> str:
-    """Replace all occurrences of the defined variables in the input string"""
-    for key, value in variables.items():
-        input_str = input_str.replace("${{ " + key + " }}", str(value))
-    return input_str
 
 
 def get_dapr_sidecar_args(
@@ -111,22 +64,3 @@ def get_dapr_sidecar_args(
 def get_container_runtime_executable() -> str:
     """Return the current container runtime executable. E.g. docker."""
     return "docker"
-
-
-def json_obj_to_flat_map(obj, prefix: str = "", separator: str = ".") -> dict[str, str]:
-    """Flatten a JSON Object into a one dimensional dict by joining the keys
-       with the specified separator."""
-    result = dict[str, str]()
-    if isinstance(obj, dict):
-        for key, value in obj.items():
-            nested_key = f"{prefix}{separator}{key}"
-            result.update(json_obj_to_flat_map(value, nested_key, separator))
-    elif isinstance(obj, list):
-        for index, value in enumerate(obj):
-            nested_key = f"{prefix}{separator}{index}"
-            result.update(json_obj_to_flat_map(value, nested_key, separator))
-    else:
-        nested_key = f"{prefix}"
-        result[nested_key] = obj
-
-    return result

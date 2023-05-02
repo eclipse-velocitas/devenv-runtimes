@@ -12,14 +12,16 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+# flake8: noqa: E402 module level import
 import argparse
 import os
 import ruamel.yaml as yaml
+from pathlib import Path
+import sys
+sys.path.append(os.path.join(Path(__file__).parents[2], "velocitas_lib"))
+from velocitas_lib import get_services, get_workspace_dir, get_script_path
 from lib import (
-    get_workspace_dir,
     create_nodeport_spec,
-    get_script_path,
-    get_services,
     parse_service_config,
     generate_nodeport,
     create_cluster_ip_spec,
