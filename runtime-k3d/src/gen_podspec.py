@@ -133,16 +133,13 @@ def generate_port_spec(service_config):
 
 def generate_clusterIP_port_spec(service_config):
     ports = []
-    type = "default"
     for port in service_config.ports:
         port_i = int(port)
-        if port_i > 9000:
-            type = "websocket"
         ports.append(
             {
                 "name": f"port{port}",
                 "port": port_i,
-                "targetPort": type,
+                "targetPort": port_i,
                 "protocol": "TCP",
             }
         )
