@@ -56,20 +56,15 @@ spec:
               value: "{{ .value }}"
           {{- end }}
         {{- end }}
-        {{- if .Values.vspecFilePath }}
-        # TODO: This need to be checked and probably reworked again
-          env:
-            - name: KUKSA_DATA_BROKER_METADATA_FILE
-              value: "{{.Values.vspecFilePath}}"
           volumeMounts:
           - name: vspec
-            mountPath: "{{.Values.vspecFilePath}}"
+            {{- $envs := .Values.imageVehicledatabroker.environmentVariables -}}
+            mountPath: {{ get $envs "KUKSA_DATA_BROKER_METADATA_FILE" }}
             subPath: vspec.json
       volumes:
         - name: vspec
           configMap:
             name: vspec-config
-        {{- end }}
 ---
 apiVersion: v1
 kind: Service

@@ -27,6 +27,16 @@ def retag_docker_images():
         retag_docker_image(service_config.image)
 
 
+def create_vspec_config():
+    subprocess.check_call([
+        "kubectl",
+        "create",
+        "configmap",
+        "vspec-config",
+        "--from-file=$VSPEC_FILE_PATH"
+    ])
+
+
 def install_runtime(helm_output_path: str):
     subprocess.check_call([
         "helm",
@@ -48,6 +58,7 @@ def main():
     if not is_runtime_installed():
         gen_helm("./helm")
         retag_docker_images()
+        create_vspec_config()
         install_runtime("./helm")
     else:
         print("Runtime already installed!")
