@@ -91,23 +91,6 @@ def create_cluster_ip_spec(service_id: str, ports: List[dict]):
     }
 
 
-def get_template():
-    """Returns deployment template."""
-    return {
-        "apiVersion": "apps/v1",
-        "kind": "Deployment",
-        "metadata": {"name": "", "labels": {"app": ""}},
-        "spec": {
-            "replicas": 1,
-            "selector": {"matchLabels": {"app": ""}},
-            "template": {
-                "metadata": {"labels": {"app": ""}},
-                "spec": {"containers": []},
-            },
-        },
-    }
-
-
 def parse_service_config(service_spec_config: dict):
     """Parses service spec configuration and returns it as an named tuple.
 

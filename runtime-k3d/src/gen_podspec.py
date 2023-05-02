@@ -94,6 +94,7 @@ def create_podspec(templates, service_spec):
 def generate_pod_spec(template_pod, service_config):
     spec = template_pod["spec"]["containers"][0]
     spec["image"] = service_config.image
+
     if service_config.args:
         spec["args"] = service_config.args
 
@@ -102,12 +103,28 @@ def generate_pod_spec(template_pod, service_config):
 
     if service_config.ports:
         spec["ports"] = generate_port_spec(service_config)
+
+    if service_config.mounts:
+        spec["volumeMounts"] = generate_container_mount(service_config)
+        template_pod["spec"]["volumes"] = [
+            {
+                "name": "pv-storage",
+                "persistentVolumeClaim": {"claimName": "pv-claim"},
+            }
+        ]
+
     template_pod["spec"]["containers"][0] = spec
     return template_pod
 
 
-def get_args(service_config):
-    return ", ".join(service_config.args)
+def generate_container_mount(service_config):
+    mounts = []
+    for mount in service_config.mounts:
+        mount_path = mount.split(":")[1]
+        if "." in mount_path:
+            mount_path = os.path.dirname(mount_path)
+        mounts.append({"mountPath": f"{mount_path}", "name": "pv-storage"})
+    return mounts
 
 
 def get_env(service_config):
