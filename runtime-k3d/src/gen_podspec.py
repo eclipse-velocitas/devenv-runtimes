@@ -14,7 +14,7 @@
 
 import argparse
 import os
-import yaml
+import ruamel.yaml as yaml
 from lib import (
     get_workspace_dir,
     create_nodeport_spec,
@@ -24,9 +24,6 @@ from lib import (
     generate_nodeport,
     create_cluster_ip_spec,
 )
-from yaml.loader import SafeLoader
-
-node_port = 30050
 
 
 def find_service_spec(lst, kind, name):
@@ -84,7 +81,9 @@ def create_podspec(templates, service_spec):
 
     if "mosquitto" in service_config.image:
         pods.append(
-            create_cluster_ip_spec(service_id, pod["spec"]["containers"][0]["ports"])
+            create_cluster_ip_spec(
+                service_id, generate_clusterIP_port_spec(service_config)
+            )
         )
 
     # TBD: mounts
@@ -132,6 +131,25 @@ def generate_port_spec(service_config):
     return ports
 
 
+def generate_clusterIP_port_spec(service_config):
+    ports = []
+    type = "default"
+    for port in service_config.ports:
+        port_i = int(port)
+        if port_i > 9000:
+            type = "websocket"
+        ports.append(
+            {
+                "name": f"port{port}",
+                "port": port_i,
+                "targetPort": type,
+                "protocol": "TCP",
+            }
+        )
+
+    return ports
+
+
 def generate_nodeport_service(service_id, port):
     nodeport_spec = create_nodeport_spec(service_id)
     nodeport_spec["spec"]["ports"] = []
@@ -164,7 +182,7 @@ def gen_podspec(output_file_path: str):
         "w",
         encoding="utf-8",
     ) as f:
-        yaml.safe_dump_all(pods, f, sort_keys=False)
+        yaml.dump_all(pods, f, default_flow_style=None, block_seq_indent=2, indent=4)
 
 
 def main():
