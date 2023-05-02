@@ -15,8 +15,7 @@
 import json
 import os
 import sys
-from collections import namedtuple
-from typing import List, Optional
+from typing import Dict, List, NamedTuple, Optional
 
 
 def require_env(name: str) -> str:
@@ -68,7 +67,8 @@ def create_nodeport_spec(service_id: str):
 
 
 def generate_nodeport(port: int):
-    """Creates nodeport from the last 3 digits of the targetport in the range of 30000-32767.
+    """Creates nodeport from the last 3 digits of the targetport in the range
+    of 30000-32767.
 
     Args:
         port: The port to be used to generate the nodeport.
@@ -91,23 +91,21 @@ def create_cluster_ip_spec(service_id: str, ports: List[dict]):
     }
 
 
+class ServiceSpecConfig(NamedTuple):
+    image: Optional[str]
+    env_vars: Dict[str, Optional[str]]
+    no_dapr: bool
+    args: List[str]
+    ports: List[str]
+    mounts: List[str]
+
+
 def parse_service_config(service_spec_config: dict):
     """Parses service spec configuration and returns it as an named tuple.
 
     Args:
         service_spec_config: The specificon of the services from config file.
     """
-    ServiceSpecConfig = namedtuple(
-        "ServiceSpecConfig",
-        [
-            "image",
-            "env_vars",
-            "no_dapr",
-            "args",
-            "ports",
-            "mounts",
-        ],
-    )
 
     no_dapr = False
     container_image = None
@@ -126,7 +124,7 @@ def parse_service_config(service_spec_config: dict):
                 if len(pair) > 1:
                     env_vars[pair[0].strip()] = pair[1].strip()
             case "no-dapr":
-                no_dapr = config_entry["value"]
+                no_dapr = config_entry["value"] == "true"
             case "arg":
                 args.append(config_entry["value"])
             case "port":

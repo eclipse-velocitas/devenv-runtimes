@@ -14,7 +14,6 @@
 
 from runtime.controlplane import configure_controlplane
 from runtime.runtime import deploy_runtime
-
 from yaspin import yaspin
 
 

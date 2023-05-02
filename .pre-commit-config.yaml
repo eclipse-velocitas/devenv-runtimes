@@ -33,14 +33,16 @@ repos:
     rev: 1.7.5
     hooks:
       - id: bandit
-        types_or: [python]
+        types: [python]
+        args: ["--ini", "setup.cfg"]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: "v1.2.0"
     hooks:
       - id: mypy
         args: [runtime-k3d]
-        language: system
+        language: python
+        language_version: "3.11"
         pass_filenames: false
 
   # - repo: https://github.com/pycqa/pydocstyle

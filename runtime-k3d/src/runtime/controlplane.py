@@ -12,50 +12,43 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import subprocess
 import os
+import subprocess
 from typing import List
-from lib import require_env, get_script_path
 
+from lib import get_script_path, require_env
 from yaspin.core import Yaspin
 
 
 def registry_exists() -> bool:
-    return subprocess.call([
-        "k3d",
-        "registry",
-        "get",
-        "k3d-registry.localhost"
-    ], stdout=subprocess.DEVNULL) == 0
+    return (
+        subprocess.call(
+            ["k3d", "registry", "get", "k3d-registry.localhost"],
+            stdout=subprocess.DEVNULL,
+        )
+        == 0
+    )
 
 
 def create_registry():
-    subprocess.check_call([
-          "k3d",
-          "registry",
-          "create",
-          "registry.localhost",
-          "--port",
-          "12345"
-    ], stdout=subprocess.DEVNULL)
+    subprocess.check_call(
+        ["k3d", "registry", "create", "registry.localhost", "--port", "12345"],
+        stdout=subprocess.DEVNULL,
+    )
 
 
 def delete_registry():
-    subprocess.check_call([
-        "k3d",
-        "registry",
-        "delete",
-        "k3d-registry.localhost"
-    ], stdout=subprocess.DEVNULL)
+    subprocess.check_call(
+        ["k3d", "registry", "delete", "k3d-registry.localhost"],
+        stdout=subprocess.DEVNULL,
+    )
 
 
 def cluster_exists() -> bool:
-    return subprocess.call([
-        "k3d",
-        "cluster",
-        "get",
-        "cluster"
-    ], stdout=subprocess.DEVNULL) == 0
+    return (
+        subprocess.call(["k3d", "cluster", "get", "cluster"], stdout=subprocess.DEVNULL)
+        == 0
+    )
 
 
 def create_cluster(dapr_config_dir: str):
@@ -68,108 +61,104 @@ def create_cluster(dapr_config_dir: str):
         https_proxy = os.getenv("HTTPS_PROXY")
         no_proxy = os.getenv("NO_PROXY")
         extra_proxy_args = [
-                            "-e", f"HTTP_PROXY={http_proxy}@server:0",
-                            "-e", f"HTTPS_PROXY={https_proxy}@server:0",
-                            "-e", f"NO_PROXY={no_proxy}@server:0"
+            "-e",
+            f"HTTP_PROXY={http_proxy}@server:0",
+            "-e",
+            f"HTTPS_PROXY={https_proxy}@server:0",
+            "-e",
+            f"NO_PROXY={no_proxy}@server:0",
         ]
     else:
         print("Creating cluster without proxy configuration")
 
-    subprocess.call([
-       "k3d",
-       "cluster",
-       "create",
-       "cluster",
-       "-p", "30555:30555",
-       "-p", "31883:31883",
-       "-p", "30051:30051",
-       "--volume", f"{dapr_config_dir}/volume:/mnt/data@server:0",
-       "--registry-use", "k3d-registry.localhost:12345"
-    ] + extra_proxy_args, stdout=subprocess.DEVNULL)
+    subprocess.call(
+        [
+            "k3d",
+            "cluster",
+            "create",
+            "cluster",
+            "-p",
+            "30555:30555",
+            "-p",
+            "31883:31883",
+            "-p",
+            "30051:30051",
+            "--volume",
+            f"{dapr_config_dir}/volume:/mnt/data@server:0",
+            "--registry-use",
+            "k3d-registry.localhost:12345",
+        ]
+        + extra_proxy_args,
+        stdout=subprocess.DEVNULL,
+    )
 
 
 def delete_cluster():
-    subprocess.call([
-        "k3d",
-        "cluster",
-        "delete",
-        "cluster"
-    ], stdout=subprocess.DEVNULL)
+    subprocess.call(["k3d", "cluster", "delete", "cluster"], stdout=subprocess.DEVNULL)
 
 
 def deployment_exists(deployment_name: str) -> bool:
-    return subprocess.call([
-        "kubectl",
-        "get",
-        "deployment",
-        deployment_name
-    ], stdout=subprocess.DEVNULL) == 0
+    return (
+        subprocess.call(
+            ["kubectl", "get", "deployment", deployment_name], stdout=subprocess.DEVNULL
+        )
+        == 0
+    )
 
 
 def deploy_zipkin():
-    subprocess.check_call([
-        "kubectl",
-        "create",
-        "deployment",
-        "zipkin",
-        "--image",
-        "openzipkin/zipkin"
-    ], stdout=subprocess.DEVNULL)
+    subprocess.check_call(
+        ["kubectl", "create", "deployment", "zipkin", "--image", "openzipkin/zipkin"],
+        stdout=subprocess.DEVNULL,
+    )
 
-    subprocess.check_call([
-        "kubectl",
-        "expose",
-        "deployment",
-        "zipkin",
-        "--type",
-        "ClusterIP",
-        "--port",
-        "9411"
-    ], stdout=subprocess.DEVNULL)
+    subprocess.check_call(
+        [
+            "kubectl",
+            "expose",
+            "deployment",
+            "zipkin",
+            "--type",
+            "ClusterIP",
+            "--port",
+            "9411",
+        ],
+        stdout=subprocess.DEVNULL,
+    )
 
 
 def dapr_is_initialized_with_k3d() -> bool:
-    return subprocess.call([
-        "dapr",
-        "status",
-        "-k"
-    ], stdout=subprocess.DEVNULL) == 0
+    return subprocess.call(["dapr", "status", "-k"], stdout=subprocess.DEVNULL) == 0
 
 
 def initialize_dapr_with_k3d(dapr_runtime_version: str, dapr_config_dir: str):
-    subprocess.check_call([
-        "dapr",
-        "init",
-        "-k",
-        "--wait",
-        "--timeout",
-        "600",
-        "--runtime-version",
-        dapr_runtime_version
-    ], stdout=subprocess.DEVNULL)
+    subprocess.check_call(
+        [
+            "dapr",
+            "init",
+            "-k",
+            "--wait",
+            "--timeout",
+            "600",
+            "--runtime-version",
+            dapr_runtime_version,
+        ],
+        stdout=subprocess.DEVNULL,
+    )
 
-    subprocess.check_call([
-        "kubectl",
-        "apply",
-        "-f",
-        f"{dapr_config_dir}/config.yaml"
-    ], stdout=subprocess.DEVNULL)
+    subprocess.check_call(
+        ["kubectl", "apply", "-f", f"{dapr_config_dir}/config.yaml"],
+        stdout=subprocess.DEVNULL,
+    )
 
-    subprocess.check_call([
-        "kubectl",
-        "apply",
-        "-f",
-        f"{dapr_config_dir}/components/pubsub.yaml"
-    ], stdout=subprocess.DEVNULL)
+    subprocess.check_call(
+        ["kubectl", "apply", "-f", f"{dapr_config_dir}/components/pubsub.yaml"],
+        stdout=subprocess.DEVNULL,
+    )
 
 
 def configure_controlplane(spinner: Yaspin):
-    dapr_config_dir = os.path.join(
-        get_script_path(),
-        "runtime",
-        "config",
-        ".dapr"
-    )
+    dapr_config_dir = os.path.join(get_script_path(), "runtime", "config", ".dapr")
 
     status = "> Checking K3D registry... "
     if not registry_exists():

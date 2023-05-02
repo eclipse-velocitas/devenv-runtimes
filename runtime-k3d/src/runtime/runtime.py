@@ -14,37 +14,31 @@
 
 import subprocess
 
-from lib import get_services, parse_service_config
 from gen_helm import gen_helm
-
+from lib import get_services, parse_service_config
 from yaspin.core import Yaspin
 
 
 def is_runtime_installed() -> bool:
-    return subprocess.call([
-        "helm",
-        "status",
-        "vehicleappruntime"
-    ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0
+    return (
+        subprocess.call(
+            ["helm", "status", "vehicleappruntime"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        == 0
+    )
 
 
 def retag_docker_image(image_name: str):
-    subprocess.check_call([
-        "docker",
-        "pull",
-        image_name
-    ], stdout=subprocess.DEVNULL)
-    subprocess.check_call([
-        "docker",
-        "tag",
-        image_name,
-        f"localhost:12345/{image_name}"
-    ], stdout=subprocess.DEVNULL)
-    subprocess.check_call([
-        "docker",
-        "push",
-        f"localhost:12345/{image_name}"
-    ], stdout=subprocess.DEVNULL)
+    subprocess.check_call(["docker", "pull", image_name], stdout=subprocess.DEVNULL)
+    subprocess.check_call(
+        ["docker", "tag", image_name, f"localhost:12345/{image_name}"],
+        stdout=subprocess.DEVNULL,
+    )
+    subprocess.check_call(
+        ["docker", "push", f"localhost:12345/{image_name}"], stdout=subprocess.DEVNULL
+    )
 
 
 def retag_docker_images():
@@ -55,29 +49,28 @@ def retag_docker_images():
 
 
 def install_runtime(helm_output_path: str):
-    subprocess.check_call([
-        "helm",
-        "install",
-        "vehicleappruntime",
-        f"{helm_output_path}",
-        "--values",
-        f"{helm_output_path}/values.yaml",
-        "--set",
-        "vspecFilePath=$VSPEC_FILE_PATH"
-        "--wait",
-        "--timeout",
-        "60s",
-        "--debug"
-    ], stdout=subprocess.DEVNULL)
+    subprocess.check_call(
+        [
+            "helm",
+            "install",
+            "vehicleappruntime",
+            f"{helm_output_path}",
+            "--values",
+            f"{helm_output_path}/values.yaml",
+            "--set",
+            "vspecFilePath=$VSPEC_FILE_PATH" "--wait",
+            "--timeout",
+            "60s",
+            "--debug",
+        ],
+        stdout=subprocess.DEVNULL,
+    )
 
 
 def uninstall_runtime():
-    subprocess.check_call([
-        "helm",
-        "uninstall",
-        "vehicleappruntime",
-        "--wait"
-    ], stdout=subprocess.DEVNULL)
+    subprocess.check_call(
+        ["helm", "uninstall", "vehicleappruntime", "--wait"], stdout=subprocess.DEVNULL
+    )
 
 
 def deploy_runtime(spinner: Yaspin):
