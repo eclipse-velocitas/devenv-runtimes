@@ -171,7 +171,7 @@ def configure_controlplane(spinner: Yaspin):
         ".dapr"
     )
 
-    status = "Checking K3D registry... "
+    status = "> Checking K3D registry... "
     if not registry_exists():
         create_registry()
         status = status + "created."
@@ -179,14 +179,14 @@ def configure_controlplane(spinner: Yaspin):
         status = status + "registry already exists."
     spinner.write(status)
 
-    status = "Checking K3D cluster... "
+    status = "> Checking K3D cluster... "
     if not cluster_exists():
         status = status + "created."
     else:
         status = status + "registry already exists."
     spinner.write(status)
 
-    status = "Checking zipkin deployment... "
+    status = "> Checking zipkin deployment... "
     if not deployment_exists("zipkin"):
         deploy_zipkin()
         status = status + "deployed."
@@ -194,7 +194,7 @@ def configure_controlplane(spinner: Yaspin):
         status = status + "already deployed."
     spinner.write(status)
 
-    status = "Checking dapr... "
+    status = "> Checking dapr... "
     if not dapr_is_initialized_with_k3d():
         dapr_runtime_version = require_env("daprRuntimeVersion")
         initialize_dapr_with_k3d(dapr_runtime_version, dapr_config_dir)

@@ -20,7 +20,7 @@ from yaspin import yaspin
 
 def runtime_up():
     """Start up the K3D runtime."""
-    with yaspin("Starting k3d runtime...") as spinner:
+    with yaspin(text="Starting k3d runtime...") as spinner:
         try:
             configure_controlplane(spinner)
             deploy_runtime(spinner)

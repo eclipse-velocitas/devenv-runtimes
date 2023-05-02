@@ -90,8 +90,6 @@ def gen_helm(output_path: str):
     ) as f:
         f.write(yaml.dump_all(services).replace("---", ""))
 
-    print("Generation has been finished!")
-
 
 if __name__ == "__main__":
     gen_helm(f"{get_script_path()}/runtime/config/helm")

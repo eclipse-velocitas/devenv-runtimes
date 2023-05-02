@@ -68,7 +68,7 @@ def uninstall_runtime():
 
 
 def deploy_runtime(spinner: Yaspin):
-    status = "Deploying runtime... "
+    status = "> Deploying runtime... "
     if not is_runtime_installed():
         gen_helm("./helm")
         retag_docker_images()
