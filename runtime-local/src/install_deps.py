@@ -13,7 +13,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 """Provides methods and functions to download and install dependencies."""
-# flake8: noqa: E402 module level import
+
 import os
 import subprocess
 import sys

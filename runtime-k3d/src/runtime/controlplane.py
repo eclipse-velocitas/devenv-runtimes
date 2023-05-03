@@ -12,7 +12,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-# flake8: noqa: E402 module level import
 import os
 import subprocess
 from typing import List

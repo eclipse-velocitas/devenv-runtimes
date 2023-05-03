@@ -12,7 +12,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-# flake8: noqa: E402 module level import
 from typing import Dict, List, NamedTuple, Optional
 
 from velocitas_lib import (

@@ -12,7 +12,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-# flake8: noqa: E402 module level import
 import subprocess
 
 from gen_helm import gen_helm
