@@ -87,6 +87,12 @@ def create_podspec(templates, service_spec):
 
 
 def generate_pod_spec(template_pod, service_config):
+    """Generate the spec for a single pod.
+
+    Args:
+        template_pod: The spec of the pod taken from the template
+        service_config: The parsed configuration from the runtime.json
+    """
     spec = template_pod["spec"]["containers"][0]
     spec["image"] = service_config.image
 
@@ -113,6 +119,11 @@ def generate_pod_spec(template_pod, service_config):
 
 
 def generate_container_mount(service_config):
+    """Generate the mount spec for a pod.
+
+    Args:
+        service_config: The parsed configuration from the runtime.json
+    """
     mounts = []
     for mount in service_config.mounts:
         mount_path = mount.split(":")[1]
@@ -124,6 +135,11 @@ def generate_container_mount(service_config):
 
 
 def get_env(service_config):
+    """Generate the spec for the environment variables for a pod.
+
+    Args:
+        service_config: The parsed configuration from the runtime.json
+    """
     env = []
     for key, value in service_config.env_vars.items():
         env.append({"name": key, "value": value})
@@ -131,6 +147,11 @@ def get_env(service_config):
 
 
 def generate_port_spec(service_config):
+    """Generate the port spec for the used ports.
+
+    Args:
+        service_config: The parsed configuration from the runtime.json
+    """
     ports = []
     for port in service_config.ports:
         ports.append(
@@ -145,6 +166,11 @@ def generate_port_spec(service_config):
 
 
 def generate_clusterIP_port_spec(service_config):
+    """Generate the port spec for a clusterIP service.
+
+    Args:
+        service_config: The parsed configuration from the runtime.json
+    """
     ports = []
     for port in service_config.ports:
         port_i = int(port)
@@ -161,6 +187,12 @@ def generate_clusterIP_port_spec(service_config):
 
 
 def generate_nodeport_service(service_id, port):
+    """Generate the port spec for a nodeport service.
+
+    Args:
+        service_config: The parsed configuration from the runtime.json
+        port
+    """
     nodeport_spec = create_nodeport_spec(service_id)
     nodeport_spec["spec"]["ports"] = []
 
@@ -176,6 +208,11 @@ def generate_nodeport_service(service_id, port):
 
 
 def gen_podspec(output_file_path: str):
+    """Generate the spec of the all the pods needed for the runtime.
+
+    Args:
+        output_file_path: The path the spec is written to.
+    """
     with open(
         f"{get_script_path()}/runtime/config/podspec/runtime_template.yaml",
         "r",
