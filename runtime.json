@@ -18,8 +18,16 @@
                 "value": "1883"
             },
             {
+                "key": "port-forward",
+                "value": "1883:1883"
+            },
+            {
                 "key": "port",
                 "value": "9001"
+            },
+            {
+                "key": "port-forward",
+                "value": "9001:9001"
             },
             {
                 "key": "arg",
@@ -56,10 +64,6 @@
                 "value": "55555"
             },
             {
-                "key": "port-forward",
-                "value": "55555:55555"
-            },
-            {
                 "key": "env",
                 "value": "KUKSA_DATA_BROKER_METADATA_FILE=${{ builtin.cache.vspec_file_path }}"
             },
@@ -90,10 +94,6 @@
             {
                 "key": "port",
                 "value": "50051"
-            },
-            {
-                "key": "port-forward",
-                "value": "50051:50051"
             },
             {
                 "key": "env",
