@@ -51,14 +51,14 @@ def retag_docker_images():
 
 
 def create_vspec_config():
-    get_cache_data()["vspec_file_path"]
+    vspec_file_path = get_cache_data()["vspec_file_path"]
     subprocess.check_call(
         [
             "kubectl",
             "create",
             "configmap",
             "vspec-config",
-            "--from-file=$VSPEC_FILE_PATH",
+            f"--from-file={vspec_file_path}",
         ]
     )
 
@@ -72,8 +72,6 @@ def install_runtime(helm_output_path: str):
             f"{helm_output_path}",
             "--values",
             f"{helm_output_path}/values.yaml",
-            "--set",
-            "vspecFilePath=$VSPEC_FILE_PATH",
             "--wait",
             "--timeout",
             "60s",
