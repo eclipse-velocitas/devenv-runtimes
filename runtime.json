@@ -69,7 +69,7 @@
             },
             {
                 "key": "mount",
-                "value": "${{ builtin.cache.vspec_file_path }}:/config/vss.json"
+                "value": "${{ builtin.cache.vspec_file_path }}:${{ builtin.cache.vspec_file_path }}"
             },
             {
                 "key": "start-pattern",
