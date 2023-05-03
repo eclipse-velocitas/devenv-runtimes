@@ -86,8 +86,6 @@ def create_podspec(templates, service_spec):
             )
         )
 
-    # TBD: mounts
-
     return pods
 
 
@@ -121,8 +119,9 @@ def generate_container_mount(service_config):
     mounts = []
     for mount in service_config.mounts:
         mount_path = mount.split(":")[1]
-        if "." in mount_path:
-            mount_path = mount.split("/vspec.json")[0]
+        # if file is given, mount the parent folder
+        if "." in mount_path.split(os.sep)[-1]:
+            mount_path = os.path.dirname(mount_path)
         mounts.append({"mountPath": f"{mount_path}", "name": "pv-storage"})
     return mounts
 
