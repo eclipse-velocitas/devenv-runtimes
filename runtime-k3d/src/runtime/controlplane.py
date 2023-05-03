@@ -171,11 +171,6 @@ def initialize_dapr_with_k3d(dapr_runtime_version: str, dapr_config_dir: str):
         stdout=subprocess.DEVNULL,
     )
 
-    subprocess.check_call(
-        ["kubectl", "apply", "-f", f"{dapr_config_dir}/components/pubsub.yaml"],
-        stdout=subprocess.DEVNULL,
-    )
-
 
 def configure_controlplane(spinner: Yaspin):
     config_dir = os.path.join(get_script_path(), "runtime", "config")

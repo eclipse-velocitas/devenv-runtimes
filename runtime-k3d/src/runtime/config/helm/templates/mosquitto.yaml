@@ -79,3 +79,21 @@ spec:
     targetPort: {{.port}}
     nodePort: {{.nodePort}}
   {{- end }}
+---
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: mqtt-pubsub
+  namespace: default
+spec:
+  type: pubsub.mqtt
+  version: v1
+  metadata:
+  - name: url
+    value: "tcp://{{.Values.imageMqttbroker.name}}.default.svc.cluster.local:1883"
+  - name: qos
+    value: 1
+  - name: retain
+    value: "false"
+  - name: cleanSession
+    value: "false"
