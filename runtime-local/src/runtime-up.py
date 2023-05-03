@@ -18,9 +18,6 @@ import os
 import subprocess
 import time
 import signal
-from pathlib import Path
-import sys
-sys.path.append(os.path.join(Path(__file__).parents[2], "velocitas_lib"))
 from velocitas_lib import (
     get_cache_data,
     get_services,

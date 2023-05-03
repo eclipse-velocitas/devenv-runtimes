@@ -14,11 +14,7 @@
 
 # flake8: noqa: E402 module level import
 from typing import Dict, List, NamedTuple, Optional
-import os
-from pathlib import Path
-import sys
 
-sys.path.append(os.path.join(Path(__file__).parents[2], "velocitas_lib"))
 from velocitas_lib import (
     replace_variables,
     get_cache_data,

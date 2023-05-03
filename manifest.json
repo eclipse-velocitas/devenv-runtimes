@@ -79,6 +79,11 @@
             "type": "runtime",
             "programs": [
                 {
+                    "id": "install-deps",
+                    "executable": "python3",
+                    "args": ["./runtime-k3d/src/install_deps.py"]
+                },
+                {
                     "id": "runtime-up",
                     "executable": "python3",
                     "args": [ "./runtime-k3d/src/runtime-up.py" ]
@@ -97,6 +102,11 @@
                     "id": "generate-helm",
                     "executable": "python3",
                     "args": [ "./runtime-k3d/src/gen_helm.py" ]
+                }
+            ],
+            "onPostInit": [
+                {
+                    "ref": "install-deps"
                 }
             ],
             "variables": [

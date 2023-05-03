@@ -18,9 +18,6 @@ import re
 import yaml
 import os
 import shutil
-from pathlib import Path
-import sys
-sys.path.append(os.path.join(Path(__file__).parents[2], "velocitas_lib"))
 from velocitas_lib import get_services, get_workspace_dir, get_script_path
 from lib import parse_service_config, generate_nodeport
 

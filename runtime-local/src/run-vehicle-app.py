@@ -15,10 +15,7 @@
 # flake8: noqa: E402 module level import
 import argparse
 import subprocess
-import os
-from pathlib import Path
 import sys
-sys.path.append(os.path.join(Path(__file__).parents[2], "velocitas_lib"))
 from velocitas_lib import get_services
 from typing import Optional
 

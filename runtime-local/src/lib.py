@@ -13,10 +13,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # flake8: noqa: E402 module level import
-import os
-from pathlib import Path
-import sys
-sys.path.append(os.path.join(Path(__file__).parents[2], "velocitas_lib"))
 from enum import Enum
 from typing import Optional, Tuple
 from velocitas_lib import get_script_path

@@ -15,11 +15,8 @@
 # flake8: noqa: E402 module level import
 import os
 import subprocess
-import sys
-from pathlib import Path
 from typing import List
 
-sys.path.append(os.path.join(Path(__file__).parents[2], "velocitas_lib"))
 from yaspin.core import Yaspin
 
 from velocitas_lib import get_script_path, require_env
