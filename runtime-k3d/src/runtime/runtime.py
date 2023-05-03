@@ -12,16 +12,20 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import os
+
 # flake8: noqa: E402 module level import
 import subprocess
+import sys
+from pathlib import Path
+
 from gen_helm import gen_helm
 from lib import parse_service_config
 from yaspin.core import Yaspin
-import os
-from pathlib import Path
-import sys
+
 sys.path.append(os.path.join(Path(__file__).parents[2], "velocitas_lib"))
 from velocitas_lib import get_cache_data, get_services
+
 
 def is_runtime_installed() -> bool:
     return (
@@ -54,13 +58,15 @@ def retag_docker_images():
 
 def create_vspec_config():
     get_cache_data()["vspec_file_path"]
-    subprocess.check_call([
-        "kubectl",
-        "create",
-        "configmap",
-        "vspec-config",
-        "--from-file=$VSPEC_FILE_PATH"
-    ])
+    subprocess.check_call(
+        [
+            "kubectl",
+            "create",
+            "configmap",
+            "vspec-config",
+            "--from-file=$VSPEC_FILE_PATH",
+        ]
+    )
 
 
 def install_runtime(helm_output_path: str):

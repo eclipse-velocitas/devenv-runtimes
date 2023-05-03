@@ -15,12 +15,14 @@
 # flake8: noqa: E402 module level import
 import os
 import subprocess
-from typing import List
-from pathlib import Path
 import sys
+from pathlib import Path
+from typing import List
+
 sys.path.append(os.path.join(Path(__file__).parents[2], "velocitas_lib"))
-from velocitas_lib import require_env, get_script_path
 from yaspin.core import Yaspin
+
+from velocitas_lib import get_script_path, require_env
 
 
 def registry_exists() -> bool:
@@ -28,6 +30,7 @@ def registry_exists() -> bool:
         subprocess.call(
             ["k3d", "registry", "get", "k3d-registry.localhost"],
             stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
         == 0
     )
@@ -49,7 +52,11 @@ def delete_registry():
 
 def cluster_exists() -> bool:
     return (
-        subprocess.call(["k3d", "cluster", "get", "cluster"], stdout=subprocess.DEVNULL)
+        subprocess.call(
+            ["k3d", "cluster", "get", "cluster"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
         == 0
     )
 
@@ -97,13 +104,19 @@ def create_cluster(dapr_config_dir: str):
 
 
 def delete_cluster():
-    subprocess.call(["k3d", "cluster", "delete", "cluster"], stdout=subprocess.DEVNULL)
+    subprocess.call(
+        ["k3d", "cluster", "delete", "cluster"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
 
 
 def deployment_exists(deployment_name: str) -> bool:
     return (
         subprocess.call(
-            ["kubectl", "get", "deployment", deployment_name], stdout=subprocess.DEVNULL
+            ["kubectl", "get", "deployment", deployment_name],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
         == 0
     )
@@ -131,7 +144,14 @@ def deploy_zipkin():
 
 
 def dapr_is_initialized_with_k3d() -> bool:
-    return subprocess.call(["dapr", "status", "-k"], stdout=subprocess.DEVNULL) == 0
+    return (
+        subprocess.call(
+            ["dapr", "status", "-k"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        == 0
+    )
 
 
 def initialize_dapr_with_k3d(dapr_runtime_version: str, dapr_config_dir: str):
@@ -173,6 +193,7 @@ def configure_controlplane(spinner: Yaspin):
 
     status = "> Checking K3D cluster... "
     if not cluster_exists():
+        create_cluster(dapr_config_dir)
         status = status + "created."
     else:
         status = status + "registry already exists."
@@ -200,12 +221,15 @@ def reset_controlplane(spinner: Yaspin):
     status = "> Checking K3D cluster... "
     if cluster_exists():
         delete_cluster()
-        status = status + "deleted"
+        status = status + "deleted."
     else:
-        status = status + "skipped, cluster does not exist"
+        status = status + "does not exist."
+    spinner.write(status)
 
+    status = "> Checking K3D registry... "
     if registry_exists():
-        print("Uninstalling runtime...")
         delete_registry()
+        status = status + "uninstalled."
     else:
-        print("Registry does not exist, skipping deletion.")
+        status = status + "does not exist."
+    spinner.write(status)
