@@ -19,7 +19,6 @@ import ruamel.yaml as yaml
 
 from velocitas_lib import get_services, get_workspace_dir, get_script_path
 from lib import (
-    create_nodeport_spec,
     parse_service_config,
     generate_nodeport,
     create_cluster_ip_spec,
@@ -193,17 +192,24 @@ def generate_nodeport_service(service_id, port):
         service_config: The parsed configuration from the runtime.json
         port
     """
-    nodeport_spec = create_nodeport_spec(service_id)
-    nodeport_spec["spec"]["ports"] = []
+    nodeport_spec = {
+        "apiVersion": "v1",
+        "kind": "Service",
+        "metadata": {"name": f"{service_id}-nodeport{port}"},
+        "spec": {"type": "NodePort", "selector": {"app": service_id}},
+    }
+
+    ports = []
 
     targetPort = int(port)
-    nodeport_spec["spec"]["ports"].append(
+    ports.append(
         {
             "port": targetPort,
             "targetPort": targetPort,
             "nodePort": generate_nodeport(targetPort),
         }
     )
+    nodeport_spec["spec"]["ports"] = ports
     return nodeport_spec
 
 

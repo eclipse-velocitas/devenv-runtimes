@@ -24,20 +24,6 @@ from velocitas_lib import (
 )
 
 
-def create_nodeport_spec(service_id: str):
-    """Creates nodeport spec for the given service_id.
-
-    Args:
-        service_id: The id of the service to create nodeport for.
-    """
-    return {
-        "apiVersion": "v1",
-        "kind": "Service",
-        "metadata": {"name": f"{service_id}-nodeport"},
-        "spec": {"type": "NodePort", "selector": {"app": service_id}},
-    }
-
-
 def generate_nodeport(port: int):
     """Creates nodeport from the last 3 digits of the targetport in the range
     of 30000-32767.
