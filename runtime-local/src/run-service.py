@@ -12,6 +12,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import argparse
 import signal
 import subprocess
 import time
@@ -19,22 +20,20 @@ import time
 from typing import Dict
 from yaspin import yaspin
 
-from lib import get_log_file_name, get_services, run_service, stop_container, stop_service
+from lib import get_log_file_name, get_specific_service, run_service, stop_container, stop_service
 
 
 spawned_processes: Dict[str, subprocess.Popen] = {}
 
 
-def run_services() -> None:
-    """Run all required services."""
+def run_specific_service(service_id: str) -> None:
+    """Run specified service."""
 
-    with yaspin(text="Starting runtime") as spinner:
+    with yaspin(text=f"Starting service {service_id}") as spinner:
         try:
-            for service in get_services():
-                service_id = service['id']
-                stop_service(service)
-                spawned_processes[service_id] = run_service(service)
-                spinner.write(f"> {service_id} running")
+            service = get_specific_service(service_id)
+            stop_service(service)
+            spawned_processes[service_id] = run_service(service)
             spinner.ok("✔ ")
         except RuntimeError as error:
             spinner.write(error.args)
@@ -55,7 +54,7 @@ def wait_while_processes_are_running():
 
 
 def terminate_spawned_processes():
-    with yaspin(text="Stopping runtime") as spinner:
+    with yaspin(text="Stopping service") as spinner:
         while len(spawned_processes) > 0:
             (service_id, process) = spawned_processes.popitem()
             process.terminate()
@@ -69,7 +68,18 @@ def handler(_signum, _frame):
 
 
 if __name__ == "__main__":
+    # The arguments we accept
+    parser = argparse.ArgumentParser(
+        description="Start the specified service as defined in runtime.json."
+    )
+    parser.add_argument(
+        "service_id",
+        type=str,
+        help="Id of the service to start - refers to 'id' key in runtime.json"
+    )
+    args = parser.parse_args()
+
     signal.signal(signal.SIGINT, handler)
     signal.signal(signal.SIGTERM, handler)
-    run_services()
+    run_specific_service(args.service_id)
     wait_while_processes_are_running()

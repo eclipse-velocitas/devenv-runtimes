@@ -32,6 +32,10 @@
             {
                 "key": "arg",
                 "value": "/mosquitto-no-auth.conf"
+            },
+            {
+                "key": "start-pattern",
+                "value": ".*mosquitto version \\d+\\.\\d+\\.\\d+ running\n"
             }
         ]
     },
@@ -66,6 +70,10 @@
             {
                 "key": "mount",
                 "value": "${{ builtin.cache.vspec_file_path }}:/config/vss.json"
+            },
+            {
+                "key": "start-pattern",
+                "value": ".*Listening on \\d+\\.\\d+\\.\\d+\\.\\d+:\\d+"
             }
         ]
     },
@@ -98,6 +106,10 @@
             {
                 "key": "env",
                 "value": "SERVICE_PORT=50051"
+            },
+            {
+                "key": "start-pattern",
+                "value": ".*[cC]onnected to data broker.*"
             }
         ]
     },
@@ -136,6 +148,10 @@
             {
                 "key": "env",
                 "value": "MAPPING_FILE=/data/mappingDefault.yml"
+            },
+            {
+                "key": "start-pattern",
+                "value": ".*[cC]onnected to data broker.*"
             }
         ]
     }

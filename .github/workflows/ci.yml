@@ -38,3 +38,33 @@ jobs:
 
       - name: Run Linters
         uses: ./.github/actions/pre-commit-action
+
+  run-local-integration-tests:
+    name: Run Integration Tests for runtime-local
+    runs-on: ubuntu-22.04
+    env:
+      DAPR_HOST_IP: 127.0.0.1
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set commit id
+        run: |
+          NEW_CONFIG="$(jq --arg GITHUB_SHA "$GITHUB_SHA" '.packages[0].version |= $GITHUB_SHA' runtime-local/test/.velocitas.json)"
+          echo "${NEW_CONFIG}" > runtime-local/test/.velocitas.json
+
+      - name: Install required packages
+        run: |
+          pip install -r runtime-local/test/requirements.txt
+          sudo curl -L https://github.com/eclipse-velocitas/cli/releases/latest/download/velocitas-linux-x64 -o /usr/bin/velocitas
+          sudo chmod +x /usr/bin/velocitas
+
+      - name: Init velocitas project
+        run: |
+          cd runtime-local/test
+          velocitas init
+
+      - name: Run integration tests for runtime-local
+        run: |
+          cd runtime-local/test
+          pytest -s ./integration/integration_test.py
