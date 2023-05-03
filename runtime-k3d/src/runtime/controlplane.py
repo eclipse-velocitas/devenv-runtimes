@@ -58,7 +58,7 @@ def cluster_exists() -> bool:
     )
 
 
-def create_cluster(dapr_config_dir: str):
+def create_cluster(config_dir: str):
     has_proxy: bool = os.getenv("HTTP_PROXY") is not None
 
     extra_proxy_args: List[str] = list()
@@ -91,7 +91,7 @@ def create_cluster(dapr_config_dir: str):
             "-p",
             "30051:30051",
             "--volume",
-            f"{dapr_config_dir}/volume:/mnt/data@server:0",
+            f"{config_dir}/volume:/mnt/data@server:0",
             "--registry-use",
             "k3d-registry.localhost:12345",
         ]
@@ -178,6 +178,7 @@ def initialize_dapr_with_k3d(dapr_runtime_version: str, dapr_config_dir: str):
 
 
 def configure_controlplane(spinner: Yaspin):
+    config_dir = os.path.join(get_script_path(), "runtime", "config")
     dapr_config_dir = os.path.join(get_script_path(), "runtime", "config", ".dapr")
 
     status = "> Checking K3D registry... "
@@ -190,7 +191,7 @@ def configure_controlplane(spinner: Yaspin):
 
     status = "> Checking K3D cluster... "
     if not cluster_exists():
-        create_cluster(dapr_config_dir)
+        create_cluster(config_dir)
         status = status + "created."
     else:
         status = status + "registry already exists."

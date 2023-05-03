@@ -92,6 +92,7 @@ def deploy_runtime(spinner: Yaspin):
     if not is_runtime_installed():
         gen_helm("./helm")
         retag_docker_images()
+        create_vspec_config()
         install_runtime("./helm")
         status = status + "installed."
     else:
