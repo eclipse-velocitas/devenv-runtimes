@@ -17,6 +17,7 @@ import subprocess
 from gen_helm import gen_helm
 from lib import parse_service_config
 from yaspin.core import Yaspin
+
 from velocitas_lib import get_cache_data, get_services
 
 
@@ -32,13 +33,20 @@ def is_runtime_installed() -> bool:
 
 
 def retag_docker_image(image_name: str):
-    subprocess.check_call(["docker", "pull", image_name], stdout=subprocess.DEVNULL)
+    subprocess.check_call(
+        ["docker", "pull", image_name],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
     subprocess.check_call(
         ["docker", "tag", image_name, f"localhost:12345/{image_name}"],
         stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
     subprocess.check_call(
-        ["docker", "push", f"localhost:12345/{image_name}"], stdout=subprocess.DEVNULL
+        ["docker", "push", f"localhost:12345/{image_name}"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
 
 
@@ -77,12 +85,15 @@ def install_runtime(helm_output_path: str):
             "--debug",
         ],
         stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
 
 
 def uninstall_runtime():
     subprocess.check_call(
-        ["helm", "uninstall", "vehicleappruntime", "--wait"], stdout=subprocess.DEVNULL
+        ["helm", "uninstall", "vehicleappruntime", "--wait"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
 
 

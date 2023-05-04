@@ -36,6 +36,7 @@ def create_registry():
     subprocess.check_call(
         ["k3d", "registry", "create", "registry.localhost", "--port", "12345"],
         stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
 
 
@@ -43,6 +44,7 @@ def delete_registry():
     subprocess.check_call(
         ["k3d", "registry", "delete", "k3d-registry.localhost"],
         stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
 
 
@@ -96,6 +98,7 @@ def create_cluster(config_dir: str):
         ]
         + extra_proxy_args,
         stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
 
 
@@ -122,6 +125,7 @@ def deploy_zipkin():
     subprocess.check_call(
         ["kubectl", "create", "deployment", "zipkin", "--image", "openzipkin/zipkin"],
         stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
 
     subprocess.check_call(
@@ -163,11 +167,13 @@ def initialize_dapr_with_k3d(dapr_runtime_version: str, dapr_config_dir: str):
             dapr_runtime_version,
         ],
         stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
 
     subprocess.check_call(
         ["kubectl", "apply", "-f", f"{dapr_config_dir}/config.yaml"],
         stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
 
 
