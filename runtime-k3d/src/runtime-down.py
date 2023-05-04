@@ -1,5 +1,4 @@
-#!/bin/bash
-# Copyright (c) 2022 Robert Bosch GmbH and Microsoft Corporation
+# Copyright (c) 2023 Robert Bosch GmbH
 #
 # This program and the accompanying materials are made available under the
 # terms of the Apache License, Version 2.0 which is available at
@@ -13,18 +12,21 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-if k3d cluster get cluster &> /dev/null
-then
-    echo "Uninstalling runtime..."
-    k3d cluster delete cluster
-else
-    echo "Control plane is not configured, skipping cluster deletion."
-fi
+from runtime.controlplane import reset_controlplane
+from runtime.runtime import undeploy_runtime
+from yaspin import yaspin
 
-if k3d registry list | grep k3d-registry.localhost &> /dev/null
-then
-    echo "Uninstalling runtime..."
-    k3d registry delete k3d-registry.localhost
-else
-    echo "Registry does not exist, skipping deletion."
-fi
+
+def runtime_down():
+    """Stop the K3D runtime."""
+    with yaspin(text="Stopping k3d runtime...") as spinner:
+        try:
+            reset_controlplane(spinner)
+            undeploy_runtime(spinner)
+            spinner.ok()
+        except Exception as err:
+            spinner.fail(err)
+
+
+if __name__ == "__main__":
+    runtime_down()

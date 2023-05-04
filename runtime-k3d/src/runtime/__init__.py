@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Robert Bosch GmbH and Microsoft Corporation
+# Copyright (c) 2023 Robert Bosch GmbH
 #
 # This program and the accompanying materials are made available under the
 # terms of the Apache License, Version 2.0 which is available at
@@ -11,21 +11,3 @@
 # under the License.
 #
 # SPDX-License-Identifier: Apache-2.0
-
-apiVersion: dapr.io/v1alpha1
-kind: Component
-metadata:
-  name: mqtt-pubsub
-  namespace: default
-spec:
-  type: pubsub.mqtt
-  version: v1
-  metadata:
-  - name: url
-    value: "tcp://mqtt-broker.default.svc.cluster.local:1883"
-  - name: qos
-    value: 1
-  - name: retain
-    value: "false"
-  - name: cleanSession
-    value: "false"

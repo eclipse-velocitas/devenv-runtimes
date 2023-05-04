@@ -1,7 +1,7 @@
 [
     {
-        "id": "mqtt",
-        "interfaces":[
+        "id": "mqtt-broker",
+        "interfaces": [
             "mqtt"
         ],
         "config": [
@@ -14,8 +14,16 @@
                 "value": "eclipse-mosquitto:latest"
             },
             {
+                "key": "port",
+                "value": "1883"
+            },
+            {
                 "key": "port-forward",
                 "value": "1883:1883"
+            },
+            {
+                "key": "port",
+                "value": "9001"
             },
             {
                 "key": "port-forward",
@@ -57,7 +65,7 @@
             },
             {
                 "key": "env",
-                "value": "KUKSA_DATA_BROKER_METADATA_FILE=/vss.json"
+                "value": "KUKSA_DATA_BROKER_METADATA_FILE=${{ builtin.cache.vspec_file_path }}"
             },
             {
                 "key": "env",
@@ -65,7 +73,7 @@
             },
             {
                 "key": "mount",
-                "value": "${{ builtin.cache.vspec_file_path }}:/vss.json"
+                "value": "${{ builtin.cache.vspec_file_path }}:${{ builtin.cache.vspec_file_path }}"
             },
             {
                 "key": "start-pattern",
@@ -75,7 +83,7 @@
     },
     {
         "id": "seatservice",
-        "interfaces":[
+        "interfaces": [
             "grpc://sdv.edge.comfort.seats.v1.Seats/MoveComponent"
         ],
         "config": [
@@ -107,15 +115,11 @@
     },
     {
         "id": "feedercan",
-        "interfaces":[],
+        "interfaces": [],
         "config": [
             {
                 "key": "image",
                 "value": "ghcr.io/eclipse/kuksa.val.feeders/dbc2val:v0.1.1"
-            },
-            {
-                "key": "mount",
-                "value": "${{ builtin.script_dir }}/data:/data"
             },
             {
                 "key": "env",
@@ -140,6 +144,10 @@
             {
                 "key": "env",
                 "value": "MAPPING_FILE=/data/mappingDefault.yml"
+            },
+            {
+                "key": "mount",
+                "value": "${{ builtin.script_dir }}/runtime/config/volume/:/data"
             },
             {
                 "key": "start-pattern",

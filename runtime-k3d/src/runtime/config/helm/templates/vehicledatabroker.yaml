@@ -11,62 +11,75 @@
 # under the License.
 #
 # SPDX-License-Identifier: Apache-2.0
-
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{.Values.imageVehicleDataBroker.name}}
+  name: {{.Values.imageVehicledatabroker.name}}
   labels:
-    app: {{.Values.imageVehicleDataBroker.name}}
+    app: {{.Values.imageVehicledatabroker.name}}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{.Values.imageVehicleDataBroker.name}}
+      app: {{.Values.imageVehicledatabroker.name}}
   template:
     metadata:
       labels:
-        app: {{.Values.imageVehicleDataBroker.name}}
+        app: {{.Values.imageVehicledatabroker.name}}
       annotations:
         dapr.io/enabled: "true"
-        dapr.io/app-id: "{{.Values.imageVehicleDataBroker.daprAppid}}"
-        dapr.io/app-port: "{{.Values.imageVehicleDataBroker.daprAppPort}}"
-        dapr.io/log-level: "{{.Values.imageVehicleDataBroker.daprLogLevel}}"
+        dapr.io/app-id: "{{.Values.imageVehicledatabroker.name}}"
+        {{- with (index .Values.imageVehicledatabroker.ports 0) }}
+        dapr.io/app-port: "{{.port}}"
+        {{- end }}
+        dapr.io/log-level: "debug"
         dapr.io/config: "config"
         dapr.io/app-protocol: "grpc"
     spec:
       containers:
-        - name: vehicledatabroker
-          image: {{.Values.imageVehicleDataBroker.repository}}:{{.Values.imageVehicleDataBroker.tag}}
-          imagePullPolicy: {{.Values.imageVehicleDataBroker.pullPolicy}}
+        - name: {{.Values.imageVehicledatabroker.name}}
+          image: {{.Values.imageVehicledatabroker.repository}}:{{.Values.imageVehicledatabroker.tag}}
+          imagePullPolicy: {{.Values.imageVehicledatabroker.pullPolicy}}
+        {{- if .Values.imageVehicledatabroker.ports}}
           ports:
-            - name: default
-              containerPort: {{.Values.imageVehicleDataBroker.daprAppPort}}
+          {{- range $i, $port := .Values.imageVehicledatabroker.ports }}
+            - name: default{{ $i }}
+              containerPort: {{ .port }}
               protocol: TCP
-      {{- if .Values.vspecFilePath }}
+          {{- end }}
+        {{- end }}
+        {{- if .Values.imageVehicledatabroker.environmentVariables}}
           env:
-            - name: KUKSA_DATA_BROKER_METADATA_FILE
-              value: "{{.Values.vspecFilePath}}"
+          {{- range .Values.imageVehicledatabroker.environmentVariables }}
+            - name: {{ .name }}
+              value: "{{ .value }}"
+          {{- end }}
+        {{- end }}
           volumeMounts:
           - name: vspec
-            mountPath: "{{.Values.vspecFilePath}}"
+            {{- range .Values.imageVehicledatabroker.environmentVariables }}
+            {{- if eq .name "KUKSA_DATA_BROKER_METADATA_FILE"}}
+            mountPath: {{ .value }}
             subPath: vspec.json
+            {{- end }}
+            {{- end }}
       volumes:
         - name: vspec
           configMap:
             name: vspec-config
-      {{- end }}
-
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{.Values.imageVehicleDataBroker.name}}-nodeport
+  name: {{.Values.imageVehicledatabroker.name}}-nodeport
 spec:
   type: NodePort
   selector:
-    app: {{.Values.imageVehicleDataBroker.name}}
+    app: {{.Values.imageVehicledatabroker.name}}
   ports:
-    - port: {{.Values.imageVehicleDataBroker.daprAppPort}}
-      targetPort: {{.Values.imageVehicleDataBroker.daprAppPort}}
-      nodePort: {{.Values.imageVehicleDataBroker.nodePort}}
+  {{- with (index .Values.imageVehicledatabroker.ports 0) }}
+    - port: {{.port}}
+      targetPort: {{.port}}
+      nodePort: {{.nodePort}}
+  {{- end }}

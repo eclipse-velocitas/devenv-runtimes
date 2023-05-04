@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Robert Bosch GmbH and Microsoft Corporation
+# Copyright (c) 2023 Robert Bosch GmbH
 #
 # This program and the accompanying materials are made available under the
 # terms of the Apache License, Version 2.0 which is available at
@@ -11,13 +11,3 @@
 # under the License.
 #
 # SPDX-License-Identifier: Apache-2.0
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: feeder-config
-data:
-  dbcfile: "/mnt/data/dbcfile.dbc"
-  mapping: "/mnt/data/mapping.yml"
-  candump: "/mnt/data/candump.log"
-  usecase: "/mnt/data/databroker"

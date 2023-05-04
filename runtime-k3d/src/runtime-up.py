@@ -1,5 +1,4 @@
-#!/bin/bash
-# Copyright (c) 2022 Robert Bosch GmbH and Microsoft Corporation
+# Copyright (c) 2023 Robert Bosch GmbH
 #
 # This program and the accompanying materials are made available under the
 # terms of the Apache License, Version 2.0 which is available at
@@ -13,10 +12,21 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-if helm status vehicleappruntime &> /dev/null
-then
-    echo "Uninstalling runtime..."
-    helm uninstall vehicleappruntime --wait
-else
-    echo "Runtime is not installed."
-fi
+from runtime.controlplane import configure_controlplane
+from runtime.runtime import deploy_runtime
+from yaspin import yaspin
+
+
+def runtime_up():
+    """Start up the K3D runtime."""
+    with yaspin(text="Starting k3d runtime...") as spinner:
+        try:
+            configure_controlplane(spinner)
+            deploy_runtime(spinner)
+            spinner.ok()
+        except Exception as err:
+            spinner.fail(err)
+
+
+if __name__ == "__main__":
+    runtime_up()

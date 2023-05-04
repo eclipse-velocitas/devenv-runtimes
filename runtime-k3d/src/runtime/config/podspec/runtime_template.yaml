@@ -30,21 +30,6 @@ spec:
     command: ["ping", "127.0.0.1"]
 ---
 apiVersion: v1
-data:
-  candump: /mnt/data/candump.log
-  dbcfile: /mnt/data/dbcfile.dbc
-  mapping: /mnt/data/mapping.yml
-  usecase: /mnt/data/databroker
-kind: ConfigMap
-metadata:
-  annotations:
-    kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"v1","data":{"candump":"/mnt/data/candump.log","dbcfile":"/mnt/data/dbcfile.dbc","mapping":"/mnt/data/mapping.yml","usecase":"/mnt/data/databroker"},"kind":"ConfigMap","metadata":{"annotations":{},"name":"feeder-config","namespace":"default"}}
-    meta.helm.sh/release-name: vehicleappruntime
-    meta.helm.sh/release-namespace: default
-  name: feeder-config
----
-apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: pv-volume
@@ -111,18 +96,23 @@ spec:
       name: websocket
       protocol: TCP
 ---
-apiVersion: v1
-kind: Service
+apiVersion: dapr.io/v1alpha1
+kind: Component
 metadata:
-  name: mqtt-broker-nodeport
+  name: mqtt-pubsub
+  namespace: default
 spec:
-  type: NodePort
-  selector:
-    app: mqtt-broker
-  ports:
-  - port: 1883
-    targetPort: 1883
-    nodePort: 31883
+  type: pubsub.mqtt
+  version: v1
+  metadata:
+  - name: url
+    value: "tcp://{{.Values.imageMqttbroker.name}}.default.svc.cluster.local:1883"
+  - name: qos
+    value: 1
+  - name: retain
+    value: "false"
+  - name: cleanSession
+    value: "false"
 ---
 apiVersion: v1
 kind: Pod

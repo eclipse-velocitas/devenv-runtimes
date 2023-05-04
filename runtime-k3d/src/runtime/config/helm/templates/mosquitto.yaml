@@ -11,68 +11,89 @@
 # under the License.
 #
 # SPDX-License-Identifier: Apache-2.0
-
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{.Values.imageMosquitto.name}}
+  name: {{.Values.imageMqttbroker.name}}
   labels:
-    app: {{.Values.imageMosquitto.name}}
+    app: {{.Values.imageMqttbroker.name}}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{.Values.imageMosquitto.name}}
+      app: {{.Values.imageMqttbroker.name}}
   template:
     metadata:
       labels:
-        app: {{.Values.imageMosquitto.name}}
+        app: {{.Values.imageMqttbroker.name}}
     spec:
       containers:
-        - name: mqtt
-          image: {{.Values.imageMosquitto.repository}}:{{.Values.imageMosquitto.tag}}
-          imagePullPolicy: {{.Values.imageMosquitto.pullPolicy}}
+        - name: {{.Values.imageMqttbroker.name}}
+          image: {{.Values.imageMqttbroker.repository}}:{{.Values.imageMqttbroker.tag}}
+          imagePullPolicy: {{.Values.imageMqttbroker.pullPolicy}}
           args:
-          {{- range .Values.imageMosquitto.args}}
+          {{- range .Values.imageMqttbroker.args}}
             - {{.}}
           {{- end }}
+          {{- if .Values.imageMqttbroker.ports}}
           ports:
-            - name: default
-              containerPort: {{.Values.imageMosquitto.port}}
+          {{- range $i, $port := .Values.imageMqttbroker.ports }}
+            - name: default{{ $i }}
+              containerPort: {{ .port }}
               protocol: TCP
-            - name: websocket
-              containerPort: {{.Values.imageMosquitto.websocketPort}}
-              protocol: TCP
+          {{- end }}
+          {{- end }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{.Values.imageMosquitto.name}}
+  name: {{.Values.imageMqttbroker.name}}
   labels:
-    app: {{.Values.imageMosquitto.name}}
+    app: {{.Values.imageMqttbroker.name}}
 spec:
   type: ClusterIP
   selector:
-    app: {{.Values.imageMosquitto.name}}
+    app: {{.Values.imageMqttbroker.name}}
+  {{- if .Values.imageMqttbroker.ports}}
   ports:
-    - port: {{.Values.imageMosquitto.port}}
-      targetPort: default
-      name: default
+  {{- range $i, $port := .Values.imageMqttbroker.ports }}
+    - port: {{ .port }}
+      targetPort: default{{ $i }}
+      name: default{{ $i }}
       protocol: TCP
-    - port: {{.Values.imageMosquitto.websocketPort}}
-      targetPort: websocket
-      name: websocket
-      protocol: TCP
+  {{- end }}
+  {{- end }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{.Values.imageMosquitto.name}}-nodeport
+  name: {{.Values.imageMqttbroker.name}}-nodeport
 spec:
   type: NodePort
   selector:
-    app: {{.Values.imageMosquitto.name}}
+    app: {{.Values.imageMqttbroker.name}}
   ports:
-  - port: {{.Values.imageMosquitto.port}}
-    targetPort: {{.Values.imageMosquitto.port}}
-    nodePort: {{.Values.imageMosquitto.nodePort}}
+  {{- with (index .Values.imageMqttbroker.ports 0) }}
+  - port: {{.port}}
+    targetPort: {{.port}}
+    nodePort: {{.nodePort}}
+  {{- end }}
+---
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: mqtt-pubsub
+  namespace: default
+spec:
+  type: pubsub.mqtt
+  version: v1
+  metadata:
+  - name: url
+    value: "tcp://{{.Values.imageMqttbroker.name}}.default.svc.cluster.local:{{ (index .Values.imageMqttbroker.ports 0).port }}"
+  - name: qos
+    value: 1
+  - name: retain
+    value: "false"
+  - name: cleanSession
+    value: "false"

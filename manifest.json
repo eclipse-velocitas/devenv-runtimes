@@ -83,29 +83,48 @@
             "type": "runtime",
             "programs": [
                 {
-                    "id": "configure_controlplane",
-                    "executable": "./runtime-k3d/src/runtime/configure_controlplane.sh"
+                    "id": "install-deps",
+                    "executable": "python3",
+                    "args": ["./runtime-k3d/src/install_deps.py"]
                 },
                 {
-                    "id": "deploy_runtime",
-                    "executable": "./runtime-k3d/src/runtime/deploy_runtime.sh"
+                    "id": "runtime-up",
+                    "executable": "python3",
+                    "args": [ "./runtime-k3d/src/runtime-up.py" ]
                 },
                 {
-                    "id": "reset_controlplane",
-                    "executable": "./runtime-k3d/src/runtime/reset_controlplane.sh"
+                    "id": "runtime-down",
+                    "executable": "python3",
+                    "args": [ "./runtime-k3d/src/runtime-down.py" ]
                 },
                 {
-                    "id": "uninstall_runtime",
-                    "executable": "./runtime-k3d/src/runtime/uninstall_runtime.sh"
+                    "id": "generate-podspec",
+                    "executable": "python3",
+                    "args": [ "./runtime-k3d/src/gen_podspec.py" ]
+                },
+                {
+                    "id": "generate-helm",
+                    "executable": "python3",
+                    "args": [ "./runtime-k3d/src/gen_helm.py" ]
                 }
             ],
-            "start": [
+            "onPostInit": [
                 {
-                    "id": "configure_controlplane"
+                    "ref": "install-deps"
+                }
+            ],
+            "variables": [
+                {
+                    "name": "daprRuntimeVersion",
+                    "type": "string",
+                    "description": "Version of the dapr.io runtime to use.",
+                    "default": "1.10.3"
                 },
                 {
-                    "id": "deploy_runtime",
-                    "dependsOn": "configure_controlplane"
+                    "name": "daprCliVersion",
+                    "type": "string",
+                    "description": "Version of the dapr.io CLI to use.",
+                    "default": "1.10.0"
                 }
             ]
         },
@@ -121,15 +140,6 @@
                 {
                     "id": "deploy_vehicleapp",
                     "executable": "./runtime-k3d/src/deployment/deploy_vehicleapp.sh"
-                }
-            ],
-            "start": [
-                {
-                    "id": "build_vehicleapp"
-                },
-                {
-                    "id": "deploy_vehicleapp",
-                    "dependsOn": "build_vehicleapp"
                 }
             ]
         }

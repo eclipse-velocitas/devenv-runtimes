@@ -15,9 +15,10 @@
 import argparse
 import subprocess
 import sys
+from velocitas_lib import get_services
 from typing import Optional
 
-from lib import MiddlewareType, get_middleware_type, get_services, get_dapr_sidecar_args
+from lib import MiddlewareType, get_middleware_type, get_dapr_sidecar_args
 
 
 def get_dapr_app_id(service_id: str) -> str:

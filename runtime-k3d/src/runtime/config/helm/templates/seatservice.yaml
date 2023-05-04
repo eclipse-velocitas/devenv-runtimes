@@ -11,51 +11,63 @@
 # under the License.
 #
 # SPDX-License-Identifier: Apache-2.0
-
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{.Values.imageSeatService.name}}
+  name: {{.Values.imageSeatservice.name}}
   labels:
-    app: {{.Values.imageSeatService.name}}
+    app: {{.Values.imageSeatservice.name}}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{.Values.imageSeatService.name}}
+      app: {{.Values.imageSeatservice.name}}
   template:
     metadata:
       labels:
-        app: {{.Values.imageSeatService.name}}
+        app: {{.Values.imageSeatservice.name}}
       annotations:
         dapr.io/enabled: "true"
-        dapr.io/app-id: "{{.Values.imageSeatService.daprAppid}}"
-        dapr.io/app-port: "{{.Values.imageSeatService.daprAppPort}}"
-        dapr.io/log-level: "{{.Values.imageSeatService.daprLogLevel}}"
+        dapr.io/app-id: "{{.Values.imageSeatservice.name}}"
+        {{- with (index .Values.imageSeatservice.ports 0) }}
+        dapr.io/app-port: "{{.port}}"
+        {{- end }}
+        dapr.io/log-level: "debug"
         dapr.io/config: "config"
         dapr.io/app-protocol: "grpc"
     spec:
       containers:
-        - name: seatservice
-          image: {{.Values.imageSeatService.repository}}:{{.Values.imageSeatService.tag}}
-          imagePullPolicy: {{.Values.imageSeatService.pullPolicy}}
+        - name: {{.Values.imageSeatservice.name}}
+          image: {{.Values.imageSeatservice.repository}}:{{.Values.imageSeatservice.tag}}
+          imagePullPolicy: {{.Values.imageSeatservice.pullPolicy}}
+          {{- if .Values.imageSeatservice.ports}}
           ports:
-          - name: default
-            containerPort: {{.Values.imageSeatService.daprAppPort}}
-            protocol: TCP
+          {{- range $i, $port := .Values.imageSeatservice.ports }}
+            - name: default{{ $i }}
+              containerPort: {{ .port }}
+              protocol: TCP
+          {{- end }}
+          {{- end }}
+          {{- if .Values.imageSeatservice.environmentVariables}}
           env:
-          - name: VEHICLEDATABROKER_DAPR_APP_ID
-            value: {{.Values.imageVehicleDataBroker.daprAppid}}
+          {{- range .Values.imageSeatservice.environmentVariables }}
+            - name: {{ .name }}
+              value: "{{ .value }}"
+          {{- end }}
+          {{- end }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{.Values.imageSeatService.name}}-nodeport
+  name: {{.Values.imageSeatservice.name}}-nodeport
 spec:
   type: NodePort
   selector:
-    app: {{.Values.imageSeatService.name}}
+    app: {{.Values.imageSeatservice.name}}
   ports:
-    - port: {{.Values.imageSeatService.daprAppPort}}
-      targetPort: {{.Values.imageSeatService.daprAppPort}}
-      nodePort: {{.Values.imageSeatService.nodePort}}
+  {{- with (index .Values.imageSeatservice.ports 0) }}
+  - port: {{.port}}
+    targetPort: {{.port}}
+    nodePort: {{.nodePort}}
+  {{- end }}
