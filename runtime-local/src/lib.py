@@ -68,9 +68,9 @@ def get_dapr_sidecar_args(
         "--app-protocol",
         "grpc",
         "--resources-path",
-        f"{get_script_path()}/.dapr/components",
+        f"{get_script_path()}/runtime/config/.dapr/components",
         "--config",
-        f"{get_script_path()}/.dapr/config.yaml",
+        f"{get_script_path()}/runtime/config/.dapr/config.yaml",
     ] + (
         ["--app-port", str(app_port)] if app_port else []
     ) + (

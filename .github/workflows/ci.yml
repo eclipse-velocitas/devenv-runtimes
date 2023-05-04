@@ -22,7 +22,7 @@ on:
   push:
     # Run only on branches/commits and not tags
     branches:
-      - main
+      - unit-tests
   pull_request:
     branches:
       - main
@@ -38,6 +38,43 @@ jobs:
 
       - name: Run Linters
         uses: ./.github/actions/pre-commit-action
+
+  unit-test:
+    name: "Run unit tests"
+    runs-on: ubuntu-22.04
+    container: ghcr.io/eclipse-velocitas/devcontainer-base-images/python:latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install required packages
+        run: |
+          pip install -e velocitas_lib
+          pip install -r runtime-k3d/src/requirements.txt
+          pip install -r runtime-k3d/src/test/requirements.txt
+          pip install -r runtime-local/test/requirements.txt
+          pip install -r velocitas_lib/test/requirements.txt
+
+      - name: unit tests
+        shell: bash
+        run: |
+          pytest --ignore-glob='*integration*' --override-ini junit_family=xunit1 --junit-xml=./results/UnitTest/junit.xml \
+          --cov ./runtime-k3d/src/test \
+          --cov ./runtime-local/test \
+          --cov ./velocitas_lib/test \
+          --cov-report=xml:results/CodeCoverage/cobertura-coverage.xml \
+          --cov-branch ./runtime-k3d/src/test \
+          --cov-branch ./runtime-local/test \
+          --cov-branch ./velocitas_lib/test
+          coverage2clover -i results/CodeCoverage/cobertura-coverage.xml -o results/CodeCoverage/clover.xml
+          coveragepy-lcov --data_file_path ./.coverage --output_file_path results/CodeCoverage/lcov.info
+
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          junit_files: ./results/UnitTest/junit.xml
 
   run-local-integration-tests:
     name: Run Integration Tests for runtime-local
@@ -55,7 +92,10 @@ jobs:
 
       - name: Install required packages
         run: |
-          pip install -r runtime-local/test/requirements.txt
+          python -m pip install --upgrade pipenv
+          pipenv install ./velocitas_lib
+          pipenv install -r runtime-local/src/requirements.txt
+          pipenv install -r runtime-local/test/requirements.txt
           sudo curl -L https://github.com/eclipse-velocitas/cli/releases/latest/download/velocitas-linux-x64 -o /usr/bin/velocitas
           sudo chmod +x /usr/bin/velocitas
 
@@ -67,4 +107,4 @@ jobs:
       - name: Run integration tests for runtime-local
         run: |
           cd runtime-local/test
-          pytest -s ./integration/integration_test.py
+          pipenv run pytest -s ./integration/integration_test.py

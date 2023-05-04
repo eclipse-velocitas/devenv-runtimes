@@ -12,12 +12,18 @@
                 {
                     "id": "run-mosquitto",
                     "executable": "python3",
-                    "args": ["./runtime-local/src/run-service.py", "mqtt"]
+                    "args": [
+                        "./runtime-local/src/run-service.py",
+                        "mqtt-broker"
+                    ]
                 },
                 {
                     "id": "run-vehicledatabroker",
                     "executable": "python3",
-                    "args": ["./runtime-local/src/run-service.py", "vehicledatabroker"]
+                    "args": [
+                        "./runtime-local/src/run-service.py",
+                        "vehicledatabroker"
+                    ]
                 },
                 {
                     "id": "run-vehicledatabroker-cli",
@@ -26,32 +32,46 @@
                 {
                     "id": "run-feedercan",
                     "executable": "python3",
-                    "args": ["./runtime-local/src/run-service.py", "feedercan"]
+                    "args": [
+                        "./runtime-local/src/run-service.py",
+                        "feedercan"
+                    ]
                 },
                 {
                     "id": "run-vehicleservices",
                     "executable": "python3",
-                    "args": ["./runtime-local/src/run-service.py", "seatservice"]
+                    "args": [
+                        "./runtime-local/src/run-service.py",
+                        "seatservice"
+                    ]
                 },
                 {
                     "id": "up",
                     "executable": "python3",
-                    "args": ["./runtime-local/src/runtime-up.py"]
+                    "args": [
+                        "./runtime-local/src/runtime-up.py"
+                    ]
                 },
                 {
                     "id": "install-deps",
-                    "executable": "python",
-                    "args": ["./runtime-local/src/install_deps.py"]
+                    "executable": "python3",
+                    "args": [
+                        "./runtime-local/src/install_deps.py"
+                    ]
                 },
                 {
                     "id": "run-vehicle-app",
                     "executable": "python3",
-                    "args": ["./runtime-local/src/run-vehicle-app.py"]
+                    "args": [
+                        "./runtime-local/src/run-vehicle-app.py"
+                    ]
                 },
                 {
                     "id": "run-dapr-sidecar",
                     "executable": "python3",
-                    "args": ["./runtime-local/src/run-dapr-sidecar.py"]
+                    "args": [
+                        "./runtime-local/src/run-dapr-sidecar.py"
+                    ]
                 }
             ],
             "onPostInit": [
@@ -85,27 +105,37 @@
                 {
                     "id": "install-deps",
                     "executable": "python3",
-                    "args": ["./runtime-k3d/src/install_deps.py"]
+                    "args": [
+                        "./runtime-k3d/src/install_deps.py"
+                    ]
                 },
                 {
                     "id": "runtime-up",
                     "executable": "python3",
-                    "args": [ "./runtime-k3d/src/runtime-up.py" ]
+                    "args": [
+                        "./runtime-k3d/src/runtime-up.py"
+                    ]
                 },
                 {
                     "id": "runtime-down",
                     "executable": "python3",
-                    "args": [ "./runtime-k3d/src/runtime-down.py" ]
+                    "args": [
+                        "./runtime-k3d/src/runtime-down.py"
+                    ]
                 },
                 {
                     "id": "generate-podspec",
                     "executable": "python3",
-                    "args": [ "./runtime-k3d/src/gen_podspec.py" ]
+                    "args": [
+                        "./runtime-k3d/src/gen_podspec.py"
+                    ]
                 },
                 {
                     "id": "generate-helm",
                     "executable": "python3",
-                    "args": [ "./runtime-k3d/src/gen_helm.py" ]
+                    "args": [
+                        "./runtime-k3d/src/gen_helm.py"
+                    ]
                 }
             ],
             "onPostInit": [
