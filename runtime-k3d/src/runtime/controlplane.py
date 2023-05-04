@@ -140,6 +140,7 @@ def deploy_zipkin():
             "9411",
         ],
         stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
     )
 
 

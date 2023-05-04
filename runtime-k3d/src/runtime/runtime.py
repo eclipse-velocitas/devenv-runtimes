@@ -66,7 +66,9 @@ def create_vspec_config():
             "configmap",
             "vspec-config",
             f"--from-file={vspec_file_path}",
-        ]
+        ],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
 
 
