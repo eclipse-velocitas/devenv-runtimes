@@ -18,7 +18,7 @@ from gen_helm import gen_helm
 from lib import parse_service_config
 from yaspin.core import Yaspin
 
-from velocitas_lib import get_cache_data, get_services
+from velocitas_lib import get_services
 
 
 def is_runtime_installed() -> bool:

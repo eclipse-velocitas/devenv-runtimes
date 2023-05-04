@@ -90,7 +90,7 @@ spec:
   version: v1
   metadata:
   - name: url
-    value: "tcp://{{.Values.imageMqttbroker.name}}.default.svc.cluster.local:1883"
+    value: "tcp://{{.Values.imageMqttbroker.name}}.default.svc.cluster.local:{{ (index .Values.imageMqttbroker.ports 0).port }}"
   - name: qos
     value: 1
   - name: retain
