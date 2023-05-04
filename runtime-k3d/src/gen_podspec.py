@@ -80,7 +80,7 @@ def create_podspec(templates, service_spec):
                 service_id, generate_clusterIP_port_spec(service_config)
             )
         )
-        # takes first specified port in runtime.json
+        # mqtt_pubsub uses first specified port in runtime.json
         pods.append(gen_mqtt_pubsub(service_id, service_config.ports[0]))
 
     return pods
@@ -116,14 +116,22 @@ def generate_pod_spec(template_pod, service_config):
 def get_volumes(service_config):
     volumes = []
     for mount in service_config.mounts:
-        mount_path, file = get_mount_folder_and_file(mount)
-        file_name = os.path.splitext(file)[0]
-        volumes.append(
-            {
-                "name": f"{file_name}",
-                "configMap": {"name": f"{file_name}-config"},
-            }
-        )
+        _, file = get_mount_folder_and_file(mount)
+        if file != "":
+            file_name = os.path.splitext(file)[0]
+            volumes.append(
+                {
+                    "name": f"{file_name}",
+                    "configMap": {"name": f"{file_name}-config"},
+                }
+            )
+        else:
+            volumes.append(
+                {
+                    "name": "pv-storage",
+                    "persistentVolumeClaim": {"claimName": "pv-claim"},
+                }
+            )
     return volumes
 
 
@@ -136,13 +144,17 @@ def generate_container_mount(service_config):
     mounts = []
     for mount in service_config.mounts:
         mount_path, file = get_mount_folder_and_file(mount)
-        mounts.append(
-            {
-                "name": f"{os.path.splitext(file)[0]}",
-                "mountPath": f"{mount_path}",
-                "subPath": f"{file}",
-            }
-        )
+        if file != "":
+            mounts.append(
+                {
+                    "name": f"{os.path.splitext(file)[0]}",
+                    "mountPath": f"{mount_path}/{file}",
+                    "subPath": f"{file}",
+                }
+            )
+        else:
+            mounts.append({"mountPath": f"{mount_path}", "name": "pv-storage"})
+
     return mounts
 
 
@@ -212,7 +224,7 @@ def generate_nodeport_service(service_id, port):
 
     Args:
         service_config: The parsed configuration from the runtime.json
-        port
+        port: The port to be published
     """
     nodeport_spec = {
         "apiVersion": "v1",
@@ -237,7 +249,7 @@ def generate_nodeport_service(service_id, port):
 
 def gen_mqtt_pubsub(service_id, port):
     return {
-        "apiVersion": " dapr.io/v1alpha1",
+        "apiVersion": "dapr.io/v1alpha1",
         "kind": "Component",
         "metadata": {"name": "mqtt-pubsub", "namespace": "default"},
         "spec": {

@@ -13,7 +13,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import subprocess
-
+import os
 from gen_helm import gen_helm
 from lib import parse_service_config
 from yaspin.core import Yaspin
@@ -57,19 +57,28 @@ def retag_docker_images():
         retag_docker_image(service_config.image)
 
 
-def create_vspec_config():
-    vspec_file_path = get_cache_data()["vspec_file_path"]
-    subprocess.check_call(
-        [
-            "kubectl",
-            "create",
-            "configmap",
-            "vspec-config",
-            f"--from-file={vspec_file_path}",
-        ],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
+def create_config_maps():
+    services = get_services()
+    for service in services:
+        service_config = parse_service_config(service["config"])
+        for mount in service_config.mounts:
+            local_path = mount.split(":")[0]
+            # if folder, don't create configmap
+            if "." not in local_path.split(os.sep)[-1]:
+                return
+
+            file = os.path.splitext(os.path.basename(local_path))[0]
+            subprocess.check_call(
+                [
+                    "kubectl",
+                    "create",
+                    "configmap",
+                    f"{file}-config",
+                    f"--from-file={local_path}",
+                ],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
 
 
 def install_runtime(helm_output_path: str):
@@ -104,7 +113,7 @@ def deploy_runtime(spinner: Yaspin):
     if not is_runtime_installed():
         gen_helm("./helm")
         retag_docker_images()
-        create_vspec_config()
+        create_config_maps()
         install_runtime("./helm")
         status = status + "installed."
     else:

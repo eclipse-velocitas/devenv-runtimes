@@ -122,10 +122,6 @@
                 "value": "ghcr.io/eclipse/kuksa.val.feeders/dbc2val:v0.1.1"
             },
             {
-                "key": "mount",
-                "value": "${{ builtin.script_dir }}/data:/data"
-            },
-            {
                 "key": "env",
                 "value": "VEHICLEDATABROKER_DAPR_APP_ID=vehicledatabroker"
             },
@@ -148,6 +144,10 @@
             {
                 "key": "env",
                 "value": "MAPPING_FILE=/data/mappingDefault.yml"
+            },
+            {
+                "key": "mount",
+                "value": "${{ builtin.script_dir }}/runtime/config/volume/:/data"
             },
             {
                 "key": "start-pattern",
