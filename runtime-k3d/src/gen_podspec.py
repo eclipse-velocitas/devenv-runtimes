@@ -14,14 +14,11 @@
 
 import argparse
 import os
-import ruamel.yaml as yaml
 
-from velocitas_lib import get_services, get_workspace_dir, get_script_path
-from lib import (
-    parse_service_config,
-    generate_nodeport,
-    create_cluster_ip_spec,
-)
+import ruamel.yaml as yaml
+from lib import create_cluster_ip_spec, generate_nodeport, parse_service_config
+
+from velocitas_lib import get_script_path, get_services, get_workspace_dir
 
 
 def find_service_spec(lst, kind, name):

@@ -34,8 +34,8 @@ def install_packages():
     """Install all required Python packages."""
     script_path = get_script_path()
     pip(["install", "-r", f"{script_path}/requirements.txt"])
-    
-    
+
+
 def install_velocitas_lib():
     """Install the velocitas lib."""
     script_path = get_script_path()

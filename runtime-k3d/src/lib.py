@@ -15,11 +15,10 @@
 from typing import Dict, List, NamedTuple, Optional
 
 from velocitas_lib import (
-    replace_variables,
     get_cache_data,
+    get_script_path,
     json_obj_to_flat_map,
     replace_variables,
-    get_script_path,
 )
 
 
