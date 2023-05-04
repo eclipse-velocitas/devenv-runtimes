@@ -80,6 +80,8 @@ def create_podspec(templates, service_spec):
                 service_id, generate_clusterIP_port_spec(service_config)
             )
         )
+        # takes first specified port in runtime.json
+        pods.append(gen_mqtt_pubsub(service_id, service_config.ports[0]))
 
     return pods
 
@@ -105,15 +107,24 @@ def generate_pod_spec(template_pod, service_config):
 
     if service_config.mounts:
         spec["volumeMounts"] = generate_container_mount(service_config)
-        template_pod["spec"]["volumes"] = [
-            {
-                "name": "pv-storage",
-                "persistentVolumeClaim": {"claimName": "pv-claim"},
-            }
-        ]
+        template_pod["spec"]["volumes"] = get_volumes(service_config)
 
     template_pod["spec"]["containers"][0] = spec
     return template_pod
+
+
+def get_volumes(service_config):
+    volumes = []
+    for mount in service_config.mounts:
+        mount_path, file = get_mount_folder_and_file(mount)
+        file_name = os.path.splitext(file)[0]
+        volumes.append(
+            {
+                "name": f"{file_name}",
+                "configMap": {"name": f"{file_name}-config"},
+            }
+        )
+    return volumes
 
 
 def generate_container_mount(service_config):
@@ -124,12 +135,24 @@ def generate_container_mount(service_config):
     """
     mounts = []
     for mount in service_config.mounts:
-        mount_path = mount.split(":")[1]
-        # if file is given, mount the parent folder
-        if "." in mount_path.split(os.sep)[-1]:
-            mount_path = os.path.dirname(mount_path)
-        mounts.append({"mountPath": f"{mount_path}", "name": "pv-storage"})
+        mount_path, file = get_mount_folder_and_file(mount)
+        mounts.append(
+            {
+                "name": f"{os.path.splitext(file)[0]}",
+                "mountPath": f"{mount_path}",
+                "subPath": f"{file}",
+            }
+        )
     return mounts
+
+
+def get_mount_folder_and_file(mount):
+    mount_path = mount.split(":")[1]
+    file = ""
+    if "." in mount_path.split(os.sep)[-1]:
+        file = os.path.basename(mount_path)
+        mount_path = os.path.dirname(mount_path)
+    return (mount_path, file)
 
 
 def get_env(service_config):
@@ -210,6 +233,27 @@ def generate_nodeport_service(service_id, port):
     )
     nodeport_spec["spec"]["ports"] = ports
     return nodeport_spec
+
+
+def gen_mqtt_pubsub(service_id, port):
+    return {
+        "apiVersion": " dapr.io/v1alpha1",
+        "kind": "Component",
+        "metadata": {"name": "mqtt-pubsub", "namespace": "default"},
+        "spec": {
+            "type": "pubsub.mqtt",
+            "version": "v1",
+            "metadata": [
+                {
+                    "name": "url",
+                    "value": f"tcp://{service_id}.default.svc.cluster.local:{port}",
+                },
+                {"name": "qos", "value": 1},
+                {"name": "retain", "value": "false"},
+                {"name": "cleanSession", "value": "false"},
+            ],
+        },
+    }
 
 
 def gen_podspec(output_file_path: str):
