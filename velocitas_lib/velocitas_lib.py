@@ -69,7 +69,7 @@ def replace_variables(input_str: str, variables: dict[str, str]) -> str:
 
 def json_obj_to_flat_map(obj, prefix: str = "", separator: str = ".") -> dict[str, str]:
     """Flatten a JSON Object into a one dimensional dict by joining the keys
-       with the specified separator."""
+    with the specified separator."""
     result = dict[str, str]()
     if isinstance(obj, dict):
         for key, value in obj.items():
