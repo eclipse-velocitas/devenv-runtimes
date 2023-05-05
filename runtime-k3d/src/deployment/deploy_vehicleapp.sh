@@ -13,8 +13,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-APP_NAME=$(echo $VELOCITAS_APP_MANIFEST | jq .Name | tr -d '"' | tr '[:upper:]' '[:lower:]')
-APP_PORT=$(echo $VELOCITAS_APP_MANIFEST | jq .Port | tr -d '"')
+APP_NAME=$(echo $VELOCITAS_APP_MANIFEST | jq .name | tr -d '"' | tr '[:upper:]' '[:lower:]')
+APP_PORT=50008
 APP_REGISTRY="k3d-registry.localhost:12345"
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )

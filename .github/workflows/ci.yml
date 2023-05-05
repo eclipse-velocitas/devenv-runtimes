@@ -85,6 +85,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
       - name: Set commit id
         run: |
           NEW_CONFIG="$(jq --arg GITHUB_SHA "$GITHUB_SHA" '.packages[0].version |= $GITHUB_SHA' runtime-local/test/.velocitas.json)"
@@ -92,19 +96,16 @@ jobs:
 
       - name: Install required packages
         run: |
-          python -m pip install --upgrade pipenv
-          pipenv install ./velocitas_lib
-          pipenv install -r runtime-local/src/requirements.txt
-          pipenv install -r runtime-local/test/requirements.txt
           sudo curl -L https://github.com/eclipse-velocitas/cli/releases/latest/download/velocitas-linux-x64 -o /usr/bin/velocitas
           sudo chmod +x /usr/bin/velocitas
 
       - name: Init velocitas project
         run: |
           cd runtime-local/test
-          pipenv run velocitas init
+          velocitas init
 
       - name: Run integration tests for runtime-local
         run: |
           cd runtime-local/test
-          pipenv run pytest -s ./integration/integration_test.py
+          pip install -r requirements.txt
+          pytest -s ./integration/integration_test.py
