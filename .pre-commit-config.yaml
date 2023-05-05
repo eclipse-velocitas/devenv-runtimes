@@ -8,7 +8,7 @@ repos:
       - id: end-of-file-fixer
       - id: check-yaml
         args: [--allow-multiple-documents]
-        exclude: ^runtime-k3d/src/deployment/config/helm/templates/|^runtime-k3d/src/runtime/config/helm/templates/|^runtime-k3d/src/runtime/config/volume/|^runtime-local/src/data/mappingDefault.yml
+        exclude: ^runtime-k3d/src/deployment/config/helm/templates/|^runtime-k3d/src/runtime/config/helm/templates/|^runtime-k3d/src/runtime/config/volume/|^runtime-local/src/runtime/config/volume/mappingDefault.yml
       - id: check-added-large-files
 
   - repo: https://github.com/PyCQA/isort
@@ -40,9 +40,9 @@ repos:
     rev: "v1.2.0"
     hooks:
       - id: mypy
-        args: [runtime-k3d]
+        args: [runtime-k3d, runtime-local]
         language: python
-        language_version: "3.11"
+        language_version: "3.10"
         pass_filenames: false
 
   # - repo: https://github.com/pycqa/pydocstyle
