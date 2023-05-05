@@ -15,31 +15,24 @@
 # flake8: noqa: E402
 import os
 import sys
+import pytest
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
 from gen_podspec import generate_port_spec
 from lib import ServiceSpecConfig
 
 
-def test_gen_port_spec():
+@pytest.mark.parametrize("ports", [["1234"], ["0"], ["4567", "1234"]])
+def test_gen_port_spec(ports):
     port_spec = generate_port_spec(
-        ServiceSpecConfig(None, None, None, None, ["1234", "5678", "0"], None)
+        ServiceSpecConfig(None, None, None, None, ports, None)
     )
     desired = [
         {
-            "name": "port1234",
-            "containerPort": 1234,
+            "name": f"port{port}",
+            "containerPort": int(port),
             "protocol": "TCP",
-        },
-        {
-            "name": "port5678",
-            "containerPort": 5678,
-            "protocol": "TCP",
-        },
-        {
-            "name": "port0",
-            "containerPort": 0,
-            "protocol": "TCP",
-        },
+        }
+        for port in ports
     ]
     assert port_spec == desired
