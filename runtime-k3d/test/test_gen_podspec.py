@@ -14,7 +14,7 @@
 import os
 import sys
 
-sys.path.append(os.path.abspath("/workspaces/devenv-runtimes/runtime-k3d/src"))
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
 from gen_podspec import generate_port_spec
 from lib import ServiceSpecConfig
 
