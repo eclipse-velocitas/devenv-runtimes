@@ -15,11 +15,10 @@
 from typing import Dict, List, NamedTuple, Optional
 
 from velocitas_lib import (
-    replace_variables,
     get_cache_data,
+    get_script_path,
     json_obj_to_flat_map,
     replace_variables,
-    get_script_path,
 )
 
 
@@ -80,7 +79,7 @@ def parse_service_config(service_spec_config: dict):
                 config_entry["value"] = replace_variables(
                     config_entry["value"], variables
                 )
-        match config_entry["key"]:
+        match config_entry["key"]:  # noqa: E999
             case "image":
                 container_image = config_entry["value"]
             case "env":

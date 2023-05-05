@@ -13,12 +13,14 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import argparse
-import re
-import yaml
 import os
+import re
 import shutil
-from velocitas_lib import get_services, get_workspace_dir, get_script_path
-from lib import parse_service_config, generate_nodeport
+
+import yaml
+from lib import generate_nodeport, parse_service_config
+
+from velocitas_lib import get_script_path, get_services, get_workspace_dir
 
 
 def generate_env_vars_spec(service_spec_config):

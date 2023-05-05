@@ -15,17 +15,23 @@
 import argparse
 import subprocess
 import sys
-from velocitas_lib import get_services
 from typing import Optional
 
-from lib import MiddlewareType, get_middleware_type, get_dapr_sidecar_args
+from lib import MiddlewareType, get_dapr_sidecar_args, get_middleware_type
+
+from velocitas_lib import get_services
 
 
 def get_dapr_app_id(service_id: str) -> str:
     return f"{service_id.upper()}_DAPR_APP_ID"
 
 
-def run_app(executable_path: str, args: list[str], app_id: Optional[str] = None, app_port: Optional[str] = None):
+def run_app(
+    executable_path: str,
+    args: list[str],
+    app_id: Optional[str] = None,
+    app_port: Optional[str] = None,
+):
     program_args = [executable_path, *args]
     envs = dict()
     for service in get_services():
@@ -64,14 +70,14 @@ if __name__ == "__main__":
         help="The port where the app is listening on.",
     )
     parser.add_argument(
-        "executable_path",
-        type=str,
-        help="Path to the executable to be invoked."
+        "executable_path", type=str, help="Path to the executable to be invoked."
     )
-    parser.add_argument(
-        "app_args",
-        nargs="*"
-    )
+    parser.add_argument("app_args", nargs="*")
 
     args = parser.parse_args()
-    run_app(args.executable_path, args.app_args, app_id=args.dapr_app_id, app_port=args.dapr_app_port)
+    run_app(
+        args.executable_path,
+        args.app_args,
+        app_id=args.dapr_app_id,
+        app_port=args.dapr_app_port,
+    )

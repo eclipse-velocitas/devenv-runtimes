@@ -15,12 +15,16 @@
 import signal
 import subprocess
 import time
-
 from typing import Dict
+
+from lib import (
+    get_log_file_name,
+    get_services,
+    run_service,
+    stop_container,
+    stop_service,
+)
 from yaspin import yaspin
-
-from lib import get_log_file_name, get_services, run_service, stop_container, stop_service
-
 
 spawned_processes: Dict[str, subprocess.Popen] = {}
 
@@ -31,7 +35,7 @@ def run_services() -> None:
     with yaspin(text="Starting runtime") as spinner:
         try:
             for service in get_services():
-                service_id = service['id']
+                service_id = service["id"]
                 stop_service(service)
                 spawned_processes[service_id] = run_service(service)
                 spinner.write(f"> {service_id} running")
@@ -64,7 +68,7 @@ def terminate_spawned_processes():
         spinner.ok("✔")
 
 
-def handler(_signum, _frame):
+def handler(_signum, _frame):  # noqa: U101 unused arguments
     terminate_spawned_processes()
 
 

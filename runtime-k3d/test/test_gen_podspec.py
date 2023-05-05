@@ -11,6 +11,8 @@
 # under the License.
 #
 # SPDX-License-Identifier: Apache-2.0
+
+# flake8: noqa: E402
 import os
 import sys
 

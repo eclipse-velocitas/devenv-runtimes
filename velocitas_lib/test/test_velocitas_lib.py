@@ -12,24 +12,25 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import json
 import os
 import sys
-import json
+
 from velocitas_lib import (
-    require_env,
-    get_workspace_dir,
     get_app_manifest,
-    get_script_path,
     get_cache_data,
-    replace_variables,
+    get_script_path,
+    get_workspace_dir,
     json_obj_to_flat_map,
+    replace_variables,
+    require_env,
 )
 
 cache_data_mock = {"testPropA": "testValueA", "testPropB": "testValueB"}
 app_manifest = {"vehicleModel": {"src": "test"}}
 
 os.environ["TEST"] = "test"
-os.environ["VELOCITAS_WORKSPACE_DIR"] = "/tmp/vehicle-app-workspace"
+os.environ["VELOCITAS_WORKSPACE_DIR"] = "/test/vehicle-app-workspace"
 os.environ["VELOCITAS_APP_MANIFEST"] = json.dumps(app_manifest)
 os.environ["VELOCITAS_CACHE_DATA"] = json.dumps(cache_data_mock)
 
@@ -39,7 +40,7 @@ def test_require_env():
 
 
 def test_get_workspace_dir():
-    assert get_workspace_dir() == "/tmp/vehicle-app-workspace"
+    assert get_workspace_dir() == "/test/vehicle-app-workspace"
 
 
 def test_get_app_manifest():

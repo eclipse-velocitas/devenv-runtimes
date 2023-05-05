@@ -102,7 +102,7 @@ jobs:
       - name: Init velocitas project
         run: |
           cd runtime-local/test
-          velocitas init
+          pipenv run velocitas init
 
       - name: Run integration tests for runtime-local
         run: |

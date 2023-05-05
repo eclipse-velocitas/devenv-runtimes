@@ -12,8 +12,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import subprocess
 import os
+import subprocess
+
 from gen_helm import gen_helm
 from lib import parse_service_config
 from yaspin.core import Yaspin
