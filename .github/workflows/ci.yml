@@ -76,6 +76,10 @@ jobs:
         with:
           junit_files: ./results/UnitTest/junit.xml
 
+      - uses: 5monkeys/cobertura-action@master
+        with:
+          path: results/CodeCoverage/cobertura-coverage.xml
+
   run-local-integration-tests:
     name: Run Integration Tests for runtime-local
     runs-on: ubuntu-22.04
