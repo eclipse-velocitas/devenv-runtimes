@@ -164,12 +164,18 @@
             "type": "deployment",
             "programs": [
                 {
-                    "id": "build_vehicleapp",
-                    "executable": "./runtime-k3d/src/deployment/build_vehicleapp.sh"
+                    "id": "build-vehicleapp",
+                    "executable": "python3",
+                    "args": [
+                        "./runtime-k3d/src/deployment/build_vehicleapp.py"
+                    ]
                 },
                 {
-                    "id": "deploy_vehicleapp",
-                    "executable": "./runtime-k3d/src/deployment/deploy_vehicleapp.sh"
+                    "id": "deploy-vehicleapp",
+                    "executable": "python3",
+                    "args": [
+                        "./runtime-k3d/src/deployment/deploy_vehicleapp.py"
+                    ]
                 }
             ]
         }

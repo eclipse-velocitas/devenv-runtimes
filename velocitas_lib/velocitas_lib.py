@@ -16,6 +16,7 @@ import json
 import os
 import re
 import sys
+from typing import Dict
 
 
 def require_env(name: str) -> str:
@@ -51,7 +52,7 @@ def get_script_path() -> str:
     return os.path.dirname(os.path.realpath(sys.argv[0]))
 
 
-def get_cache_data():
+def get_cache_data() -> Dict[str, any]:
     """Return the data of the cache as Python object."""
     return json.loads(require_env("VELOCITAS_CACHE_DATA"))
 
