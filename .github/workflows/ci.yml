@@ -60,6 +60,7 @@ jobs:
         shell: bash
         run: |
           pytest --ignore-glob='*integration*' --override-ini junit_family=xunit1 --junit-xml=./results/UnitTest/junit.xml \
+          --cov-append \
           --cov ./runtime-k3d/test \
           --cov ./runtime-local/test \
           --cov ./velocitas_lib/test \
