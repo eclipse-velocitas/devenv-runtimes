@@ -18,13 +18,13 @@ import sys
 import pytest
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
-from gen_podspec import generate_port_spec
+import gen_podspec
 from lib import ServiceSpecConfig
 
 
 @pytest.mark.parametrize("ports", [["1234"], ["0"], ["4567", "1234"]])
 def test_gen_port_spec(ports):
-    port_spec = generate_port_spec(
+    port_spec = gen_podspec.generate_port_spec(
         ServiceSpecConfig(None, None, None, None, ports, None)
     )
     desired = [
@@ -36,3 +36,72 @@ def test_gen_port_spec(ports):
         for port in ports
     ]
     assert port_spec == desired
+
+
+@pytest.mark.parametrize("ports", [["1234"], ["0"], ["4567", "1234"]])
+def test_gen_clusterIp_port_spec(ports):
+    port_spec = gen_podspec.generate_clusterIP_port_spec(
+        ServiceSpecConfig(None, None, None, None, ports, None)
+    )
+    desired = [
+        {
+            "name": f"port{port}",
+            "port": int(port),
+            "targetPort": int(port),
+            "protocol": "TCP",
+        }
+        for port in ports
+    ]
+    assert port_spec == desired
+
+
+@pytest.mark.parametrize("service_id,port", [("test", "1234"), ("", "0")])
+def test_gen_mqtt_pubsub(service_id, port):
+    gen = gen_podspec.gen_mqtt_pubsub(service_id, port)
+    desired = {
+        "apiVersion": "dapr.io/v1alpha1",
+        "kind": "Component",
+        "metadata": {"name": "mqtt-pubsub", "namespace": "default"},
+        "spec": {
+            "type": "pubsub.mqtt",
+            "version": "v1",
+            "metadata": [
+                {
+                    "name": "url",
+                    "value": f"tcp://{service_id}.default.svc.cluster.local:{port}",
+                },
+                {"name": "qos", "value": 1},
+                {"name": "retain", "value": "false"},
+                {"name": "cleanSession", "value": "false"},
+            ],
+        },
+    }
+    assert gen == desired
+
+
+@pytest.mark.parametrize(
+    "mount",
+    [
+        "test:test",
+        "/test/test/test:test",
+        pytest.param("test/test.json:test.json", marks=pytest.mark.xfail),
+    ],
+)
+def test_get_mount_folder(mount):
+    path, _ = gen_podspec.get_mount_folder_and_file(mount)
+    expected = mount.split(":")[1]
+
+    assert path == expected
+
+
+@pytest.mark.parametrize(
+    "mount",
+    [
+        pytest.param("test:test", marks=pytest.mark.xfail),
+        "test/test.json:test.json",
+    ],
+)
+def test_get_mount_file(mount):
+    _, file = gen_podspec.get_mount_folder_and_file(mount)
+    expected = mount.split(":")[1]
+    assert file == expected
