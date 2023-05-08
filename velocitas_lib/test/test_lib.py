@@ -12,10 +12,13 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+# flake8: noqa: U100 unused argument (because of pytest.fixture)
+
 import json
 import os
-import pytest
 import sys
+
+import pytest
 
 from velocitas_lib import (
     get_app_manifest,
@@ -54,16 +57,16 @@ def set_velocitas_cache_data() -> str:
     return os.environ["VELOCITAS_CACHE_DATA"]
 
 
-def test_require_env__env_var_set__returns_env_value(set_test_env_var):
+def test_require_env__env_var_set__returns_env_value(set_test_env_var):  # type: ignore
     assert require_env("TEST") == "test"
 
 
 def test_require_env__env_var_not_set__raises_ValueError():
     with pytest.raises(ValueError):
-        require_env("TEST_ENV_NOT_SET") == "test"
+        require_env("TEST_ENV_NOT_SET")
 
 
-def test_get_workspace_dir__returns_workspace_dir_path(set_velocitas_workspace_dir):
+def test_get_workspace_dir__returns_workspace_dir_path(set_velocitas_workspace_dir):  # type: ignore
     assert get_workspace_dir() == "/test/vehicle-app-workspace"
 
 
@@ -73,9 +76,9 @@ def test_get_app_manifest__app_manifest_set__returns_app_manifest_data(
     assert get_app_manifest()["vehicleModel"]["src"] == "test"
 
 
-def test_get_app_manifest__missing_key__raises_KeyError(set_app_manifest):
+def test_get_app_manifest__missing_key__raises_KeyError(set_app_manifest):  # type: ignore
     with pytest.raises(KeyError):
-        get_app_manifest()["vehicleModel"]["srcs"] == "test"
+        get_app_manifest()["vehicleModel"]["srcs"]
 
 
 def test_get_app_manifest__no_app_manifest__raises_ValueError():
@@ -88,7 +91,7 @@ def test_get_script_path__returns_script_path():
     assert get_script_path() == os.path.dirname(os.path.realpath(sys.argv[0]))
 
 
-def test_get_cache_data__returns_cache_data(set_velocitas_cache_data):
+def test_get_cache_data__returns_cache_data(set_velocitas_cache_data):  # type: ignore
     assert get_cache_data()["testPropA"] == "testValueA"
     assert get_cache_data()["testPropB"] == "testValueB"
 
@@ -119,8 +122,23 @@ def test_replace_variables__variable_not_defined__raises_KeyError():
         replace_variables(input_str_a, variables_to_replace)
 
 
+def test_replace_variables__no_replacement_in_input_str__returns_input_str():
+    input_str_a = "test.string.a"
+    input_str_b = "/test/test.string.b/test"
+    input_str_c = "testImage:testVersion"
+    input_str_d = "url.com/owner/repo/service:version"
+    variables_to_replace = {
+        "test.string.a": "testA",
+        "test.string.b": "testB",
+    }
+    assert replace_variables(input_str_a, variables_to_replace) == input_str_a
+    assert replace_variables(input_str_b, variables_to_replace) == input_str_b
+    assert replace_variables(input_str_c, variables_to_replace) == input_str_c
+    assert replace_variables(input_str_d, variables_to_replace) == input_str_d
+
+
 def test_json_obj_to_flat_map__returns_replaced_cache_data_with_separator(
-    set_velocitas_cache_data,
+    set_velocitas_cache_data,  # type: ignore
 ):
     separator = "test.separator"
     cache_data_with_keys_to_replace = json_obj_to_flat_map(get_cache_data(), separator)

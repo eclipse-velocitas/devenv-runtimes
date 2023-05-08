@@ -63,6 +63,8 @@ def get_services():
 
 def replace_variables(input_str: str, variables: dict[str, str]) -> str:
     """Replace all occurrences of the defined variables in the input string"""
+    if "${{" not in input_str:
+        return input_str
     input_str_match = re.search(r"(?<=\${{)(.*?)(?=}})", input_str)
     if input_str_match:
         input_str_value = input_str_match.group().strip()
