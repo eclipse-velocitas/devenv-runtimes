@@ -79,6 +79,7 @@ jobs:
       - uses: 5monkeys/cobertura-action@master
         with:
           path: results/CodeCoverage/cobertura-coverage.xml
+          minimum_coverage: 80
 
   run-local-integration-tests:
     name: Run Integration Tests for runtime-local
