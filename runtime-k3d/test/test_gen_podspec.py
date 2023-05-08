@@ -98,10 +98,116 @@ def test_get_mount_folder(mount):
     "mount",
     [
         pytest.param("test:test", marks=pytest.mark.xfail),
+        "test/test.json:test/test.json",
         "test/test.json:test.json",
     ],
 )
 def test_get_mount_file(mount):
     _, file = gen_podspec.get_mount_folder_and_file(mount)
-    expected = mount.split(":")[1]
+    expected = os.path.basename(mount.split(":")[1])
     assert file == expected
+
+
+@pytest.mark.parametrize(
+    "mount",
+    [
+        pytest.param("test:test", marks=pytest.mark.xfail),
+        "test/test.json:test/test.json",
+        "test/test.json:test.json",
+    ],
+)
+def test_get_volumes_configmap(mount):
+    volumes = gen_podspec.get_volumes(
+        ServiceSpecConfig(None, None, None, None, None, [mount])
+    )
+    file_name = os.path.splitext(gen_podspec.get_mount_folder_and_file(mount)[1])[0]
+    desired = [
+        {
+            "name": f"{file_name}",
+            "configMap": {"name": f"{file_name}-config"},
+        }
+    ]
+    assert volumes == desired
+
+
+@pytest.mark.parametrize(
+    "mount",
+    [
+        pytest.param("test:test", marks=pytest.mark.xfail),
+        "test/test.json:test/test.json",
+        "test/test.json:test.json",
+    ],
+)
+def test_get_volumes_configmap(mount):
+    volumes = gen_podspec.get_volumes(
+        ServiceSpecConfig(None, None, None, None, None, [mount])
+    )
+    file_name = os.path.splitext(gen_podspec.get_mount_folder_and_file(mount)[1])[0]
+    desired = [
+        {
+            "name": f"{file_name}",
+            "configMap": {"name": f"{file_name}-config"},
+        }
+    ]
+    assert volumes == desired
+
+
+@pytest.mark.parametrize(
+    "mount",
+    [
+        pytest.param("test/test.json:test.json", marks=pytest.mark.xfail),
+        "test/test:test/test",
+        "test/test:test",
+    ],
+)
+def test_get_volumes_standard(mount):
+    volumes = gen_podspec.get_volumes(
+        ServiceSpecConfig(None, None, None, None, None, [mount])
+    )
+    desired = [
+        {
+            "name": "pv-storage",
+            "persistentVolumeClaim": {"claimName": "pv-claim"},
+        }
+    ]
+    assert volumes == desired
+
+
+@pytest.mark.parametrize(
+    "mount",
+    [
+        pytest.param("test:test", marks=pytest.mark.xfail),
+        "test/test.json:test/test.json",
+        "test/test.json:test.json",
+    ],
+)
+def test_get_container_mount_file(mount):
+    mounts = gen_podspec.generate_container_mount(
+        ServiceSpecConfig(None, None, None, None, None, [mount])
+    )
+    path, file = gen_podspec.get_mount_folder_and_file(mount)
+    desired = [
+        {
+            "name": f"{os.path.splitext(file)[0]}",
+            "mountPath": f"{path}/{file}",
+            "subPath": f"{file}",
+        }
+    ]
+    assert mounts == desired
+
+
+@pytest.mark.parametrize(
+    "mount",
+    [
+        pytest.param("test/test.json:test.json", marks=pytest.mark.xfail),
+        "test/test:test/test",
+        "test/test:test",
+    ],
+)
+def test_get_container_mount_folder(mount):
+    mounts = gen_podspec.generate_container_mount(
+        ServiceSpecConfig(None, None, None, None, None, [mount])
+    )
+    path, _ = gen_podspec.get_mount_folder_and_file(mount)
+    desired = [{"mountPath": f"{path}", "name": "pv-storage"}]
+    assert mounts == desired
