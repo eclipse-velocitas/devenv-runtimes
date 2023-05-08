@@ -12,7 +12,42 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import os
+import sys
+import pytest
 
-def test_abc():
-    test_var = "abc"
-    assert test_var == "abc"
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
+import gen_helm
+from lib import ServiceSpecConfig, generate_nodeport
+
+
+@pytest.mark.parametrize("env_vars", [{"CAN": "cansim"},
+                                      {"KUKSA_DATA_BROKER_PORT": "55555",
+                                       "name": "value"}])
+def test_generate_env_vars_spec(env_vars):
+    env_vars_spec = gen_helm.generate_env_vars_spec(
+            ServiceSpecConfig(None, env_vars, None, None, None, None)
+        )
+    desired = [
+        {
+            "name": env[0],
+            "value": env[1],
+        }
+        for env in env_vars.items()
+    ]
+    assert env_vars_spec == desired
+
+
+@pytest.mark.parametrize("ports", [["9834"], ["0"], ["4567", "6789"]])
+def test_gen_port_spec(ports):
+    port_spec = gen_helm.generate_ports_spec(
+        ServiceSpecConfig(None, None, None, None, ports, None)
+    )
+    desired = [
+        {
+            "port": int(port),
+            "nodePort": generate_nodeport(int(port)),
+        }
+        for port in ports
+    ]
+    assert port_spec == desired

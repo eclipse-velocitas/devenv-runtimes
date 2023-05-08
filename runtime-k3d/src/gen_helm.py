@@ -33,7 +33,6 @@ def generate_env_vars_spec(service_spec_config):
 
 def generate_ports_spec(service_spec_config):
     ports = []
-    i = 1
     for port in service_spec_config.ports:
         ports.append(
             {
@@ -41,7 +40,6 @@ def generate_ports_spec(service_spec_config):
                 "nodePort": generate_nodeport(int(port)),
             }
         )
-        i = i + 1
     return ports
 
 
