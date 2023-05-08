@@ -23,6 +23,7 @@ from velocitas_lib import get_services
 
 
 def is_runtime_installed() -> bool:
+    """Return whether the runtime is installed or not."""
     return (
         subprocess.call(
             ["helm", "status", "vehicleappruntime"],
@@ -34,6 +35,7 @@ def is_runtime_installed() -> bool:
 
 
 def retag_docker_image(image_name: str):
+    """Retag the given docker image to be available in K8S."""
     subprocess.check_call(
         ["docker", "pull", image_name],
         stdout=subprocess.DEVNULL,
@@ -52,6 +54,7 @@ def retag_docker_image(image_name: str):
 
 
 def retag_docker_images():
+    """Retag docker images of all defined services from runtime.json"""
     services = get_services()
     for service in services:
         service_config = parse_service_config(service["config"])
@@ -59,6 +62,7 @@ def retag_docker_images():
 
 
 def create_config_maps():
+    """Create config maps for all services."""
     services = get_services()
     for service in services:
         service_config = parse_service_config(service["config"])
@@ -82,15 +86,20 @@ def create_config_maps():
             )
 
 
-def install_runtime(helm_output_path: str):
+def install_runtime(helm_chart_path: str):
+    """Install the runtime from the given helm chart.
+
+    Args:
+        helm_chart_path (str): Path to the helm chart directory to install.
+    """
     subprocess.check_call(
         [
             "helm",
             "install",
             "vehicleappruntime",
-            f"{helm_output_path}",
+            f"{helm_chart_path}",
             "--values",
-            f"{helm_output_path}/values.yaml",
+            f"{helm_chart_path}/values.yaml",
             "--wait",
             "--timeout",
             "60s",
@@ -102,6 +111,7 @@ def install_runtime(helm_output_path: str):
 
 
 def uninstall_runtime():
+    """Uninstall the runtime."""
     subprocess.check_call(
         ["helm", "uninstall", "vehicleappruntime", "--wait"],
         stdout=subprocess.DEVNULL,
@@ -110,6 +120,11 @@ def uninstall_runtime():
 
 
 def deploy_runtime(spinner: Yaspin):
+    """Deploy the runtime and display the progress using the given spinner.
+
+    Args:
+        spinner (Yaspin): The progress spinner to update.
+    """
     status = "> Deploying runtime... "
     if not is_runtime_installed():
         gen_helm("./helm")
@@ -123,6 +138,12 @@ def deploy_runtime(spinner: Yaspin):
 
 
 def undeploy_runtime(spinner: Yaspin):
+    """Undeploy/remove the runtime and display the progress
+    using the given spinner.
+
+    Args:
+        spinner (Yaspin): The progress spinner to update.
+    """
     status = "> Undeploying runtime... "
     if is_runtime_installed():
         uninstall_runtime()

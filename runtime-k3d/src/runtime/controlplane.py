@@ -22,6 +22,11 @@ from velocitas_lib import get_script_path, require_env
 
 
 def registry_exists() -> bool:
+    """Check if the K3D registry exists.
+
+    Returns:
+        bool: True if the registry exists, False if not.
+    """
     return (
         subprocess.call(
             ["k3d", "registry", "get", "k3d-registry.localhost"],
@@ -33,6 +38,7 @@ def registry_exists() -> bool:
 
 
 def create_registry():
+    """Create the K3D registry."""
     subprocess.check_call(
         ["k3d", "registry", "create", "registry.localhost", "--port", "12345"],
         stdout=subprocess.DEVNULL,
@@ -41,6 +47,7 @@ def create_registry():
 
 
 def delete_registry():
+    """Delete the K3D registry."""
     subprocess.check_call(
         ["k3d", "registry", "delete", "k3d-registry.localhost"],
         stdout=subprocess.DEVNULL,
@@ -49,6 +56,11 @@ def delete_registry():
 
 
 def cluster_exists() -> bool:
+    """Check if the K3D cluster exists.
+
+    Returns:
+        bool: True if the cluster exists, False if not.
+    """
     return (
         subprocess.call(
             ["k3d", "cluster", "get", "cluster"],
@@ -59,7 +71,12 @@ def cluster_exists() -> bool:
     )
 
 
-def create_cluster(config_dir: str):
+def create_cluster(dapr_config_dir_path: str):
+    """Create the cluster with the given dapr config dir.
+
+    Args:
+        dapr_config_dir_path (str): The path to the dapr config directory.
+    """
     has_proxy: bool = os.getenv("HTTP_PROXY") is not None
 
     extra_proxy_args: List[str] = list()
@@ -92,7 +109,7 @@ def create_cluster(config_dir: str):
             "-p",
             "30051:30051",
             "--volume",
-            f"{config_dir}/volume:/mnt/data@server:0",
+            f"{dapr_config_dir_path}/volume:/mnt/data@server:0",
             "--registry-use",
             "k3d-registry.localhost:12345",
         ]
@@ -103,6 +120,7 @@ def create_cluster(config_dir: str):
 
 
 def delete_cluster():
+    """Delete the K3D cluster."""
     subprocess.call(
         ["k3d", "cluster", "delete", "cluster"],
         stdout=subprocess.DEVNULL,
@@ -111,6 +129,14 @@ def delete_cluster():
 
 
 def deployment_exists(deployment_name: str) -> bool:
+    """Check if the deployment of a given name exists.
+
+    Args:
+        deployment_name (str): The name of the deployment.
+
+    Returns:
+        bool: True if the deployment exists, False if not.
+    """
     return (
         subprocess.call(
             ["kubectl", "get", "deployment", deployment_name],
@@ -122,6 +148,7 @@ def deployment_exists(deployment_name: str) -> bool:
 
 
 def deploy_zipkin():
+    """Deploy zipkin to the cluster."""
     subprocess.check_call(
         ["kubectl", "create", "deployment", "zipkin", "--image", "openzipkin/zipkin"],
         stdout=subprocess.DEVNULL,
@@ -145,6 +172,7 @@ def deploy_zipkin():
 
 
 def dapr_is_initialized_with_k3d() -> bool:
+    """Check if dapr is initialized with k3d."""
     return (
         subprocess.call(
             ["dapr", "status", "-k"],
@@ -155,7 +183,13 @@ def dapr_is_initialized_with_k3d() -> bool:
     )
 
 
-def initialize_dapr_with_k3d(dapr_runtime_version: str, dapr_config_dir: str):
+def initialize_dapr_with_k3d(dapr_runtime_version: str, dapr_config_dir_path: str):
+    """Initialize dapr with K3D.
+
+    Args:
+        dapr_runtime_version (str): The runtime version of dapr.
+        dapr_config_dir_path (str): The path to the dapr config directory.
+    """
     subprocess.check_call(
         [
             "dapr",
@@ -172,13 +206,19 @@ def initialize_dapr_with_k3d(dapr_runtime_version: str, dapr_config_dir: str):
     )
 
     subprocess.check_call(
-        ["kubectl", "apply", "-f", f"{dapr_config_dir}/config.yaml"],
+        ["kubectl", "apply", "-f", f"{dapr_config_dir_path}/config.yaml"],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
 
 
 def configure_controlplane(spinner: Yaspin):
+    """Configure the K3D control plane and display the progress
+    using the given spinner.
+
+    Args:
+        spinner (Yaspin): The progress spinner to update.
+    """
     config_dir = os.path.join(get_script_path(), "runtime", "config")
     dapr_config_dir = os.path.join(get_script_path(), "runtime", "config", ".dapr")
 
@@ -217,6 +257,12 @@ def configure_controlplane(spinner: Yaspin):
 
 
 def reset_controlplane(spinner: Yaspin):
+    """Reset the K3D control plane and display the progress
+    using the given spinner.
+
+    Args:
+        spinner (Yaspin): The progress spinner to update.
+    """
     status = "> Checking K3D cluster... "
     if cluster_exists():
         delete_cluster()
