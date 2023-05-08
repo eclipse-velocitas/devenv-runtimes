@@ -15,12 +15,13 @@
 # flake8: noqa: E402
 import os
 import sys
+from typing import Optional
 
 import pytest
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
 import gen_podspec
-from lib import ServiceSpecConfig
+from lib import ServiceSpecConfig, generate_nodeport
 
 
 @pytest.mark.parametrize("ports", [["1234"], ["0"], ["4567", "1234"]])
@@ -117,29 +118,7 @@ def test_get_mount_file(mount):
         "test/test.json:test.json",
     ],
 )
-def test_get_volumes_configmap(mount):
-    volumes = gen_podspec.get_volumes(
-        ServiceSpecConfig(None, None, None, None, None, [mount])
-    )
-    file_name = os.path.splitext(gen_podspec.get_mount_folder_and_file(mount)[1])[0]
-    desired = [
-        {
-            "name": f"{file_name}",
-            "configMap": {"name": f"{file_name}-config"},
-        }
-    ]
-    assert volumes == desired
-
-
-@pytest.mark.parametrize(
-    "mount",
-    [
-        pytest.param("test:test", marks=pytest.mark.xfail),
-        "test/test.json:test/test.json",
-        "test/test.json:test.json",
-    ],
-)
-def test_get_volumes_configmap(mount):
+def test_get_volumes_file(mount):
     volumes = gen_podspec.get_volumes(
         ServiceSpecConfig(None, None, None, None, None, [mount])
     )
@@ -161,7 +140,7 @@ def test_get_volumes_configmap(mount):
         "test/test:test",
     ],
 )
-def test_get_volumes_standard(mount):
+def test_get_volumes_folder(mount):
     volumes = gen_podspec.get_volumes(
         ServiceSpecConfig(None, None, None, None, None, [mount])
     )
@@ -212,3 +191,44 @@ def test_get_container_mount_folder(mount):
     path, _ = gen_podspec.get_mount_folder_and_file(mount)
     desired = [{"mountPath": f"{path}", "name": "pv-storage"}]
     assert mounts == desired
+
+
+@pytest.mark.parametrize(
+    "key,value",
+    [("test_key", "test_value"), ("", None)],
+)
+def test_get_env(key, value):
+    env = dict[str, Optional[str]]()
+    env[key] = value
+    env_array = gen_podspec.get_env(
+        ServiceSpecConfig(None, env, None, None, None, None)
+    )
+
+    desired = [{"name": key, "value": value}]
+    assert env_array == desired
+
+
+@pytest.mark.parametrize(
+    "service_id,port",
+    [("test", "1234"), ("", "0")],
+)
+def test_get_nodeport_service(service_id, port):
+    service = gen_podspec.generate_nodeport_service(service_id, port)
+
+    desired = {
+        "apiVersion": "v1",
+        "kind": "Service",
+        "metadata": {"name": f"{service_id}-nodeport{port}"},
+        "spec": {
+            "type": "NodePort",
+            "selector": {"app": f"{service_id}"},
+            "ports": [
+                {
+                    "port": int(port),
+                    "targetPort": int(port),
+                    "nodePort": generate_nodeport(int(port)),
+                }
+            ],
+        },
+    }
+    assert service == desired
