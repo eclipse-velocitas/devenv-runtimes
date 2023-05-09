@@ -17,12 +17,14 @@
 import json
 import os
 import sys
+from pathlib import Path
 
 import pytest
 
 from velocitas_lib import (
     get_app_manifest,
     get_cache_data,
+    get_package_path,
     get_script_path,
     get_workspace_dir,
     json_obj_to_flat_map,
@@ -89,6 +91,10 @@ def test_get_app_manifest__no_app_manifest__raises_ValueError():
 
 def test_get_script_path__returns_script_path():
     assert get_script_path() == os.path.dirname(os.path.realpath(sys.argv[0]))
+
+
+def test_get_package_path__returns_package_path():
+    assert get_package_path() == Path(__file__).resolve().parents[2]
 
 
 def test_get_cache_data__returns_cache_data(set_velocitas_cache_data):  # type: ignore
