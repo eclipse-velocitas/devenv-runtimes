@@ -17,7 +17,7 @@ import subprocess
 from build_vehicleapp import build_vehicleapp
 from yaspin import yaspin
 
-from velocitas_lib import get_app_manifest, get_script_path
+from velocitas_lib import get_app_manifest, get_script_path, require_env
 
 
 def is_docker_image_build_locally(app_name: str) -> bool:
@@ -67,7 +67,7 @@ def uninstall_vehicleapp():
 
 def install_vehicleapp(app_name: str):
     """Install VehicleApp helm chart"""
-    app_port = 50008
+    app_port = require_env("vehicleAppPort")
     app_registry = "k3d-registry.localhost:12345"
     script_dir = get_script_path()
     helm_config_dir = script_dir + "/config/helm"

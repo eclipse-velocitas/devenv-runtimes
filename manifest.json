@@ -177,6 +177,20 @@
                         "./runtime-k3d/src/deployment/deploy_vehicleapp.py"
                     ]
                 }
+            ],
+            "variables": [
+                {
+                    "name": "dockerfilePath",
+                    "type": "string",
+                    "description": "Path of Dockerfile to use",
+                    "default": "./app/Dockerfile"
+                },
+                {
+                    "name": "vehicleAppPort",
+                    "type": "number",
+                    "description": "Port of VehicleApp to use",
+                    "default": 50008
+                }
             ]
         }
     ]

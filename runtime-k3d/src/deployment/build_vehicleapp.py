@@ -18,7 +18,7 @@ from typing import List
 
 from yaspin import yaspin
 
-from velocitas_lib import get_app_manifest, get_workspace_dir
+from velocitas_lib import get_app_manifest, get_workspace_dir, require_env
 
 
 def build_vehicleapp():
@@ -28,7 +28,7 @@ def build_vehicleapp():
             status = "> Building VehicleApp image"
             app_name = get_app_manifest()["name"].lower()
             image_tag = f"localhost:12345/{app_name}:local"
-            dockerfile_path = "./app/Dockerfile"
+            dockerfile_path = require_env("dockerfilePath")
             os.environ["DOCKER_BUILDKIT"] = "1"
             has_proxy: bool = os.getenv("HTTP_PROXY") is not None
 
