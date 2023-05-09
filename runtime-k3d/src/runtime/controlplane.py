@@ -18,7 +18,7 @@ from typing import List
 
 from yaspin.core import Yaspin
 
-from velocitas_lib import get_script_path, require_env
+from velocitas_lib import get_package_path, get_script_path, require_env
 
 
 def registry_exists() -> bool:
@@ -71,11 +71,11 @@ def cluster_exists() -> bool:
     )
 
 
-def create_cluster(dapr_config_dir_path: str):
-    """Create the cluster with the given dapr config dir.
+def create_cluster(config_dir_path: str):
+    """Create the cluster with the given config dir.
 
     Args:
-        dapr_config_dir_path (str): The path to the dapr config directory.
+        config_dir_path (str): The path to the config directory.
     """
     has_proxy: bool = os.getenv("HTTP_PROXY") is not None
 
@@ -109,7 +109,7 @@ def create_cluster(dapr_config_dir_path: str):
             "-p",
             "30051:30051",
             "--volume",
-            f"{dapr_config_dir_path}/volume:/mnt/data@server:0",
+            f"{config_dir_path}/feedercan:/mnt/data@server:0",
             "--registry-use",
             "k3d-registry.localhost:12345",
         ]
@@ -219,7 +219,7 @@ def configure_controlplane(spinner: Yaspin):
     Args:
         spinner (Yaspin): The progress spinner to update.
     """
-    config_dir = os.path.join(get_script_path(), "runtime", "config")
+    config_dir = os.path.join(get_package_path(), "config")
     dapr_config_dir = os.path.join(get_script_path(), "runtime", "config", ".dapr")
 
     status = "> Checking K3D registry... "

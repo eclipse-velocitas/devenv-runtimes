@@ -24,6 +24,7 @@ from typing import Optional, Tuple
 
 from velocitas_lib import (
     get_cache_data,
+    get_package_path,
     get_script_path,
     get_services,
     get_workspace_dir,
@@ -150,7 +151,7 @@ def run_service(service_spec) -> subprocess.Popen:
     patterns = []
 
     variables = json_obj_to_flat_map(get_cache_data(), "builtin.cache")
-    variables["builtin.script_dir"] = get_script_path()
+    variables["builtin.package_dir"] = get_package_path()
 
     for config_entry in service_spec["config"]:
         if config_entry["key"] == "image":

@@ -16,7 +16,7 @@ from typing import Dict, List, NamedTuple, Optional
 
 from velocitas_lib import (
     get_cache_data,
-    get_script_path,
+    get_package_path,
     json_obj_to_flat_map,
     replace_variables,
 )
@@ -71,7 +71,7 @@ def parse_service_config(service_spec_config: dict):
     args = []
 
     variables = json_obj_to_flat_map(get_cache_data(), "builtin.cache")
-    variables["builtin.script_dir"] = get_script_path()
+    variables["builtin.package_dir"] = get_package_path()
 
     for config_entry in service_spec_config:
         if not isinstance(config_entry["value"], (int, float, bool)):

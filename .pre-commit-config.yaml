@@ -8,7 +8,7 @@ repos:
       - id: end-of-file-fixer
       - id: check-yaml
         args: [--allow-multiple-documents]
-        exclude: ^runtime-k3d/src/deployment/config/helm/templates/|^runtime-k3d/src/runtime/config/helm/templates/|^runtime-k3d/src/runtime/config/volume/|^runtime-local/src/runtime/config/volume/mappingDefault.yml
+        exclude: ^runtime-k3d/src/deployment/config/helm/templates/|^runtime-k3d/src/runtime/config/helm/templates/|^config/feedercan/
       - id: check-added-large-files
 
   - repo: https://github.com/PyCQA/isort

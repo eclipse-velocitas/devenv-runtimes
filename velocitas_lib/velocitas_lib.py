@@ -16,6 +16,7 @@ import json
 import os
 import re
 import sys
+from pathlib import Path
 from typing import Dict
 
 
@@ -52,6 +53,12 @@ def get_script_path() -> str:
     return os.path.dirname(os.path.realpath(sys.argv[0]))
 
 
+def get_package_path() -> Path:
+    """Return the absolute path to the package directory the invoked Python script
+    is located in."""
+    return Path(__file__).resolve().parents[1]
+
+
 def get_cache_data() -> Dict[str, any]:
     """Return the data of the cache as Python object."""
     return json.loads(require_env("VELOCITAS_CACHE_DATA"))
@@ -59,7 +66,12 @@ def get_cache_data() -> Dict[str, any]:
 
 def get_services():
     """Return all specified services as Python object."""
-    return json.load(open(f"{get_script_path()}/../../runtime.json", encoding="utf-8"))
+    return json.load(
+        open(
+            f"{Path(get_script_path()).resolve().parents[1]}/runtime.json",
+            encoding="utf-8",
+        )
+    )
 
 
 def replace_variables(input_str: str, variables: dict[str, str]) -> str:
