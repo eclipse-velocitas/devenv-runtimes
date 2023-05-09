@@ -122,11 +122,10 @@ def deploy_vehicleapp():
             else:
                 spinner.write(f"{status} vapp-chart not yet installed.")
 
-            status = f"> Installing vapp-chart for {app_name}..."
             spinner.write(status)
             install_vehicleapp(app_name)
-            spinner.write(f"{status} done!")
-            spinner.ok()
+            spinner.write(f"> Installing vapp-chart for {app_name}... done!")
+            spinner.ok("✔")
         except Exception as err:
             spinner.fail(err)
 

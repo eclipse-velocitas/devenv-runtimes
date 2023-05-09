@@ -77,7 +77,7 @@ def build_vehicleapp():
                 stderr=subprocess.DEVNULL,
                 cwd=get_workspace_dir(),
             )
-            spinner.ok()
+            spinner.ok("✔")
         except Exception as err:
             spinner.fail(err)
 

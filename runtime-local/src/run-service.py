@@ -38,10 +38,10 @@ def run_specific_service(service_id: str) -> None:
             service = get_specific_service(service_id)
             stop_service(service)
             spawned_processes[service_id] = run_service(service)
-            spinner.ok("✔ ")
+            spinner.ok("✔")
         except RuntimeError as error:
             spinner.write(error.args)
-            spinner.fail("💥 ")
+            spinner.fail("💥")
             terminate_spawned_processes()
             print(f"Starting {service_id=} failed")
             with open(get_log_file_name(service_id), mode="r", encoding="utf-8") as log:

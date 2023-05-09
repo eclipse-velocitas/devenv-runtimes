@@ -81,7 +81,7 @@ def create_cluster(config_dir_path: str):
 
     extra_proxy_args: List[str] = list()
     if has_proxy:
-        print("Creating cluster with proxy configuration")
+        print("Creating cluster with proxy configuration.")
         http_proxy = os.getenv("HTTP_PROXY")
         https_proxy = os.getenv("HTTPS_PROXY")
         no_proxy = os.getenv("NO_PROXY")
@@ -94,7 +94,7 @@ def create_cluster(config_dir_path: str):
             f"NO_PROXY={no_proxy}@server:0",
         ]
     else:
-        print("Creating cluster without proxy configuration")
+        print("Creating cluster without proxy configuration.")
 
     subprocess.call(
         [
