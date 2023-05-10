@@ -14,45 +14,51 @@
 
 import argparse
 import os
+from typing import Any, Tuple
 
 import ruamel.yaml as yaml
-from lib import create_cluster_ip_spec, generate_nodeport, parse_service_config
+from lib import (
+    ServiceSpecConfig,
+    create_cluster_ip_spec,
+    generate_nodeport,
+    parse_service_config,
+)
 
 from velocitas_lib import get_script_path, get_services, get_workspace_dir
 
 
-def find_service_spec(lst, kind, name):
-    """Returns index of spec for given kind and name.
+def find_service_spec(lst: list[dict[str, Any]], kind: str, name: str) -> int:
+    """Returns index of spec for given kind and name. -1 if not found.
     Args:
         lst: The list of the template specifications.
         kind: The kind of the pod.
         name: The name of the pod.
     """
-    return [
-        i
-        for i, elem in enumerate(lst)
-        if elem["kind"] == kind and elem["metadata"]["name"] == name
-    ]
+    for i, elem in enumerate(lst):
+        if elem["kind"] == kind and elem["metadata"]["name"] == name:
+            return i
+
+    return -1
 
 
-def init_template(templates):
+def init_template(templates: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Initializes podspecs list with non generated podspecs.
     Args:
         templates: The list of the template specifications.
     """
     template = []
-    template.append(templates[find_service_spec(templates, "Pod", "bash")[0]])
+    template.append(templates[find_service_spec(templates, "Pod", "bash")])
     template.append(
-        templates[find_service_spec(templates, "PersistentVolume", "pv-volume")[0]]
+        templates[find_service_spec(templates, "PersistentVolume", "pv-volume")]
     )
     template.append(
-        templates[find_service_spec(templates, "PersistentVolumeClaim", "pv-claim")[0]]
+        templates[find_service_spec(templates, "PersistentVolumeClaim", "pv-claim")]
     )
 
     return template
 
 
-def create_podspec(templates, service_spec):
+def create_podspec(templates, service_spec) -> list[dict[str, Any]]:
     """Creates podspec for given service specification.
 
     Args:
@@ -63,7 +69,7 @@ def create_podspec(templates, service_spec):
     pods = []
     service_config = parse_service_config(service_spec["config"])
 
-    template_pod = templates[find_service_spec(templates, "Pod", service_id)[0]]
+    template_pod = templates[find_service_spec(templates, "Pod", service_id)]
 
     pod = generate_pod_spec(template_pod, service_config)
     pods.append(pod)
@@ -83,7 +89,9 @@ def create_podspec(templates, service_spec):
     return pods
 
 
-def generate_pod_spec(template_pod, service_config):
+def generate_pod_spec(
+    template_pod: dict[str, Any], service_config: ServiceSpecConfig
+) -> dict[str, Any]:
     """Generate the spec for a single pod.
 
     Args:
@@ -110,7 +118,7 @@ def generate_pod_spec(template_pod, service_config):
     return template_pod
 
 
-def get_volumes(service_config):
+def get_volumes(service_config: ServiceSpecConfig) -> list[dict[str, Any]]:
     volumes = []
     for mount in service_config.mounts:
         _, file = get_mount_folder_and_file(mount)
@@ -132,7 +140,7 @@ def get_volumes(service_config):
     return volumes
 
 
-def generate_container_mount(service_config):
+def generate_container_mount(service_config: ServiceSpecConfig) -> list[dict[str, Any]]:
     """Generate the mount spec for a pod.
 
     Args:
@@ -155,7 +163,7 @@ def generate_container_mount(service_config):
     return mounts
 
 
-def get_mount_folder_and_file(mount):
+def get_mount_folder_and_file(mount: str) -> Tuple[str, str]:
     mount_path = mount.split(":")[1]
     file = ""
     if "." in mount_path.split(os.sep)[-1]:
@@ -164,7 +172,7 @@ def get_mount_folder_and_file(mount):
     return (mount_path, file)
 
 
-def get_env(service_config):
+def get_env(service_config: ServiceSpecConfig) -> list[dict[str, Any]]:
     """Generate the spec for the environment variables for a pod.
 
     Args:
@@ -176,7 +184,7 @@ def get_env(service_config):
     return env
 
 
-def generate_port_spec(service_config):
+def generate_port_spec(service_config: ServiceSpecConfig) -> list[dict[str, Any]]:
     """Generate the port spec for the used ports.
 
     Args:
@@ -195,7 +203,9 @@ def generate_port_spec(service_config):
     return ports
 
 
-def generate_clusterIP_port_spec(service_config):
+def generate_clusterIP_port_spec(
+    service_config: ServiceSpecConfig,
+) -> list[dict[str, Any]]:
     """Generate the port spec for a clusterIP service.
 
     Args:
@@ -216,7 +226,7 @@ def generate_clusterIP_port_spec(service_config):
     return ports
 
 
-def generate_nodeport_service(service_id, port):
+def generate_nodeport_service(service_id: str, port: str) -> dict[str, Any]:
     """Generate the port spec for a nodeport service.
 
     Args:

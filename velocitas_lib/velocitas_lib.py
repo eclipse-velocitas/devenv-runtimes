@@ -17,7 +17,7 @@ import os
 import re
 import sys
 from pathlib import Path
-from typing import Dict
+from typing import Any
 
 
 def require_env(name: str) -> str:
@@ -59,12 +59,12 @@ def get_package_path() -> Path:
     return Path(__file__).resolve().parents[1]
 
 
-def get_cache_data() -> Dict[str, any]:
+def get_cache_data() -> dict[str, Any]:
     """Return the data of the cache as Python object."""
     return json.loads(require_env("VELOCITAS_CACHE_DATA"))
 
 
-def get_services():
+def get_services() -> dict[str, Any]:
     """Return all specified services as Python object."""
     return json.load(
         open(

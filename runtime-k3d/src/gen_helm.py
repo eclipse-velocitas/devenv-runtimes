@@ -16,14 +16,17 @@ import argparse
 import os
 import re
 import shutil
+from typing import Any
 
 import ruamel.yaml as yaml
-from lib import generate_nodeport, parse_service_config
+from lib import ServiceSpecConfig, generate_nodeport, parse_service_config
 
 from velocitas_lib import get_script_path, get_services, get_workspace_dir
 
 
-def generate_env_vars_spec(service_spec_config):
+def generate_env_vars_spec(
+    service_spec_config: ServiceSpecConfig,
+) -> list[dict[str, Any]]:
     envs = []
     for env in service_spec_config.env_vars.items():
         envs.append({"name": env[0], "value": env[1]})
@@ -31,7 +34,7 @@ def generate_env_vars_spec(service_spec_config):
     return envs
 
 
-def generate_ports_spec(service_spec_config):
+def generate_ports_spec(service_spec_config: ServiceSpecConfig) -> list[dict[str, Any]]:
     ports = []
     for port in service_spec_config.ports:
         ports.append(
@@ -43,7 +46,7 @@ def generate_ports_spec(service_spec_config):
     return ports
 
 
-def generate_values_by_service(service_spec):
+def generate_values_by_service(service_spec: dict[str, Any]) -> dict[str, Any]:
     """Generates values specification from the given service spec.
     Args:
         service_spec: The spec of the service.
@@ -53,7 +56,7 @@ def generate_values_by_service(service_spec):
     service_spec_config = parse_service_config(service_spec["config"])
 
     value_spec_key = f"image{service_id.capitalize()}"
-    value_spec = {value_spec_key: {}}
+    value_spec: dict[str, Any] = {value_spec_key: {}}
 
     value_spec[value_spec_key]["name"] = service_id
     value_spec[value_spec_key]["repository"] = service_spec_config.image.split(":")[0]

@@ -12,7 +12,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Dict, List, NamedTuple, Optional
+from typing import Any, List, NamedTuple, Optional
 
 from velocitas_lib import (
     get_cache_data,
@@ -22,7 +22,7 @@ from velocitas_lib import (
 )
 
 
-def generate_nodeport(port: int):
+def generate_nodeport(port: int) -> int:
     """Creates nodeport from the last 3 digits of the targetport in the range
     of 30000-32767.
 
@@ -33,7 +33,7 @@ def generate_nodeport(port: int):
     return int(f"30{nodeport}")
 
 
-def create_cluster_ip_spec(service_id: str, ports: List[dict]):
+def create_cluster_ip_spec(service_id: str, ports: List[dict]) -> dict[str, Any]:
     """Creates cluster ip spec for the given service_id.
 
     Args:
@@ -49,14 +49,14 @@ def create_cluster_ip_spec(service_id: str, ports: List[dict]):
 
 class ServiceSpecConfig(NamedTuple):
     image: Optional[str]
-    env_vars: Dict[str, Optional[str]]
+    env_vars: dict[str, Optional[str]]
     no_dapr: bool
     args: List[str]
     ports: List[str]
     mounts: List[str]
 
 
-def parse_service_config(service_spec_config: dict):
+def parse_service_config(service_spec_config: dict) -> ServiceSpecConfig:
     """Parses service spec configuration and returns it as an named tuple.
 
     Args:
