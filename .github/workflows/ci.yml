@@ -60,27 +60,30 @@ jobs:
         shell: bash
         run: |
           pytest --ignore-glob='*integration*' --override-ini junit_family=xunit1 --junit-xml=./results/UnitTest/junit.xml \
-          --cov-append \
-          --cov ./runtime-k3d/test \
-          --cov ./runtime-local/test \
-          --cov ./velocitas_lib/test \
+          --cov ./runtime-k3d \
+          --cov ./runtime-local \
+          --cov ./velocitas_lib \
           --cov-report=xml:results/CodeCoverage/cobertura-coverage.xml \
           --cov-branch ./runtime-k3d/test \
           --cov-branch ./runtime-local/test \
           --cov-branch ./velocitas_lib/test
-          coverage2clover -i results/CodeCoverage/cobertura-coverage.xml -o results/CodeCoverage/clover.xml
-          coveragepy-lcov --data_file_path ./.coverage --output_file_path results/CodeCoverage/lcov.info
 
       - name: Publish Unit Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
+        uses: mikepenz/action-junit-report@v3
         if: always()
         with:
-          junit_files: ./results/UnitTest/junit.xml
+          report_paths: ./results/UnitTest/junit.xml
+          summary: true
+          update_check: true
+          annotate_only: true
 
       - uses: 5monkeys/cobertura-action@master
         with:
           path: results/CodeCoverage/cobertura-coverage.xml
           minimum_coverage: 80
+          show_line: true
+          show_branch: true
+          fail_below_threshold: false
 
   run-local-integration-tests:
     name: Run Integration Tests for runtime-local
