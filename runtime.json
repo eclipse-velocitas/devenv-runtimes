@@ -11,7 +11,7 @@
             },
             {
                 "key": "image",
-                "value": "eclipse-mosquitto:latest"
+                "value": "eclipse-mosquitto:2.0.14"
             },
             {
                 "key": "port",

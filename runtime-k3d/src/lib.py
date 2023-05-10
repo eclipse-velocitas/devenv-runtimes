@@ -23,8 +23,8 @@ from velocitas_lib import (
 
 
 def generate_nodeport(port: int) -> int:
-    """Creates nodeport from the last 3 digits of the targetport in the range
-    of 30000-32767.
+    """Creates nodeport from the last 3 digits of the passed port in the range
+    of 30000-30999.
 
     Args:
         port: The port to be used to generate the nodeport.
