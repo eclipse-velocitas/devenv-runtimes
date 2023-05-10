@@ -22,7 +22,7 @@ on:
   push:
     # Run only on branches/commits and not tags
     branches:
-      - unit-tests
+      - main
   pull_request:
     branches:
       - main
