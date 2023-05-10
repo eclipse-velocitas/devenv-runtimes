@@ -14,7 +14,10 @@
 
 import json
 import os
+import re
 import sys
+from pathlib import Path
+from typing import Dict
 
 
 def require_env(name: str) -> str:
@@ -50,21 +53,41 @@ def get_script_path() -> str:
     return os.path.dirname(os.path.realpath(sys.argv[0]))
 
 
-def get_cache_data():
+def get_package_path() -> Path:
+    """Return the absolute path to the package directory the invoked Python script
+    is located in."""
+    return Path(__file__).resolve().parents[1]
+
+
+def get_cache_data() -> Dict[str, any]:
     """Return the data of the cache as Python object."""
     return json.loads(require_env("VELOCITAS_CACHE_DATA"))
 
 
 def get_services():
     """Return all specified services as Python object."""
-    return json.load(open(f"{get_script_path()}/../../runtime.json", encoding="utf-8"))
+    return json.load(
+        open(
+            f"{Path(get_script_path()).resolve().parents[1]}/runtime.json",
+            encoding="utf-8",
+        )
+    )
 
 
 def replace_variables(input_str: str, variables: dict[str, str]) -> str:
     """Replace all occurrences of the defined variables in the input string"""
-    for key, value in variables.items():
-        input_str = input_str.replace("${{ " + key + " }}", str(value))
-    return input_str
+    if "${{" not in input_str:
+        return input_str
+    input_str_match = re.search(r"(?<=\${{)(.*?)(?=}})", input_str)
+    if input_str_match:
+        input_str_value = input_str_match.group().strip()
+        if input_str_value not in variables:
+            raise KeyError(f"{input_str_value!r} not in {variables!r}")
+        for key, value in variables.items():
+            input_str = input_str.replace("${{ " + key + " }}", str(value))
+        return input_str
+    else:
+        raise ValueError(f"{input_str!r} not in the right format")
 
 
 def json_obj_to_flat_map(obj, prefix: str = "", separator: str = ".") -> dict[str, str]:

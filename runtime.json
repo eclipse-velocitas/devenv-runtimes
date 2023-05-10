@@ -147,7 +147,7 @@
             },
             {
                 "key": "mount",
-                "value": "${{ builtin.script_dir }}/runtime/config/volume/:/data"
+                "value": "${{ builtin.package_dir }}/config/feedercan/:/data"
             },
             {
                 "key": "start-pattern",

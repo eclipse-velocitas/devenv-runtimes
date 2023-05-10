@@ -14,7 +14,7 @@
 
 import json
 from pathlib import Path
-from re import compile, Pattern
+from re import Pattern, compile
 from subprocess import PIPE, Popen
 from threading import Timer
 
@@ -41,15 +41,15 @@ command: str = "velocitas exec runtime-local"
 regex_runtime_up: Pattern[str] = compile(r"✔.* Starting runtime")
 regex_mqtt: Pattern[str] = compile(r"✔.* Starting service mqtt")
 regex_vdb: Pattern[str] = compile(r"✔.* Starting service vehicledatabroker")
-regex_seatservice: Pattern[str]= compile(r"✔.* Starting service seatservice")
-regex_feedercan: Pattern[str]= compile(r"✔.* Starting service feedercan")
+regex_seatservice: Pattern[str] = compile(r"✔.* Starting service seatservice")
+regex_feedercan: Pattern[str] = compile(r"✔.* Starting service feedercan")
 timeout_sec: float = 180
 
 
 def run_command_until_logs_match(command: str, regex_service: Pattern[str]) -> bool:
-    successfully_running: bool = False
-
-    proc: Popen[str] = Popen(command.split(" "), stdout=PIPE, bufsize=1, universal_newlines=True)
+    proc: Popen[str] = Popen(
+        command.split(" "), stdout=PIPE, bufsize=1, universal_newlines=True
+    )
     timer: Timer = Timer(timeout_sec, proc.kill)
     timer.start()
     for line in iter(proc.stdout.readline, b""):
@@ -72,5 +72,7 @@ def test_run_sevices_separately_successfully():
     create_dummy_vspec_file()
     assert run_command_until_logs_match(f"{command} run-mosquitto", regex_mqtt)
     assert run_command_until_logs_match(f"{command} run-vehicledatabroker", regex_vdb)
-    assert run_command_until_logs_match(f"{command} run-vehicleservices", regex_seatservice)
+    assert run_command_until_logs_match(
+        f"{command} run-vehicleservices", regex_seatservice
+    )
     assert run_command_until_logs_match(f"{command} run-feedercan", regex_feedercan)

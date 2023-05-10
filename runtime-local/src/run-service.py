@@ -16,12 +16,16 @@ import argparse
 import signal
 import subprocess
 import time
-
 from typing import Dict
+
+from lib import (
+    get_log_file_name,
+    get_specific_service,
+    run_service,
+    stop_container,
+    stop_service,
+)
 from yaspin import yaspin
-
-from lib import get_log_file_name, get_specific_service, run_service, stop_container, stop_service
-
 
 spawned_processes: Dict[str, subprocess.Popen] = {}
 
@@ -34,10 +38,10 @@ def run_specific_service(service_id: str) -> None:
             service = get_specific_service(service_id)
             stop_service(service)
             spawned_processes[service_id] = run_service(service)
-            spinner.ok("✔ ")
+            spinner.ok("✔")
         except RuntimeError as error:
             spinner.write(error.args)
-            spinner.fail("💥 ")
+            spinner.fail("💥")
             terminate_spawned_processes()
             print(f"Starting {service_id=} failed")
             with open(get_log_file_name(service_id), mode="r", encoding="utf-8") as log:
@@ -63,7 +67,7 @@ def terminate_spawned_processes():
         spinner.ok("✔")
 
 
-def handler(_signum, _frame):
+def handler(_signum, _frame):  # noqa: U101 unused arguments
     terminate_spawned_processes()
 
 
@@ -75,7 +79,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "service_id",
         type=str,
-        help="Id of the service to start - refers to 'id' key in runtime.json"
+        help="Id of the service to start - refers to 'id' key in runtime.json",
     )
     args = parser.parse_args()
 

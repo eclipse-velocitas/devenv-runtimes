@@ -227,7 +227,7 @@ def generate_nodeport_service(service_id, port):
         "apiVersion": "v1",
         "kind": "Service",
         "metadata": {"name": f"{service_id}-nodeport{port}"},
-        "spec": {"type": "NodePort", "selector": {"app": service_id}},
+        "spec": {"type": "NodePort", "selector": {"app": f"{service_id}"}},
     }
 
     ports = []

@@ -21,9 +21,14 @@ from lib import get_dapr_sidecar_args
 
 
 def start_sidecar(
-    app_id: str, app_port: Optional[str] = None, grpc_port: Optional[str] = None, http_port: Optional[str] = None
+    app_id: str,
+    app_port: Optional[str] = None,
+    grpc_port: Optional[str] = None,
+    http_port: Optional[str] = None,
 ):
-    args, env = get_dapr_sidecar_args(app_id, app_port=app_port, grpc_port=grpc_port, http_port=http_port)
+    args, env = get_dapr_sidecar_args(
+        app_id, app_port=app_port, grpc_port=grpc_port, http_port=http_port
+    )
 
     print(args)
     subprocess.check_call(args)
@@ -61,4 +66,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    start_sidecar(args.app_id, app_port=args.app_port, grpc_port=args.dapr_grpc_port, http_port=args.dapr_http_port)
+    start_sidecar(
+        args.app_id,
+        app_port=args.app_port,
+        grpc_port=args.dapr_grpc_port,
+        http_port=args.dapr_http_port,
+    )

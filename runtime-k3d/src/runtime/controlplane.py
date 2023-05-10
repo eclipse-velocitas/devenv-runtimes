@@ -18,7 +18,7 @@ from typing import List
 
 from yaspin.core import Yaspin
 
-from velocitas_lib import get_script_path, require_env
+from velocitas_lib import get_package_path, get_script_path, require_env
 
 
 def registry_exists() -> bool:
@@ -71,17 +71,17 @@ def cluster_exists() -> bool:
     )
 
 
-def create_cluster(dapr_config_dir_path: str):
-    """Create the cluster with the given dapr config dir.
+def create_cluster(config_dir_path: str):
+    """Create the cluster with the given config dir.
 
     Args:
-        dapr_config_dir_path (str): The path to the dapr config directory.
+        config_dir_path (str): The path to the config directory.
     """
     has_proxy: bool = os.getenv("HTTP_PROXY") is not None
 
     extra_proxy_args: List[str] = list()
     if has_proxy:
-        print("Creating cluster with proxy configuration")
+        print("Creating cluster with proxy configuration.")
         http_proxy = os.getenv("HTTP_PROXY")
         https_proxy = os.getenv("HTTPS_PROXY")
         no_proxy = os.getenv("NO_PROXY")
@@ -94,7 +94,7 @@ def create_cluster(dapr_config_dir_path: str):
             f"NO_PROXY={no_proxy}@server:0",
         ]
     else:
-        print("Creating cluster without proxy configuration")
+        print("Creating cluster without proxy configuration.")
 
     subprocess.call(
         [
@@ -109,7 +109,7 @@ def create_cluster(dapr_config_dir_path: str):
             "-p",
             "30051:30051",
             "--volume",
-            f"{dapr_config_dir_path}/volume:/mnt/data@server:0",
+            f"{config_dir_path}/feedercan:/mnt/data@server:0",
             "--registry-use",
             "k3d-registry.localhost:12345",
         ]
@@ -219,7 +219,7 @@ def configure_controlplane(spinner: Yaspin):
     Args:
         spinner (Yaspin): The progress spinner to update.
     """
-    config_dir = os.path.join(get_script_path(), "runtime", "config")
+    config_dir = os.path.join(get_package_path(), "config")
     dapr_config_dir = os.path.join(get_script_path(), "runtime", "config", ".dapr")
 
     status = "> Checking K3D registry... "

@@ -23,7 +23,7 @@ def runtime_down():
         try:
             reset_controlplane(spinner)
             undeploy_runtime(spinner)
-            spinner.ok()
+            spinner.ok("✔")
         except Exception as err:
             spinner.fail(err)
 
