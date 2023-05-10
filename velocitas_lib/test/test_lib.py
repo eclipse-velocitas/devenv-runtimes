@@ -143,10 +143,29 @@ def test_replace_variables__no_replacement_in_input_str__returns_input_str():
     assert replace_variables(input_str_d, variables_to_replace) == input_str_d
 
 
-def test_json_obj_to_flat_map__returns_replaced_cache_data_with_separator(
+def test_json_obj_to_flat_map__obj_is_dict__returns_replaced_cache_data_with_separator(
     set_velocitas_cache_data,  # type: ignore
 ):
     separator = "test.separator"
     cache_data_with_keys_to_replace = json_obj_to_flat_map(get_cache_data(), separator)
     assert cache_data_with_keys_to_replace[f"{separator}.testPropA"] == "testValueA"
     assert cache_data_with_keys_to_replace[f"{separator}.testPropB"] == "testValueB"
+
+
+def test_json_obj_to_flat_map__obj_is_list__returns_replaced_cache_data_with_separator(
+    set_velocitas_cache_data,  # type: ignore
+):
+    separator = "test.separator"
+    cache_data_with_keys_to_replace = json_obj_to_flat_map(
+        list(get_cache_data()), separator
+    )
+    assert cache_data_with_keys_to_replace[f"{separator}.0"] == "testPropA"
+    assert cache_data_with_keys_to_replace[f"{separator}.1"] == "testPropB"
+
+
+def test_json_obj_to_flat_map__obj_is_str__returns_replaced_cache_data_with_separator(
+    set_velocitas_cache_data,  # type: ignore
+):
+    separator = "test.separator"
+    cache_data_with_keys_to_replace = json_obj_to_flat_map("test", separator)
+    assert cache_data_with_keys_to_replace[f"{separator}"] == "test"

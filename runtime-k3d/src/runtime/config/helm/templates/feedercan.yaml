@@ -44,10 +44,10 @@ spec:
           imagePullPolicy: {{.Values.imageFeedercan.pullPolicy}}
           {{- if .Values.imageFeedercan.environmentVariables}}
           env:
-          {{- range .Values.imageFeedercan.environmentVariables }}
+            {{- range .Values.imageFeedercan.environmentVariables }}
             - name: {{ .name }}
               value: "{{ .value }}"
-          {{- end }}
+            {{- end }}
           {{- end }}
           volumeMounts:
           - mountPath: "/data"

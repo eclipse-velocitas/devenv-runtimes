@@ -1,2 +1,4 @@
 .DS_Store
 __pycache__
+
+runtime-k3d/src/runtime/config/helm/templates/values.yaml
