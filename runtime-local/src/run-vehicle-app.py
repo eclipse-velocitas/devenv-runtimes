@@ -14,7 +14,6 @@
 
 import argparse
 import subprocess
-import sys
 from typing import Optional
 
 from lib import MiddlewareType, get_dapr_sidecar_args, get_middleware_type

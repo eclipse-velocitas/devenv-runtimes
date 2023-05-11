@@ -16,15 +16,20 @@ import argparse
 import os
 import re
 import shutil
-from typing import Any
 import sys
+from typing import Any
+
+import ruamel.yaml as yaml
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "deployment"))
 
-import ruamel.yaml as yaml
-from lib import ServiceSpecConfig, generate_nodeport, parse_service_config
+from lib import ServiceSpecConfig, generate_nodeport, parse_service_config  # noqa: E402
 
-from velocitas_lib import get_package_path, get_services, get_workspace_dir
+from velocitas_lib import (  # noqa: E402
+    get_package_path,
+    get_services,
+    get_workspace_dir,
+)
 
 
 def generate_env_vars_spec(

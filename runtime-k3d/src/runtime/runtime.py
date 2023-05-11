@@ -16,12 +16,13 @@ import os
 import subprocess
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "runtime"))
-from deployment.gen_helm import gen_helm
-from deployment.lib import parse_service_config
 from yaspin.core import Yaspin
 
 from velocitas_lib import get_services
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "runtime"))
+from deployment.gen_helm import gen_helm  # noqa: E402
+from deployment.lib import parse_service_config  # noqa: E402
 
 
 def is_runtime_installed() -> bool:

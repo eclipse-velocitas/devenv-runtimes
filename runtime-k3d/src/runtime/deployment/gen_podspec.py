@@ -14,20 +14,21 @@
 
 import argparse
 import os
-from typing import Any, Tuple
 import sys
+from typing import Any, Tuple
+
+import ruamel.yaml as yaml
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "deployment"))
 
-import ruamel.yaml as yaml
-from lib import (
+from lib import (  # noqa: E402
     ServiceSpecConfig,
     create_cluster_ip_spec,
     generate_nodeport,
     parse_service_config,
 )
 
-from velocitas_lib import get_script_path, get_services, get_workspace_dir
+from velocitas_lib import get_script_path, get_services, get_workspace_dir  # noqa: E402
 
 
 def find_service_spec(lst: list[dict[str, Any]], kind: str, name: str) -> int:

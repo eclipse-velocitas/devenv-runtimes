@@ -18,7 +18,7 @@ from typing import List
 
 from yaspin.core import Yaspin
 
-from velocitas_lib import get_package_path, get_script_path, require_env
+from velocitas_lib import get_package_path, require_env
 
 
 def registry_exists() -> bool:
