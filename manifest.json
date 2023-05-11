@@ -113,28 +113,28 @@
                     "id": "runtime-up",
                     "executable": "python3",
                     "args": [
-                        "./runtime-k3d/src/runtime-up.py"
+                        "./runtime-k3d/src/runtime/runtime-up.py"
                     ]
                 },
                 {
                     "id": "runtime-down",
                     "executable": "python3",
                     "args": [
-                        "./runtime-k3d/src/runtime-down.py"
+                        "./runtime-k3d/src/runtime/runtime-down.py"
                     ]
                 },
                 {
                     "id": "generate-podspec",
                     "executable": "python3",
                     "args": [
-                        "./runtime-k3d/src/gen_podspec.py"
+                        "./runtime-k3d/src/runtime/deployment/gen_podspec.py"
                     ]
                 },
                 {
                     "id": "generate-helm",
                     "executable": "python3",
                     "args": [
-                        "./runtime-k3d/src/gen_helm.py"
+                        "./runtime-k3d/src/runtime/deployment/gen_helm.py"
                     ]
                 }
             ],
@@ -167,14 +167,14 @@
                     "id": "build-vehicleapp",
                     "executable": "python3",
                     "args": [
-                        "./runtime-k3d/src/deployment/build_vehicleapp.py"
+                        "./runtime-k3d/src/app-deployment/build_vehicleapp.py"
                     ]
                 },
                 {
                     "id": "deploy-vehicleapp",
                     "executable": "python3",
                     "args": [
-                        "./runtime-k3d/src/deployment/deploy_vehicleapp.py"
+                        "./runtime-k3d/src/app-deployment/deploy_vehicleapp.py"
                     ]
                 }
             ],

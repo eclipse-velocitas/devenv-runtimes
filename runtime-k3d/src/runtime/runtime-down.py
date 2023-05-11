@@ -12,21 +12,21 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from runtime.controlplane import configure_controlplane
-from runtime.runtime import deploy_runtime
+from controlplane import reset_controlplane
+from runtime import undeploy_runtime
 from yaspin import yaspin
 
 
-def runtime_up():
-    """Start up the K3D runtime."""
-    with yaspin(text="Starting k3d runtime...") as spinner:
+def runtime_down():
+    """Stop the K3D runtime."""
+    with yaspin(text="Stopping k3d runtime...") as spinner:
         try:
-            configure_controlplane(spinner)
-            deploy_runtime(spinner)
+            reset_controlplane(spinner)
+            undeploy_runtime(spinner)
             spinner.ok("✔")
         except Exception as err:
             spinner.fail(err)
 
 
 if __name__ == "__main__":
-    runtime_up()
+    runtime_down()

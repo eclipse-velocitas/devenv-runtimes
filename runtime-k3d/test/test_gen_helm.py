@@ -18,9 +18,9 @@ import sys
 
 import pytest
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
-import gen_helm
-from lib import ServiceSpecConfig, generate_nodeport
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src/runtime"))
+import deployment.gen_helm as gen_helm
+from deployment.lib import ServiceSpecConfig, generate_nodeport
 
 
 @pytest.mark.parametrize(

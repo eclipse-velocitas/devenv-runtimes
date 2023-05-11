@@ -68,7 +68,7 @@ def get_services() -> dict[str, Any]:
     """Return all specified services as Python object."""
     return json.load(
         open(
-            f"{Path(get_script_path()).resolve().parents[1]}/runtime.json",
+            f"{get_package_path()}/runtime.json",
             encoding="utf-8",
         )
     )

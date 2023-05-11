@@ -19,9 +19,9 @@ from typing import Optional
 
 import pytest
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
-import gen_podspec
-from lib import ServiceSpecConfig, generate_nodeport
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src/runtime"))
+import deployment.gen_podspec as gen_podspec
+from deployment.lib import ServiceSpecConfig, generate_nodeport
 
 
 @pytest.mark.parametrize("ports", [["1234"], ["0"], ["4567", "1234"]])

@@ -17,11 +17,14 @@ import os
 import re
 import shutil
 from typing import Any
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "deployment"))
 
 import ruamel.yaml as yaml
 from lib import ServiceSpecConfig, generate_nodeport, parse_service_config
 
-from velocitas_lib import get_script_path, get_services, get_workspace_dir
+from velocitas_lib import get_package_path, get_services, get_workspace_dir
 
 
 def generate_env_vars_spec(
@@ -87,7 +90,7 @@ def generate_values_file(output_path: str):
 
 def copy_helm_chart(output_path: str):
     shutil.copytree(
-        f"{get_script_path()}/runtime/config/helm",
+        f"{get_package_path()}/runtime-k3d/src/runtime/deployment/config/helm",
         output_path,
         symlinks=False,
         ignore=None,

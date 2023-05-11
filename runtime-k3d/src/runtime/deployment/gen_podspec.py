@@ -15,6 +15,9 @@
 import argparse
 import os
 from typing import Any, Tuple
+import sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "deployment"))
 
 import ruamel.yaml as yaml
 from lib import (
@@ -282,7 +285,7 @@ def gen_podspec(output_file_path: str):
         output_file_path: The path the spec is written to.
     """
     with open(
-        f"{get_script_path()}/runtime/config/podspec/runtime_template.yaml",
+        f"{get_script_path()}/config/podspec/runtime_template.yaml",
         "r",
         encoding="utf-8",
     ) as f:

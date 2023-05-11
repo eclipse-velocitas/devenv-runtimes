@@ -220,7 +220,15 @@ def configure_controlplane(spinner: Yaspin):
         spinner (Yaspin): The progress spinner to update.
     """
     config_dir = os.path.join(get_package_path(), "config")
-    dapr_config_dir = os.path.join(get_script_path(), "runtime", "config", ".dapr")
+    dapr_config_dir = os.path.join(
+        get_package_path(),
+        "runtime-k3d",
+        "src",
+        "runtime",
+        "deployment",
+        "config",
+        ".dapr",
+    )
 
     status = "> Checking K3D registry... "
     if not registry_exists():

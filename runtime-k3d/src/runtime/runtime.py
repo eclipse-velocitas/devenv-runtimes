@@ -14,9 +14,11 @@
 
 import os
 import subprocess
+import sys
 
-from gen_helm import gen_helm
-from lib import parse_service_config
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "runtime"))
+from deployment.gen_helm import gen_helm
+from deployment.lib import parse_service_config
 from yaspin.core import Yaspin
 
 from velocitas_lib import get_services
