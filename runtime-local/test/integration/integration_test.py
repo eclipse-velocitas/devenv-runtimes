@@ -20,7 +20,7 @@ from threading import Timer
 
 
 def create_dummy_vspec_file():
-    """Creates an empty vspec json file in the project's cache directory
+    """Create an empty vspec json file in the project's cache directory
     plus the respective 'vspec_file_path' cache variable pointing to it.
     !!! Todo: Replace this workaround solution making assumptions about
               the cache location.

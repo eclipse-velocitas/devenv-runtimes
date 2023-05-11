@@ -26,19 +26,15 @@ def start_sidecar(
     grpc_port: Optional[str] = None,
     http_port: Optional[str] = None,
 ):
-    args, env = get_dapr_sidecar_args(
+    args, _ = get_dapr_sidecar_args(
         app_id, app_port=app_port, grpc_port=grpc_port, http_port=http_port
     )
 
-    print(args)
     subprocess.check_call(args)
 
 
 if __name__ == "__main__":
-    print(sys.argv)
-
     # The arguments we accept
-
     parser = argparse.ArgumentParser(
         description="Starts the Dapr sidecar for the app to debug."
     )

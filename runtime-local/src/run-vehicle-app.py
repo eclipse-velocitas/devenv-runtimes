@@ -46,15 +46,11 @@ def run_app(
         envs.update(dapr_env)
         program_args = dapr_args + program_args
 
-    print(program_args)
     subprocess.check_call(program_args)
 
 
 if __name__ == "__main__":
-    print(sys.argv)
-
     # The arguments we accept
-
     parser = argparse.ArgumentParser(
         description="Starts the Dapr sidecar for the app to debug."
     )

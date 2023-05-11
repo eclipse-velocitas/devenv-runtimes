@@ -23,7 +23,7 @@ from velocitas_lib import (
 
 
 def generate_nodeport(port: int) -> int:
-    """Creates nodeport from the last 3 digits of the passed port in the range
+    """Create nodeport from the last 3 digits of the passed port in the range
     of 30000-30999.
 
     Args:
@@ -34,7 +34,7 @@ def generate_nodeport(port: int) -> int:
 
 
 def create_cluster_ip_spec(service_id: str, ports: List[dict]) -> dict[str, Any]:
-    """Creates cluster ip spec for the given service_id.
+    """Create cluster ip spec for the given service id.
 
     Args:
         service_id: The id of the service to create cluster ip for.
@@ -57,7 +57,7 @@ class ServiceSpecConfig(NamedTuple):
 
 
 def parse_service_config(service_spec_config: dict) -> ServiceSpecConfig:
-    """Parses service spec configuration and returns it as an named tuple.
+    """Parse service spec configuration and return it as an named tuple.
 
     Args:
         service_spec_config: The specificon of the services from config file.
@@ -74,7 +74,7 @@ def parse_service_config(service_spec_config: dict) -> ServiceSpecConfig:
     variables["builtin.package_dir"] = get_package_path()
 
     for config_entry in service_spec_config:
-        if not isinstance(config_entry["value"], (int, float, bool)):
+        if isinstance(config_entry["value"], str):
             if "builtin" in config_entry["value"]:
                 config_entry["value"] = replace_variables(
                     config_entry["value"], variables
