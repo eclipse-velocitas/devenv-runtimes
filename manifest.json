@@ -167,14 +167,14 @@
                     "id": "build-vehicleapp",
                     "executable": "python3",
                     "args": [
-                        "./runtime-k3d/src/app-deployment/build_vehicleapp.py"
+                        "./runtime-k3d/src/app_deployment/build_vehicleapp.py"
                     ]
                 },
                 {
                     "id": "deploy-vehicleapp",
                     "executable": "python3",
                     "args": [
-                        "./runtime-k3d/src/app-deployment/deploy_vehicleapp.py"
+                        "./runtime-k3d/src/app_deployment/deploy_vehicleapp.py"
                     ]
                 }
             ],
