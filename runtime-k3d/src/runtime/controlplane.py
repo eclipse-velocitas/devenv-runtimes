@@ -71,28 +71,31 @@ def cluster_exists() -> bool:
     )
 
 
+def append_proxy_var_if_set(proxy_args: List[str], var_name: str):
+    """Append the specified environment variable setting to the passed list,
+    if the variable exists in the calling environment
+
+    Args:
+        proxy_args (List[str]): List to append to
+        var_name (str): Enironment variable to append if existing
+    """
+    var_content = os.getenv(var_name)
+    if var_content:
+        proxy_args += ["-e", f"{var_content}@server:0"]
+
+
 def create_cluster(config_dir_path: str):
     """Create the cluster with the given config dir.
 
     Args:
         config_dir_path (str): The path to the config directory.
     """
-    has_proxy: bool = os.getenv("HTTP_PROXY") is not None
-
     extra_proxy_args: List[str] = list()
-    if has_proxy:
+    append_proxy_var_if_set(extra_proxy_args, "HTTP_PROXY")
+    append_proxy_var_if_set(extra_proxy_args, "HTTPS_PROXY")
+    append_proxy_var_if_set(extra_proxy_args, "NO_PROXY")
+    if len(extra_proxy_args) > 0:
         print("Creating cluster with proxy configuration.")
-        http_proxy = os.getenv("HTTP_PROXY")
-        https_proxy = os.getenv("HTTPS_PROXY")
-        no_proxy = os.getenv("NO_PROXY")
-        extra_proxy_args = [
-            "-e",
-            f"HTTP_PROXY={http_proxy}@server:0",
-            "-e",
-            f"HTTPS_PROXY={https_proxy}@server:0",
-            "-e",
-            f"NO_PROXY={no_proxy}@server:0",
-        ]
     else:
         print("Creating cluster without proxy configuration.")
 
