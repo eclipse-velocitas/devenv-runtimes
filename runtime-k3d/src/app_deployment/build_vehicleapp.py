@@ -30,31 +30,19 @@ def build_vehicleapp():
             image_tag = f"localhost:12345/{app_name}:local"
             dockerfile_path = require_env("dockerfilePath")
             os.environ["DOCKER_BUILDKIT"] = "1"
-            has_proxy: bool = os.getenv("HTTP_PROXY") is not None
 
-            extra_proxy_args: List[str] = list()
-
-            if has_proxy:
-                status = f"{status} with proxy configuration."
-                http_proxy = os.getenv("HTTP_PROXY", default="")
-                https_proxy = os.getenv("HTTPS_PROXY", default="")
-                ftp_proxy = os.getenv("FTP_PROXY", default="")
-                all_proxy = os.getenv("ALL_PROXY", default="")
-                no_proxy = os.getenv("NO_PROXY", default="")
-                extra_proxy_args = [
-                    "--build-arg",
-                    f"HTTP_PROXY={http_proxy}",
-                    "--build-arg",
-                    f"HTTPS_PROXY={https_proxy}",
-                    "--build-arg",
-                    f"FTP_PROXY={ftp_proxy}",
-                    "--build-arg",
-                    f"ALL_PROXY={all_proxy}",
-                    "--build-arg",
-                    f"NO_PROXY={no_proxy}",
-                ]
-            else:
-                status = f"{status} without proxy configuration."
+            extra_proxy_args: List[str] = [
+                "--build-arg",
+                "HTTP_PROXY",
+                "--build-arg",
+                "HTTPS_PROXY",
+                "--build-arg",
+                "FTP_PROXY",
+                "--build-arg",
+                "ALL_PROXY",
+                "--build-arg",
+                "NO_PROXY",
+            ]
 
             spinner.write(status)
 
