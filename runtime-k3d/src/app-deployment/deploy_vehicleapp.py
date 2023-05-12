@@ -69,17 +69,17 @@ def install_vehicleapp(app_name: str):
     """Install VehicleApp helm chart"""
     app_port = require_env("vehicleAppPort")
     app_registry = "k3d-registry.localhost:12345"
-    script_dir = get_script_path()
-    helm_config_dir = script_dir + "/config/helm"
+    script_path = get_script_path()
+    helm_config_path = script_path + "/config/helm"
 
     subprocess.check_call(
         [
             "helm",
             "install",
             "vapp-chart",
-            helm_config_dir,
+            helm_config_path,
             "--values",
-            f"{helm_config_dir}/values.yaml",
+            f"{helm_config_path}/values.yaml",
             "--set",
             f"imageVehicleApp.repository={app_registry}/{app_name}",
             "--set",

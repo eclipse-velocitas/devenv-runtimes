@@ -219,8 +219,8 @@ def configure_controlplane(spinner: Yaspin):
     Args:
         spinner (Yaspin): The progress spinner to update.
     """
-    config_dir = os.path.join(get_package_path(), "config")
-    dapr_config_dir = os.path.join(
+    config_dir_path = os.path.join(get_package_path(), "config")
+    dapr_config_dir_path = os.path.join(
         get_package_path(),
         "runtime-k3d",
         "src",
@@ -240,7 +240,7 @@ def configure_controlplane(spinner: Yaspin):
 
     status = "> Checking K3D cluster... "
     if not cluster_exists():
-        create_cluster(config_dir)
+        create_cluster(config_dir_path)
         status = status + "created."
     else:
         status = status + "registry already exists."
@@ -257,7 +257,7 @@ def configure_controlplane(spinner: Yaspin):
     status = "> Checking dapr... "
     if not dapr_is_initialized_with_k3d():
         dapr_runtime_version = require_env("daprRuntimeVersion")
-        initialize_dapr_with_k3d(dapr_runtime_version, dapr_config_dir)
+        initialize_dapr_with_k3d(dapr_runtime_version, dapr_config_dir_path)
         status = status + "initialized."
     else:
         status = status + "already initialized."
