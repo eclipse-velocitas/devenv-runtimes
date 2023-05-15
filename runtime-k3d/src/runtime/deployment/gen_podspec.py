@@ -81,6 +81,11 @@ def create_podspec(templates, service_spec) -> list[dict[str, Any]]:
     for port in service_config.ports:
         pods.append(generate_nodeport_service(service_id, port))
 
+    for mount in service_config.mounts:
+        _, file = get_mount_folder_and_file(mount)
+        if file != "":
+            pods.append(generate_configmap(mount.split(":")[0], file))
+
     if "mosquitto" in service_config.image:
         pods.append(
             create_cluster_ip_spec(
@@ -142,6 +147,22 @@ def get_volumes(service_config: ServiceSpecConfig) -> list[dict[str, Any]]:
                 }
             )
     return volumes
+
+
+def generate_configmap(local_path: str, file: str):
+    data = ""
+    with open(local_path) as f:
+        data = f.read()
+
+    return {
+        "apiVersion": "v1",
+        "data": {f"{file}": data},
+        "kind": "ConfigMap",
+        "metadata": {
+            "name": f"{os.path.splitext(file)[0]}-config",
+            "namespace": "default",
+        },
+    }
 
 
 def generate_container_mount(service_config: ServiceSpecConfig) -> list[dict[str, Any]]:

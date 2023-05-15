@@ -76,17 +76,25 @@ def create_config_maps():
                 return
 
             file = os.path.splitext(os.path.basename(local_path))[0]
-            subprocess.check_call(
-                [
-                    "kubectl",
-                    "create",
-                    "configmap",
-                    f"{file}-config",
-                    f"--from-file={local_path}",
-                ],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-            )
+            if (
+                not subprocess.call(
+                    ["kubectl", "describe", "configmaps", f"{file}-config"],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                )
+                == 0
+            ):
+                subprocess.check_call(
+                    [
+                        "kubectl",
+                        "create",
+                        "configmap",
+                        f"{file}-config",
+                        f"--from-file={local_path}",
+                    ],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                )
 
 
 def install_runtime(helm_chart_path: str):
