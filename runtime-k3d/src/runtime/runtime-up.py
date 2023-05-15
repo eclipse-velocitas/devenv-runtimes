@@ -12,21 +12,40 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import argparse
+
 from controlplane import configure_controlplane
 from runtime import deploy_runtime
 from yaspin import yaspin
 
 
-def runtime_up():
+def runtime_up(skip_services: bool):
     """Start up the K3D runtime."""
     with yaspin(text="Starting k3d runtime...") as spinner:
         try:
             configure_controlplane(spinner)
-            deploy_runtime(spinner)
+            if not skip_services:
+                deploy_runtime(spinner)
+            else:
+                spinner.write("Skipping services")
             spinner.ok("✔")
         except Exception as err:
             spinner.fail(err)
 
 
+def main():
+    parser = argparse.ArgumentParser("runtime-up")
+    parser.add_argument(
+        "-s",
+        "--skip_services",
+        required=False,
+        action="store_true",
+        help="Configure only the cluster and don't deploy all services",
+    )
+    args = parser.parse_args()
+
+    runtime_up(args.skip_services)
+
+
 if __name__ == "__main__":
-    runtime_up()
+    main()

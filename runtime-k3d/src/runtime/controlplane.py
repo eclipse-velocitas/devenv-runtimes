@@ -71,7 +71,7 @@ def cluster_exists() -> bool:
     )
 
 
-def append_proxy_var_if_set(proxy_args: List[str], var_name: str):
+def append_proxy_var_if_set(proxy_args: List[str], var_name: str):  # noqa: U100
     """Append the specified environment variable setting to the passed list,
     if the variable exists in the calling environment
 
