@@ -29,8 +29,11 @@ def generate_nodeport(port: int) -> int:
     Args:
         port: The port to be used to generate the nodeport.
     """
-    nodeport = f"{(port%1000):03d}"
-    return int(f"30{nodeport}")
+    nodeport = port % 10000
+    if nodeport > 2767:
+        nodeport = nodeport % 1000
+
+    return int(f"3{nodeport:04d}")
 
 
 def create_cluster_ip_spec(service_id: str, ports: List[dict]) -> dict[str, Any]:
