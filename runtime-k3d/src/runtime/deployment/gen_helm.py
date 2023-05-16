@@ -115,7 +115,7 @@ def main():
     parser = argparse.ArgumentParser("generate-helm")
     parser.add_argument(
         "-o",
-        "--output_path",
+        "--output-path",
         type=str,
         required=False,
         help="Destination Path for the generated Helm Chart and templates.",

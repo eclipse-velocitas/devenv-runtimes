@@ -21,10 +21,11 @@ from yaspin import yaspin
 
 def runtime_up(skip_services: bool):
     """Start up the K3D runtime."""
-    with yaspin(text="Starting k3d runtime...") as spinner:
+    with yaspin(text="Configuring controlplane for k3d...") as spinner:
         try:
             configure_controlplane(spinner)
             if not skip_services:
+                spinner.text = "Starting k3d runtime..."
                 deploy_runtime(spinner)
             else:
                 spinner.write("Skipping services")
@@ -37,7 +38,7 @@ def main():
     parser = argparse.ArgumentParser("runtime-up")
     parser.add_argument(
         "-s",
-        "--skip_services",
+        "--skip-services",
         required=False,
         action="store_true",
         help="Configure only the cluster and don't deploy all services",

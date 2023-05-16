@@ -331,7 +331,7 @@ def main():
     parser = argparse.ArgumentParser("generate-podspec")
     parser.add_argument(
         "-o",
-        "--output_file_path",
+        "--output-file-path",
         type=str,
         required=False,
         help="Full path including name and file extension of the output file.",

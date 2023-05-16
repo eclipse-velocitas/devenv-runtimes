@@ -63,7 +63,7 @@ def terminate_spawned_processes():
             (service_id, process) = spawned_processes.popitem()
             process.terminate()
             stop_container(service_id, subprocess.DEVNULL)
-            spinner.write(f"> {process.args[0]} (service_id='{service_id}') terminated")
+            spinner.write(f"> {process.args[0]} (service-id='{service_id}') terminated")
         spinner.ok("✔")
 
 
