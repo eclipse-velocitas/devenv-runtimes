@@ -12,8 +12,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Pod
 metadata:
   name: bash
 spec:
@@ -63,18 +63,27 @@ metadata:
   labels:
     app: mqtt-broker
 spec:
-  containers:
-      - name: mqtt
-        image: eclipse-mosquitto:2.0.14
-        imagePullPolicy: IfNotPresent
-        args: [ "mosquitto", "-c", "/mosquitto-no-auth.conf" ]
-        ports:
-          - name: default
-            containerPort: 1883
-            protocol: TCP
-          - name: websocket
-            containerPort: 9001
-            protocol: TCP
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqtt-broker
+  template:
+    metadata:
+      labels:
+        app: mqtt-broker
+    spec:
+      containers:
+          - name: mqtt
+            image: eclipse-mosquitto:2.0.14
+            imagePullPolicy: IfNotPresent
+            args: [ "mosquitto", "-c", "/mosquitto-no-auth.conf" ]
+            ports:
+              - name: default
+                containerPort: 1883
+                protocol: TCP
+              - name: websocket
+                containerPort: 9001
+                protocol: TCP
 ---
 apiVersion: v1
 kind: Service
@@ -120,37 +129,46 @@ metadata:
   name: feedercan
   labels:
     app: feedercan
-  annotations:
-    dapr.io/enabled: "true"
-    dapr.io/app-id: "feedercan"
-    dapr.io/log-level: "debug"
-    dapr.io/config: "config"
-    dapr.io/app-protocol: "grpc"
 spec:
-  volumes:
-    - name: pv-storage
-      persistentVolumeClaim:
-        claimName: pv-claim
-  containers:
-    - name: feedercan
-      image: ghcr.io/eclipse/kuksa.val.feeders/dbc2val:v0.1.0
-      imagePullPolicy: Always
-      env:
-        - name: VEHICLEDATABROKER_DAPR_APP_ID
-          value: vehicledatabroker
-        - name: LOG_LEVEL
-          value: "info,databroker=info,dbcfeeder.broker_client=info,dbcfeeder=info"
-        - name: USECASE
-          value: "databroker"
-        - name: CANDUMP_FILE
-          value: "/data/candumpDefault.log"
-        - name: MAPPING_FILE
-          value: "/data/mappingDefault.yml"
-        - name: DBC_FILE
-          value: "/data/dbcfileDefault.dbc"
-      volumeMounts:
-      - mountPath: "/data"
-        name: pv-storage
+  replicas: 1
+  selector:
+    matchLabels:
+      app: feedercan
+  template:
+    metadata:
+      labels:
+        app: feedercan
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "feedercan"
+        dapr.io/log-level: "debug"
+        dapr.io/config: "config"
+        dapr.io/app-protocol: "grpc"
+    spec:
+      volumes:
+        - name: pv-storage
+          persistentVolumeClaim:
+            claimName: pv-claim
+      containers:
+        - name: feedercan
+          image: ghcr.io/eclipse/kuksa.val.feeders/dbc2val:v0.1.0
+          imagePullPolicy: Always
+          env:
+            - name: VEHICLEDATABROKER_DAPR_APP_ID
+              value: vehicledatabroker
+            - name: LOG_LEVEL
+              value: "info,databroker=info,dbcfeeder.broker_client=info,dbcfeeder=info"
+            - name: USECASE
+              value: "databroker"
+            - name: CANDUMP_FILE
+              value: "/data/candumpDefault.log"
+            - name: MAPPING_FILE
+              value: "/data/mappingDefault.yml"
+            - name: DBC_FILE
+              value: "/data/dbcfileDefault.dbc"
+          volumeMounts:
+          - mountPath: "/data"
+            name: pv-storage
 ---
 
 apiVersion: apps/v1
@@ -159,22 +177,31 @@ metadata:
   name: vehicledatabroker
   labels:
     app: vehicledatabroker
-  annotations:
-    dapr.io/enabled: "true"
-    dapr.io/app-id: "vehicledatabroker"
-    dapr.io/app-port: "55555"
-    dapr.io/log-level: "debug"
-    dapr.io/config: "config"
-    dapr.io/app-protocol: "grpc"
 spec:
-  containers:
-    - name: vehicledatabroker
-      image: ghcr.io/boschglobal/kuksa.val/databroker:0.0.2
-      imagePullPolicy: Always
-      ports:
-        - name: default
-          containerPort: 55555
-          protocol: TCP
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vehicledatabroker
+  template:
+    metadata:
+      labels:
+        app: vehicledatabroker
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "vehicledatabroker"
+        dapr.io/app-port: "55555"
+        dapr.io/log-level: "debug"
+        dapr.io/config: "config"
+        dapr.io/app-protocol: "grpc"
+    spec:
+      containers:
+        - name: vehicledatabroker
+          image: ghcr.io/boschglobal/kuksa.val/databroker:0.0.2
+          imagePullPolicy: Always
+          ports:
+            - name: default
+              containerPort: 55555
+              protocol: TCP
 
 ---
 apiVersion: v1
@@ -196,25 +223,34 @@ metadata:
   name: seatservice
   labels:
     app: seatservice
-  annotations:
-    dapr.io/enabled: "true"
-    dapr.io/app-id: "seatservice"
-    dapr.io/app-port: "50051"
-    dapr.io/log-level: "debug"
-    dapr.io/config: "config"
-    dapr.io/app-protocol: "grpc"
 spec:
-  containers:
-    - name: seatservice
-      image: ghcr.io/eclipse/kuksa.val.services/seat_service:v0.1.0
-      imagePullPolicy: Always
-      ports:
-      - name: default
-        containerPort: 50051
-        protocol: TCP
-      env:
-      - name: VEHICLEDATABROKER_DAPR_APP_ID
-        value: vehicledatabroker
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seatservice
+  template:
+    metadata:
+      labels:
+        app: seatservice
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "seatservice"
+        dapr.io/app-port: "50051"
+        dapr.io/log-level: "debug"
+        dapr.io/config: "config"
+        dapr.io/app-protocol: "grpc"
+    spec:
+      containers:
+        - name: seatservice
+          image: ghcr.io/eclipse/kuksa.val.services/seat_service:v0.1.0
+          imagePullPolicy: Always
+          ports:
+          - name: default
+            containerPort: 50051
+            protocol: TCP
+          env:
+          - name: VEHICLEDATABROKER_DAPR_APP_ID
+            value: vehicledatabroker
 ---
 apiVersion: v1
 kind: Service

@@ -73,7 +73,7 @@ def create_podspec(templates, service_spec) -> list[dict[str, Any]]:
     pods = []
     service_config = parse_service_config(service_spec["config"])
 
-    template_pod = templates[find_service_spec(templates, "Pod", service_id)]
+    template_pod = templates[find_service_spec(templates, "Deployment", service_id)]
 
     pod = generate_pod_spec(template_pod, service_config)
     pods.append(pod)
@@ -107,7 +107,7 @@ def generate_pod_spec(
         template_pod: The spec of the pod taken from the template
         service_config: The parsed configuration from the runtime.json
     """
-    spec = template_pod["spec"]["containers"][0]
+    spec = template_pod["spec"]["template"]["spec"]["containers"][0]
     spec["image"] = service_config.image
 
     if service_config.args:
@@ -121,9 +121,11 @@ def generate_pod_spec(
 
     if service_config.mounts:
         spec["volumeMounts"] = generate_container_mount(service_config)
-        template_pod["spec"]["volumes"] = get_volumes(service_config)
+        template_pod["spec"]["template"]["spec"]["volumes"] = get_volumes(
+            service_config
+        )
 
-    template_pod["spec"]["containers"][0] = spec
+    template_pod["spec"]["template"]["spec"]["containers"][0] = spec
     return template_pod
 
 
