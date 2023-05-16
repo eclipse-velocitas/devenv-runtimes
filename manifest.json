@@ -110,14 +110,14 @@
                     ]
                 },
                 {
-                    "id": "runtime-up",
+                    "id": "up",
                     "executable": "python3",
                     "args": [
                         "./runtime-k3d/src/runtime/runtime-up.py"
                     ]
                 },
                 {
-                    "id": "runtime-down",
+                    "id": "down",
                     "executable": "python3",
                     "args": [
                         "./runtime-k3d/src/runtime/runtime-down.py"
