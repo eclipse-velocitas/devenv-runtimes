@@ -72,6 +72,14 @@
                     "args": [
                         "./runtime-local/src/run-dapr-sidecar.py"
                     ]
+                },
+                {
+                    "id": "run-integration-test",
+                    "executable": "pytest",
+                    "args": [
+                        "-s",
+                        "./runtime-local/test/integration/integration_test.py"
+                    ]
                 }
             ],
             "onPostInit": [
