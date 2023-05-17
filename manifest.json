@@ -75,7 +75,7 @@
                 },
                 {
                     "id": "run-integration-test",
-                    "executable": "cd runtime-local/test && pytest",
+                    "executable": "cd runtime-local/test ; pytest",
                     "args": [
                         "-s",
                         "./runtime-local/test/integration/integration_test.py"
