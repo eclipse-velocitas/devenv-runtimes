@@ -107,7 +107,7 @@ def get_log_file_name(service_id: str) -> str:
     return os.path.join(
         get_workspace_dir(),
         "logs",
-        "runtime-local",
+        "runtime-k3d",
         f"{service_id}.txt")
 
 

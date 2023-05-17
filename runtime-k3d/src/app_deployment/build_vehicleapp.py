@@ -21,7 +21,7 @@ from yaspin import yaspin
 from velocitas_lib import get_app_manifest, get_workspace_dir, require_env
 
 
-def build_vehicleapp():
+def build_vehicleapp(log_file=subprocess.DEVNULL):
     """Build VehicleApp docker image and display the progress using a spinner."""
     with yaspin(text="Building VehicleApp...") as spinner:
         try:
@@ -61,8 +61,8 @@ def build_vehicleapp():
                     ".",
                     "--no-cache",
                 ],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
+                stdout=log_file,
+                stderr=log_file,
                 cwd=get_workspace_dir(),
             )
             spinner.ok("✔")

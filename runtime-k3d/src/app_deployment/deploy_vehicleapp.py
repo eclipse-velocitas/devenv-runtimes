@@ -35,37 +35,37 @@ def is_docker_image_build_locally(app_name: str) -> bool:
     return output.decode("utf-8").strip() == f"localhost:12345/{app_name}:local"
 
 
-def push_docker_image_to_registry(app_name: str):
+def push_docker_image_to_registry(app_name: str, log_file=subprocess.DEVNULL):
     """Push docker image to local k3d image registry"""
     subprocess.check_call(
         ["docker", "push", f"localhost:12345/{app_name}:local"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=log_file,
+        stderr=log_file,
     )
 
 
-def is_vehicleapp_installed() -> bool:
+def is_vehicleapp_installed(log_file=subprocess.DEVNULL) -> bool:
     """Return whether the runtime is installed or not."""
     return (
         subprocess.call(
             ["helm", "status", "vapp-chart"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            stdout=log_file,
+            stderr=log_file,
         )
         == 0
     )
 
 
-def uninstall_vehicleapp():
+def uninstall_vehicleapp(log_file=subprocess.DEVNULL):
     """Uninstall VehicleApp helm chart"""
     subprocess.check_call(
         ["helm", "uninstall", "vapp-chart", "--wait"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=log_file,
+        stderr=log_file,
     )
 
 
-def install_vehicleapp(app_name: str):
+def install_vehicleapp(app_name: str, log_file=subprocess.DEVNULL):
     """Install VehicleApp helm chart"""
     app_port = require_env("vehicleAppPort")
     app_registry = "k3d-registry.localhost:12345"
@@ -93,12 +93,12 @@ def install_vehicleapp(app_name: str):
             "60s",
             "--debug",
         ],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=log_file,
+        stderr=log_file,
     )
 
 
-def deploy_vehicleapp():
+def deploy_vehicleapp(log_file):
     """Deploy VehicleApp docker image via helm to k3d cluster
     and display the progress using a given spinner."""
     with yaspin(text="Deploying VehicleApp...") as spinner:

@@ -12,6 +12,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+from io import TextIOWrapper
 import os
 import subprocess
 from typing import List
@@ -21,7 +22,7 @@ from yaspin.core import Yaspin
 from velocitas_lib import get_package_path, require_env
 
 
-def registry_exists() -> bool:
+def registry_exists(log_file=subprocess.DEVNULL) -> bool:
     """Check if the K3D registry exists.
 
     Returns:
@@ -30,32 +31,32 @@ def registry_exists() -> bool:
     return (
         subprocess.call(
             ["k3d", "registry", "get", "k3d-registry.localhost"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            stdout=log_file,
+            stderr=log_file,
         )
         == 0
     )
 
 
-def create_registry():
+def create_registry(log_file=subprocess.DEVNULL):
     """Create the K3D registry."""
     subprocess.check_call(
         ["k3d", "registry", "create", "registry.localhost", "--port", "12345"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=log_file,
+        stderr=log_file,
     )
 
 
-def delete_registry():
+def delete_registry(log_file=subprocess.DEVNULL):
     """Delete the K3D registry."""
     subprocess.check_call(
         ["k3d", "registry", "delete", "k3d-registry.localhost"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=log_file,
+        stderr=log_file,
     )
 
 
-def cluster_exists() -> bool:
+def cluster_exists(log_file=subprocess.DEVNULL) -> bool:
     """Check if the K3D cluster exists.
 
     Returns:
@@ -64,8 +65,8 @@ def cluster_exists() -> bool:
     return (
         subprocess.call(
             ["k3d", "cluster", "get", "cluster"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            stdout=log_file,
+            stderr=log_file,
         )
         == 0
     )
@@ -84,7 +85,7 @@ def append_proxy_var_if_set(proxy_args: List[str], var_name: str):  # noqa: U100
         proxy_args += ["-e", f"{var_content}@server:0"]
 
 
-def create_cluster(config_dir_path: str):
+def create_cluster(config_dir_path: str, log_file=subprocess.DEVNULL):
     """Create the cluster with the given config dir.
 
     Args:
@@ -117,21 +118,21 @@ def create_cluster(config_dir_path: str):
             "k3d-registry.localhost:12345",
         ]
         + extra_proxy_args,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=log_file,
+        stderr=log_file,
     )
 
 
-def delete_cluster():
+def delete_cluster(log_file=subprocess.DEVNULL):
     """Delete the K3D cluster."""
     subprocess.call(
         ["k3d", "cluster", "delete", "cluster"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=log_file,
+        stderr=log_file,
     )
 
 
-def deployment_exists(deployment_name: str) -> bool:
+def deployment_exists(deployment_name: str, log_file=subprocess.DEVNULL) -> bool:
     """Check if the deployment of a given name exists.
 
     Args:
@@ -143,19 +144,19 @@ def deployment_exists(deployment_name: str) -> bool:
     return (
         subprocess.call(
             ["kubectl", "get", "deployment", deployment_name],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            stdout=log_file,
+            stderr=log_file,
         )
         == 0
     )
 
 
-def deploy_zipkin():
+def deploy_zipkin(log_file=subprocess.DEVNULL):
     """Deploy zipkin to the cluster."""
     subprocess.check_call(
         ["kubectl", "create", "deployment", "zipkin", "--image", "openzipkin/zipkin"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=log_file,
+        stderr=log_file,
     )
 
     subprocess.check_call(
@@ -169,24 +170,24 @@ def deploy_zipkin():
             "--port",
             "9411",
         ],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=log_file,
+        stderr=log_file,
     )
 
 
-def dapr_is_initialized_with_k3d() -> bool:
+def dapr_is_initialized_with_k3d(log_file=subprocess.DEVNULL) -> bool:
     """Check if dapr is initialized with k3d."""
     return (
         subprocess.call(
             ["dapr", "status", "-k"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            stdout=log_file,
+            stderr=log_file,
         )
         == 0
     )
 
 
-def initialize_dapr_with_k3d(dapr_runtime_version: str, dapr_config_dir_path: str):
+def initialize_dapr_with_k3d(dapr_runtime_version: str, dapr_config_dir_path: str, log_file=subprocess.DEVNULL):
     """Initialize dapr with K3D.
 
     Args:
@@ -204,18 +205,18 @@ def initialize_dapr_with_k3d(dapr_runtime_version: str, dapr_config_dir_path: st
             "--runtime-version",
             dapr_runtime_version,
         ],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=log_file,
+        stderr=log_file,
     )
 
     subprocess.check_call(
         ["kubectl", "apply", "-f", f"{dapr_config_dir_path}/config.yaml"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=log_file,
+        stderr=log_file,
     )
 
 
-def configure_controlplane(spinner: Yaspin):
+def configure_controlplane(spinner: Yaspin, log_file=subprocess.DEVNULL):
     """Configure the K3D control plane and display the progress
     using the given spinner.
 

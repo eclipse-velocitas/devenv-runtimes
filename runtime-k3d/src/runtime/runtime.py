@@ -25,34 +25,34 @@ from deployment.gen_helm import gen_helm  # noqa: E402
 from deployment.lib import parse_service_config  # noqa: E402
 
 
-def is_runtime_installed() -> bool:
+def is_runtime_installed(log_file=subprocess.DEVNULL) -> bool:
     """Return whether the runtime is installed or not."""
     return (
         subprocess.call(
             ["helm", "status", "vehicleappruntime"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            stdout=log_file,
+            stderr=log_file,
         )
         == 0
     )
 
 
-def retag_docker_image(image_name: str):
+def retag_docker_image(image_name: str, log_file=subprocess.DEVNULL):
     """Retag the given docker image to be available in K8S."""
     subprocess.check_call(
         ["docker", "pull", image_name],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=log_file,
+        stderr=log_file,
     )
     subprocess.check_call(
         ["docker", "tag", image_name, f"localhost:12345/{image_name}"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=log_file,
+        stderr=log_file,
     )
     subprocess.check_call(
         ["docker", "push", f"localhost:12345/{image_name}"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=log_file,
+        stderr=log_file,
     )
 
 
@@ -64,7 +64,7 @@ def retag_docker_images():
         retag_docker_image(service_config.image)
 
 
-def create_config_maps():
+def create_config_maps(log_file=subprocess.DEVNULL):
     """Create config maps for all services."""
     services = get_services()
     for service in services:
@@ -79,8 +79,8 @@ def create_config_maps():
             if (
                 not subprocess.call(
                     ["kubectl", "describe", "configmaps", f"{file}-config"],
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
+                    stdout=log_file,
+                    stderr=log_file,
                 )
                 == 0
             ):
@@ -92,12 +92,12 @@ def create_config_maps():
                         f"{file}-config",
                         f"--from-file={local_path}",
                     ],
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.DEVNULL,
+                    stdout=log_file,
+                    stderr=log_file,
                 )
 
 
-def install_runtime(helm_chart_path: str):
+def install_runtime(helm_chart_path: str, log_file=subprocess.DEVNULL):
     """Install the runtime from the given helm chart.
 
     Args:
@@ -116,17 +116,17 @@ def install_runtime(helm_chart_path: str):
             "60s",
             "--debug",
         ],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=log_file,
+        stderr=log_file,
     )
 
 
-def uninstall_runtime():
+def uninstall_runtime(log_file=subprocess.DEVNULL):
     """Uninstall the runtime."""
     subprocess.check_call(
         ["helm", "uninstall", "vehicleappruntime", "--wait"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=log_file,
+        stderr=log_file,
     )
 
 
