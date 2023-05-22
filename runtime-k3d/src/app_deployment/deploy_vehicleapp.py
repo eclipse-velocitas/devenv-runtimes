@@ -15,6 +15,7 @@
 import subprocess
 
 from build_vehicleapp import build_vehicleapp
+from runtime.deployment.lib import create_log_file
 from yaspin import yaspin
 
 from velocitas_lib import get_app_manifest, get_script_path, require_env
@@ -101,6 +102,8 @@ def install_vehicleapp(app_name: str, log_file=subprocess.DEVNULL):
 def deploy_vehicleapp(log_file):
     """Deploy VehicleApp docker image via helm to k3d cluster
     and display the progress using a given spinner."""
+
+    log_file = create_log_file("deploy-vapp")
     with yaspin(text="Deploying VehicleApp...") as spinner:
         try:
             app_name = get_app_manifest()["name"].lower()
@@ -108,21 +111,21 @@ def deploy_vehicleapp(log_file):
             if not is_docker_image_build_locally(app_name):
                 spinner.write("Cannot find vehicle app image...")
                 spinner.stop()
-                build_vehicleapp()
+                build_vehicleapp(log_file)
 
             spinner.start()
-            push_docker_image_to_registry(app_name)
+            push_docker_image_to_registry(app_name, log_file)
             status = f"> Pushing {app_name} docker image to k3d registry done!"
             spinner.write(status)
 
             status = "> Uninstalling vapp-chart..."
-            if is_vehicleapp_installed():
-                uninstall_vehicleapp()
+            if is_vehicleapp_installed(log_file):
+                uninstall_vehicleapp(log_file)
                 spinner.write(f"{status} done!")
             else:
                 spinner.write(f"{status} vapp-chart not yet installed.")
 
-            install_vehicleapp(app_name)
+            install_vehicleapp(app_name, log_file)
             spinner.write(f"> Installing vapp-chart for {app_name}... done!")
             spinner.ok("✔")
         except Exception as err:

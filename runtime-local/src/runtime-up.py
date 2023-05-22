@@ -32,7 +32,7 @@ spawned_processes: Dict[str, subprocess.Popen] = {}
 def run_services() -> None:
     """Run all required services."""
 
-    print('Hint: Log files can be found in your workspace\'s logs directory')
+    print("Hint: Log files can be found in your workspace's logs directory")
     with yaspin(text="Starting runtime") as spinner:
         try:
             for service in get_services():

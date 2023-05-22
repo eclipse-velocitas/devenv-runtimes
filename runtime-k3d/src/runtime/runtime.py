@@ -56,12 +56,12 @@ def retag_docker_image(image_name: str, log_file=subprocess.DEVNULL):
     )
 
 
-def retag_docker_images():
+def retag_docker_images(log_file=subprocess.DEVNULL):
     """Retag docker images of all defined services from runtime.json"""
     services = get_services()
     for service in services:
         service_config = parse_service_config(service["config"])
-        retag_docker_image(service_config.image)
+        retag_docker_image(service_config.image, log_file)
 
 
 def create_config_maps(log_file=subprocess.DEVNULL):
@@ -130,25 +130,25 @@ def uninstall_runtime(log_file=subprocess.DEVNULL):
     )
 
 
-def deploy_runtime(spinner: Yaspin):
+def deploy_runtime(spinner: Yaspin, log_file=subprocess.DEVNULL):
     """Deploy the runtime and display the progress using the given spinner.
 
     Args:
         spinner (Yaspin): The progress spinner to update.
     """
     status = "> Deploying runtime... "
-    if not is_runtime_installed():
+    if not is_runtime_installed(log_file):
         gen_helm("./helm")
-        retag_docker_images()
-        create_config_maps()
-        install_runtime("./helm")
+        retag_docker_images(log_file)
+        create_config_maps(log_file)
+        install_runtime("./helm", log_file)
         status = status + "installed."
     else:
         status = status + "already installed."
     spinner.write(status)
 
 
-def undeploy_runtime(spinner: Yaspin):
+def undeploy_runtime(spinner: Yaspin, log_file=subprocess.DEVNULL):
     """Undeploy/remove the runtime and display the progress
     using the given spinner.
 
@@ -156,8 +156,8 @@ def undeploy_runtime(spinner: Yaspin):
         spinner (Yaspin): The progress spinner to update.
     """
     status = "> Undeploying runtime... "
-    if is_runtime_installed():
-        uninstall_runtime()
+    if is_runtime_installed(log_file):
+        uninstall_runtime(log_file)
         status = status + "uninstalled!"
     else:
         status = status + "runtime is not installed."

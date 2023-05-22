@@ -12,7 +12,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from io import TextIOWrapper
 import os
 import subprocess
 from typing import List
@@ -187,7 +186,9 @@ def dapr_is_initialized_with_k3d(log_file=subprocess.DEVNULL) -> bool:
     )
 
 
-def initialize_dapr_with_k3d(dapr_runtime_version: str, dapr_config_dir_path: str, log_file=subprocess.DEVNULL):
+def initialize_dapr_with_k3d(
+    dapr_runtime_version: str, dapr_config_dir_path: str, log_file=subprocess.DEVNULL
+):
     """Initialize dapr with K3D.
 
     Args:
@@ -235,33 +236,33 @@ def configure_controlplane(spinner: Yaspin, log_file=subprocess.DEVNULL):
     )
 
     status = "> Checking K3D registry... "
-    if not registry_exists():
-        create_registry()
+    if not registry_exists(log_file):
+        create_registry(log_file)
         status = status + "created."
     else:
         status = status + "registry already exists."
     spinner.write(status)
 
     status = "> Checking K3D cluster... "
-    if not cluster_exists():
-        create_cluster(config_dir_path)
+    if not cluster_exists(log_file):
+        create_cluster(config_dir_path, log_file)
         status = status + "created."
     else:
         status = status + "registry already exists."
     spinner.write(status)
 
     status = "> Checking zipkin deployment... "
-    if not deployment_exists("zipkin"):
-        deploy_zipkin()
+    if not deployment_exists("zipkin", log_file):
+        deploy_zipkin(log_file)
         status = status + "deployed."
     else:
         status = status + "already deployed."
     spinner.write(status)
 
     status = "> Checking dapr... "
-    if not dapr_is_initialized_with_k3d():
+    if not dapr_is_initialized_with_k3d(log_file):
         dapr_runtime_version = require_env("daprRuntimeVersion")
-        initialize_dapr_with_k3d(dapr_runtime_version, dapr_config_dir_path)
+        initialize_dapr_with_k3d(dapr_runtime_version, dapr_config_dir_path, log_file)
         status = status + "initialized."
     else:
         status = status + "already initialized."
