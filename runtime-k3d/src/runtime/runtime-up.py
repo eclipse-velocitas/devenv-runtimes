@@ -14,7 +14,7 @@
 
 import argparse
 
-from lib import create_log_file
+from deployment.lib import create_log_file
 from controlplane import configure_controlplane
 from runtime import deploy_runtime
 from yaspin import yaspin
@@ -22,6 +22,7 @@ from yaspin import yaspin
 
 def runtime_up(skip_services: bool):
     """Start up the K3D runtime."""
+
     print('Hint: Log files can be found in your workspace\'s logs directory')
     log_file = create_log_file('runtime')
     with yaspin(text="Configuring controlplane for k3d...") as spinner:
