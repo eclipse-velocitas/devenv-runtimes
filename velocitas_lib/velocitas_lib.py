@@ -16,6 +16,7 @@ import json
 import os
 import re
 import sys
+from io import TextIOWrapper
 from pathlib import Path
 from typing import Any
 
@@ -107,3 +108,31 @@ def json_obj_to_flat_map(obj, prefix: str = "", separator: str = ".") -> dict[st
         result[nested_key] = obj
 
     return result
+
+
+def get_log_file_name(service_id: str, runtime_id: str) -> str:
+    """Build the log file name for the given service and runtime.
+
+    Args:
+        service_id (str): The ID of the service to log.
+        runtime_id (str): The ID of the runtime to log.
+
+    Returns:
+        str: The log file name.
+    """
+    return os.path.join(get_workspace_dir(), "logs", runtime_id, f"{service_id}.txt")
+
+
+def create_log_file(service_id: str, runtime_id: str) -> TextIOWrapper:
+    """Create a log file for the given service and runtime.
+
+    Args:
+        service_id (str): The ID of the service to log.
+        runtime_id (str): The ID of the runtime to log.
+
+    Returns:
+        TextIOWrapper: The log file.
+    """
+    log_file_name = get_log_file_name(service_id, runtime_id)
+    os.makedirs(os.path.dirname(log_file_name), exist_ok=True)
+    return open(log_file_name, "w", encoding="utf-8")

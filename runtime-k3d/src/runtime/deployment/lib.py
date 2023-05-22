@@ -12,14 +12,11 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import os
-from io import TextIOWrapper
 from typing import Any, List, NamedTuple, Optional
 
 from velocitas_lib import (
     get_cache_data,
     get_package_path,
-    get_workspace_dir,
     json_obj_to_flat_map,
     replace_variables,
 )
@@ -100,33 +97,3 @@ def parse_service_config(service_spec_config: dict) -> ServiceSpecConfig:
                 mounts.append(config_entry["value"])
 
     return ServiceSpecConfig(container_image, env_vars, no_dapr, args, ports, mounts)
-
-
-def get_log_file_name(service_id: str) -> str:
-    """Build the log file name for the given service.
-
-    Args:
-        service_id (str): The ID of the service to log.
-
-    Returns:
-        str: The log file name.
-    """
-    return os.path.join(
-        get_workspace_dir(),
-        "logs",
-        "runtime-k3d",
-        f"{service_id}.txt")
-
-
-def create_log_file(service_id: str) -> TextIOWrapper:
-    """Create a log file for the given service.
-
-    Args:
-        service_id (str): The ID of the service to log.
-
-    Returns:
-        TextIOWrapper: The log file.
-    """
-    log_file_name = get_log_file_name(service_id)
-    os.makedirs(os.path.dirname(log_file_name), exist_ok=True)
-    return open(log_file_name, "w", encoding="utf-8")

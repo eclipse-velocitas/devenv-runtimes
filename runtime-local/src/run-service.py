@@ -44,7 +44,11 @@ def run_specific_service(service_id: str) -> None:
             spinner.fail("💥")
             terminate_spawned_processes()
             print(f"Starting {service_id=} failed")
-            with open(get_log_file_name(service_id), mode="r", encoding="utf-8") as log:
+            with open(
+                get_log_file_name(service_id, "runtime-local"),
+                mode="r",
+                encoding="utf-8",
+            ) as log:
                 print(f">>>> Start log of {service_id} >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 print(log.read(), end="")
                 print(f"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< End log of {service_id} <<<<")

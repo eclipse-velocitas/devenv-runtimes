@@ -15,10 +15,14 @@
 import subprocess
 
 from build_vehicleapp import build_vehicleapp
-from runtime.deployment.lib import create_log_file
 from yaspin import yaspin
 
-from velocitas_lib import get_app_manifest, get_script_path, require_env
+from velocitas_lib import (
+    create_log_file,
+    get_app_manifest,
+    get_script_path,
+    require_env,
+)
 
 
 def is_docker_image_build_locally(app_name: str) -> bool:
@@ -99,11 +103,11 @@ def install_vehicleapp(app_name: str, log_file=subprocess.DEVNULL):
     )
 
 
-def deploy_vehicleapp(log_file):
+def deploy_vehicleapp():
     """Deploy VehicleApp docker image via helm to k3d cluster
     and display the progress using a given spinner."""
 
-    log_file = create_log_file("deploy-vapp")
+    log_file = create_log_file("deploy-vapp", "runtime-k3d")
     with yaspin(text="Deploying VehicleApp...") as spinner:
         try:
             app_name = get_app_manifest()["name"].lower()
@@ -111,7 +115,7 @@ def deploy_vehicleapp(log_file):
             if not is_docker_image_build_locally(app_name):
                 spinner.write("Cannot find vehicle app image...")
                 spinner.stop()
-                build_vehicleapp(log_file)
+                build_vehicleapp()
 
             spinner.start()
             push_docker_image_to_registry(app_name, log_file)

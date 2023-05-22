@@ -18,11 +18,18 @@ from typing import List
 
 from yaspin import yaspin
 
-from velocitas_lib import get_app_manifest, get_workspace_dir, require_env
+from velocitas_lib import (
+    create_log_file,
+    get_app_manifest,
+    get_workspace_dir,
+    require_env,
+)
 
 
-def build_vehicleapp(log_file=subprocess.DEVNULL):
+def build_vehicleapp():
     """Build VehicleApp docker image and display the progress using a spinner."""
+
+    log_file = create_log_file("build-vapp", "runtime-k3d")
     with yaspin(text="Building VehicleApp...") as spinner:
         try:
             status = "> Building VehicleApp image"

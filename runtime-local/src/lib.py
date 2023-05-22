@@ -12,7 +12,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import os
 import subprocess
 import time
 from enum import Enum
@@ -23,11 +22,11 @@ from threading import Timer
 from typing import Optional, Tuple
 
 from velocitas_lib import (
+    create_log_file,
     get_cache_data,
     get_package_path,
     get_script_path,
     get_services,
-    get_workspace_dir,
     json_obj_to_flat_map,
     replace_variables,
 )
@@ -95,34 +94,6 @@ def get_container_runtime_executable() -> str:
     return "docker"
 
 
-def get_log_file_name(service_id: str) -> str:
-    """Build the log file name for the given service.
-
-    Args:
-        service_id (str): The ID of the service to log.
-
-    Returns:
-        str: The log file name.
-    """
-    return os.path.join(
-        get_workspace_dir(), "logs", "runtime-local", f"{service_id}.txt"
-    )
-
-
-def create_log_file(service_id: str) -> TextIOWrapper:
-    """Create a log file for the given service.
-
-    Args:
-        service_id (str): The ID of the service to log.
-
-    Returns:
-        TextIOWrapper: The log file.
-    """
-    log_file_name = get_log_file_name(service_id)
-    os.makedirs(os.path.dirname(log_file_name), exist_ok=True)
-    return open(log_file_name, "w", encoding="utf-8")
-
-
 dapr_pattern: Pattern[str] = compile(
     r".*You\'re up and running! Both Dapr and your app logs will appear here\.\n"
 )
@@ -139,7 +110,7 @@ def run_service(service_spec) -> subprocess.Popen:
     """
     service_id = service_spec["id"]
 
-    log = create_log_file(service_id)
+    log = create_log_file(service_id, "runtime-local")
     log.write(f"Starting {service_id!r}\n")
 
     no_dapr = False
@@ -305,7 +276,7 @@ def stop_service(service_spec):
     service_id = service_spec["id"]
     no_dapr = False
 
-    log = create_log_file(service_id)
+    log = create_log_file(service_id, "runtime-local")
     log.write(f"Stopping {service_id!r}\n")
 
     for config_entry in service_spec["config"]:

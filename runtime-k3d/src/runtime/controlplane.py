@@ -269,7 +269,7 @@ def configure_controlplane(spinner: Yaspin, log_file=subprocess.DEVNULL):
     spinner.write(status)
 
 
-def reset_controlplane(spinner: Yaspin):
+def reset_controlplane(spinner: Yaspin, log_file=subprocess.DEVNULL):
     """Reset the K3D control plane and display the progress
     using the given spinner.
 
@@ -277,16 +277,16 @@ def reset_controlplane(spinner: Yaspin):
         spinner (Yaspin): The progress spinner to update.
     """
     status = "> Checking K3D cluster... "
-    if cluster_exists():
-        delete_cluster()
+    if cluster_exists(log_file):
+        delete_cluster(log_file)
         status = status + "deleted."
     else:
         status = status + "does not exist."
     spinner.write(status)
 
     status = "> Checking K3D registry... "
-    if registry_exists():
-        delete_registry()
+    if registry_exists(log_file):
+        delete_registry(log_file)
         status = status + "uninstalled."
     else:
         status = status + "does not exist."
