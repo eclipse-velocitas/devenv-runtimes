@@ -17,14 +17,10 @@ import subprocess
 import time
 from typing import Dict
 
-from lib import (
-    get_log_file_name,
-    get_services,
-    run_service,
-    stop_container,
-    stop_service,
-)
+from lib import get_services, run_service, stop_container, stop_service
 from yaspin import yaspin
+
+from velocitas_lib import get_log_file_name
 
 spawned_processes: Dict[str, subprocess.Popen] = {}
 
@@ -32,6 +28,7 @@ spawned_processes: Dict[str, subprocess.Popen] = {}
 def run_services() -> None:
     """Run all required services."""
 
+    print("Hint: Log files can be found in your workspace's logs directory")
     with yaspin(text="Starting runtime") as spinner:
         try:
             for service in get_services():
@@ -45,7 +42,11 @@ def run_services() -> None:
             spinner.fail("💥")
             terminate_spawned_processes()
             print(f"Starting {service_id=} failed")
-            with open(get_log_file_name(service_id), mode="r", encoding="utf-8") as log:
+            with open(
+                get_log_file_name(service_id, "runtime-local"),
+                mode="r",
+                encoding="utf-8",
+            ) as log:
                 print(f">>>> Start log of {service_id} >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 print(log.read(), end="")
                 print(f"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< End log of {service_id} <<<<")

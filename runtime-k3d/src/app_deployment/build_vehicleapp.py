@@ -18,11 +18,19 @@ from typing import List
 
 from yaspin import yaspin
 
-from velocitas_lib import get_app_manifest, get_workspace_dir, require_env
+from velocitas_lib import (
+    create_log_file,
+    get_app_manifest,
+    get_workspace_dir,
+    require_env,
+)
 
 
 def build_vehicleapp():
     """Build VehicleApp docker image and display the progress using a spinner."""
+
+    print("Hint: Log files can be found in your workspace's logs directory")
+    log_output = create_log_file("build-vapp", "runtime-k3d")
     with yaspin(text="Building VehicleApp...") as spinner:
         try:
             status = "> Building VehicleApp image"
@@ -46,7 +54,7 @@ def build_vehicleapp():
 
             spinner.write(status)
 
-            subprocess.call(
+            subprocess.check_call(
                 [
                     "docker",
                     "build",
@@ -61,13 +69,14 @@ def build_vehicleapp():
                     ".",
                     "--no-cache",
                 ],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
+                stdout=log_output,
+                stderr=log_output,
                 cwd=get_workspace_dir(),
             )
             spinner.ok("✔")
         except Exception as err:
-            spinner.fail(err)
+            log_output.write(str(err))
+            spinner.fail("💥")
 
 
 if __name__ == "__main__":

@@ -18,20 +18,26 @@ from controlplane import configure_controlplane
 from runtime import deploy_runtime
 from yaspin import yaspin
 
+from velocitas_lib import create_log_file
+
 
 def runtime_up(skip_services: bool):
     """Start up the K3D runtime."""
+
+    print("Hint: Log files can be found in your workspace's logs directory")
+    log_output = create_log_file("runtime-up", "runtime-k3d")
     with yaspin(text="Configuring controlplane for k3d...") as spinner:
         try:
-            configure_controlplane(spinner)
+            configure_controlplane(spinner, log_output)
             if not skip_services:
                 spinner.text = "Starting k3d runtime..."
-                deploy_runtime(spinner)
+                deploy_runtime(spinner, log_output)
             else:
                 spinner.write("Skipping services")
             spinner.ok("✔")
         except Exception as err:
-            spinner.fail(err)
+            log_output.write(str(err))
+            spinner.fail("💥")
 
 
 def main():
