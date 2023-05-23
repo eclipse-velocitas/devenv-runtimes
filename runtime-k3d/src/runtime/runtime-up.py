@@ -29,6 +29,8 @@ def runtime_up(skip_services: bool):
     with yaspin(text="Configuring controlplane for k3d...") as spinner:
         try:
             configure_controlplane(spinner, log_output)
+            spinner.ok("✔")
+            spinner.start()
             if not skip_services:
                 spinner.text = "Starting k3d runtime..."
                 deploy_runtime(spinner, log_output)

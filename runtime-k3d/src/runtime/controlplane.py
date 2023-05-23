@@ -100,11 +100,14 @@ def append_proxy_var_if_set(proxy_args: List[str], var_name: str):  # noqa: U100
 
 
 def create_cluster(
-    config_dir_path: str, log_output: TextIOWrapper | int = subprocess.DEVNULL
+    spinner: Yaspin,
+    config_dir_path: str,
+    log_output: TextIOWrapper | int = subprocess.DEVNULL,
 ):
     """Create the cluster with the given config dir.
 
     Args:
+        spinner (Yaspin): Active spinner to write to.
         config_dir_path (str): The path to the config directory.
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
@@ -113,9 +116,9 @@ def create_cluster(
     append_proxy_var_if_set(extra_proxy_args, "HTTPS_PROXY")
     append_proxy_var_if_set(extra_proxy_args, "NO_PROXY")
     if len(extra_proxy_args) > 0:
-        print("Creating cluster with proxy configuration.")
+        spinner.write("> Creating cluster with proxy configuration.")
     else:
-        print("Creating cluster without proxy configuration.")
+        spinner.write("> Creating cluster without proxy configuration.")
 
     subprocess.check_call(
         [
@@ -286,7 +289,7 @@ def configure_controlplane(
 
     status = "> Checking K3D cluster... "
     if not cluster_exists(log_output):
-        create_cluster(config_dir_path, log_output)
+        create_cluster(spinner, config_dir_path, log_output)
         status = status + "created."
     else:
         status = status + "registry already exists."
