@@ -29,7 +29,7 @@ from velocitas_lib import (
 def build_vehicleapp():
     """Build VehicleApp docker image and display the progress using a spinner."""
 
-    log_file = create_log_file("build-vapp", "runtime-k3d")
+    log_output = create_log_file("build-vapp", "runtime-k3d")
     with yaspin(text="Building VehicleApp...") as spinner:
         try:
             status = "> Building VehicleApp image"
@@ -68,8 +68,8 @@ def build_vehicleapp():
                     ".",
                     "--no-cache",
                 ],
-                stdout=log_file,
-                stderr=log_file,
+                stdout=log_output,
+                stderr=log_output,
                 cwd=get_workspace_dir(),
             )
             spinner.ok("✔")

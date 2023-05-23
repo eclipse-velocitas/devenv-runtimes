@@ -18,14 +18,10 @@ import subprocess
 import time
 from typing import Dict
 
-from lib import (
-    get_log_file_name,
-    get_specific_service,
-    run_service,
-    stop_container,
-    stop_service,
-)
+from lib import get_specific_service, run_service, stop_container, stop_service
 from yaspin import yaspin
+
+from velocitas_lib.velocitas_lib import get_log_file_name
 
 spawned_processes: Dict[str, subprocess.Popen] = {}
 

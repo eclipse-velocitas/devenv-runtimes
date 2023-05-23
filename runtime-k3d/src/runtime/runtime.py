@@ -15,6 +15,7 @@
 import os
 import subprocess
 import sys
+from io import TextIOWrapper
 
 from yaspin.core import Yaspin
 
@@ -25,47 +26,66 @@ from deployment.gen_helm import gen_helm  # noqa: E402
 from deployment.lib import parse_service_config  # noqa: E402
 
 
-def is_runtime_installed(log_file=subprocess.DEVNULL) -> bool:
-    """Return whether the runtime is installed or not."""
+def is_runtime_installed(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bool:
+    """Return whether the runtime is installed or not.
+
+    Args:
+        log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
+    """
     return (
         subprocess.call(
             ["helm", "status", "vehicleappruntime"],
-            stdout=log_file,
-            stderr=log_file,
+            stdout=log_output,
+            stderr=log_output,
         )
         == 0
     )
 
 
-def retag_docker_image(image_name: str, log_file=subprocess.DEVNULL):
-    """Retag the given docker image to be available in K8S."""
+def retag_docker_image(
+    image_name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL
+):
+    """Retag the given docker image to be available in K8S.
+
+    Args:
+        image_name (str): Image name to retag.
+        log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
+    """
     subprocess.check_call(
         ["docker", "pull", image_name],
-        stdout=log_file,
-        stderr=log_file,
+        stdout=log_output,
+        stderr=log_output,
     )
     subprocess.check_call(
         ["docker", "tag", image_name, f"localhost:12345/{image_name}"],
-        stdout=log_file,
-        stderr=log_file,
+        stdout=log_output,
+        stderr=log_output,
     )
     subprocess.check_call(
         ["docker", "push", f"localhost:12345/{image_name}"],
-        stdout=log_file,
-        stderr=log_file,
+        stdout=log_output,
+        stderr=log_output,
     )
 
 
-def retag_docker_images(log_file=subprocess.DEVNULL):
-    """Retag docker images of all defined services from runtime.json"""
+def retag_docker_images(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+    """Retag docker images of all defined services from runtime.json
+
+    Args:
+        log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
+    """
     services = get_services()
     for service in services:
         service_config = parse_service_config(service["config"])
-        retag_docker_image(service_config.image, log_file)
+        retag_docker_image(service_config.image, log_output)
 
 
-def create_config_maps(log_file=subprocess.DEVNULL):
-    """Create config maps for all services."""
+def create_config_maps(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+    """Create config maps for all services.
+
+    Args:
+        log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
+    """
     services = get_services()
     for service in services:
         service_config = parse_service_config(service["config"])
@@ -79,8 +99,8 @@ def create_config_maps(log_file=subprocess.DEVNULL):
             if (
                 not subprocess.call(
                     ["kubectl", "describe", "configmaps", f"{file}-config"],
-                    stdout=log_file,
-                    stderr=log_file,
+                    stdout=log_output,
+                    stderr=log_output,
                 )
                 == 0
             ):
@@ -92,16 +112,19 @@ def create_config_maps(log_file=subprocess.DEVNULL):
                         f"{file}-config",
                         f"--from-file={local_path}",
                     ],
-                    stdout=log_file,
-                    stderr=log_file,
+                    stdout=log_output,
+                    stderr=log_output,
                 )
 
 
-def install_runtime(helm_chart_path: str, log_file=subprocess.DEVNULL):
+def install_runtime(
+    helm_chart_path: str, log_output: TextIOWrapper | int = subprocess.DEVNULL
+):
     """Install the runtime from the given helm chart.
 
     Args:
         helm_chart_path (str): Path to the helm chart directory to install.
+        log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
     subprocess.check_call(
         [
@@ -116,48 +139,58 @@ def install_runtime(helm_chart_path: str, log_file=subprocess.DEVNULL):
             "60s",
             "--debug",
         ],
-        stdout=log_file,
-        stderr=log_file,
+        stdout=log_output,
+        stderr=log_output,
     )
 
 
-def uninstall_runtime(log_file=subprocess.DEVNULL):
-    """Uninstall the runtime."""
+def uninstall_runtime(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+    """Uninstall the runtime.
+
+    Args:
+        log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
+    """
     subprocess.check_call(
         ["helm", "uninstall", "vehicleappruntime", "--wait"],
-        stdout=log_file,
-        stderr=log_file,
+        stdout=log_output,
+        stderr=log_output,
     )
 
 
-def deploy_runtime(spinner: Yaspin, log_file=subprocess.DEVNULL):
+def deploy_runtime(
+    spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DEVNULL
+):
     """Deploy the runtime and display the progress using the given spinner.
 
     Args:
         spinner (Yaspin): The progress spinner to update.
+        log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
     status = "> Deploying runtime... "
-    if not is_runtime_installed(log_file):
+    if not is_runtime_installed(log_output):
         gen_helm("./helm")
-        retag_docker_images(log_file)
-        create_config_maps(log_file)
-        install_runtime("./helm", log_file)
+        retag_docker_images(log_output)
+        create_config_maps(log_output)
+        install_runtime("./helm", log_output)
         status = status + "installed."
     else:
         status = status + "already installed."
     spinner.write(status)
 
 
-def undeploy_runtime(spinner: Yaspin, log_file=subprocess.DEVNULL):
+def undeploy_runtime(
+    spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DEVNULL
+):
     """Undeploy/remove the runtime and display the progress
     using the given spinner.
 
     Args:
         spinner (Yaspin): The progress spinner to update.
+        log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
     status = "> Undeploying runtime... "
-    if is_runtime_installed(log_file):
-        uninstall_runtime(log_file)
+    if is_runtime_installed(log_output):
+        uninstall_runtime(log_output)
         status = status + "uninstalled!"
     else:
         status = status + "runtime is not installed."

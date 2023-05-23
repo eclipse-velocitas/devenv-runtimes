@@ -22,11 +22,11 @@ from velocitas_lib import create_log_file
 def runtime_down():
     """Stop the K3D runtime."""
 
-    log_file = create_log_file("runtime-down", "runtime-k3d")
+    log_output = create_log_file("runtime-down", "runtime-k3d")
     with yaspin(text="Stopping k3d runtime...") as spinner:
         try:
-            reset_controlplane(spinner, log_file)
-            undeploy_runtime(spinner, log_file)
+            reset_controlplane(spinner, log_output)
+            undeploy_runtime(spinner, log_output)
             spinner.ok("✔")
         except Exception as err:
             spinner.fail(err)
