@@ -36,7 +36,8 @@ def runtime_up(skip_services: bool):
                 spinner.write("Skipping services")
             spinner.ok("✔")
         except Exception as err:
-            spinner.fail(err)
+            log_output.write(str(err))
+            spinner.fail("💥")
 
 
 def main():

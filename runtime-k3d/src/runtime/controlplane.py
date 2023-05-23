@@ -117,7 +117,7 @@ def create_cluster(
     else:
         print("Creating cluster without proxy configuration.")
 
-    subprocess.call(
+    subprocess.check_call(
         [
             "k3d",
             "cluster",

@@ -22,6 +22,7 @@ from velocitas_lib import create_log_file
 def runtime_down():
     """Stop the K3D runtime."""
 
+    print("Hint: Log files can be found in your workspace's logs directory")
     log_output = create_log_file("runtime-down", "runtime-k3d")
     with yaspin(text="Stopping k3d runtime...") as spinner:
         try:
@@ -29,7 +30,8 @@ def runtime_down():
             undeploy_runtime(spinner, log_output)
             spinner.ok("✔")
         except Exception as err:
-            spinner.fail(err)
+            log_output.write(str(err))
+            spinner.fail("💥")
 
 
 if __name__ == "__main__":

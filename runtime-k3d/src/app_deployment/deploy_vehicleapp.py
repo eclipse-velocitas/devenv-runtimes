@@ -136,6 +136,7 @@ def deploy_vehicleapp():
     """Deploy VehicleApp docker image via helm to k3d cluster
     and display the progress using a given spinner."""
 
+    print("Hint: Log files can be found in your workspace's logs directory")
     log_output = create_log_file("deploy-vapp", "runtime-k3d")
     with yaspin(text="Deploying VehicleApp...") as spinner:
         try:
@@ -162,7 +163,8 @@ def deploy_vehicleapp():
             spinner.write(f"> Installing vapp-chart for {app_name}... done!")
             spinner.ok("✔")
         except Exception as err:
-            spinner.fail(err)
+            log_output.write(str(err))
+            spinner.fail("💥")
 
 
 if __name__ == "__main__":
