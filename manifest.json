@@ -78,7 +78,7 @@
                     "executable": "pytest",
                     "args": [
                         "-s",
-                        "./integration/integration_test.py"
+                        "./runtime-local/test/integration/integration_test.py"
                     ]
                 }
             ],
