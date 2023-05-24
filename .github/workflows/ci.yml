@@ -38,3 +38,83 @@ jobs:
 
       - name: Run Linters
         uses: ./.github/actions/pre-commit-action
+
+  unit-test:
+    name: "Run unit tests"
+    runs-on: ubuntu-22.04
+    container: ghcr.io/eclipse-velocitas/devcontainer-base-images/python:latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install required packages
+        run: |
+          pip install -e velocitas_lib
+          pip install -r runtime-k3d/src/requirements.txt
+          pip install -r runtime-k3d/test/requirements.txt
+          pip install -r runtime-local/test/requirements.txt
+          pip install -r velocitas_lib/test/requirements.txt
+
+      - name: unit tests
+        shell: bash
+        run: |
+          pytest --ignore-glob='*integration*' --override-ini junit_family=xunit1 --junit-xml=./results/UnitTest/junit.xml \
+          --cov ./runtime-k3d \
+          --cov ./runtime-local \
+          --cov ./velocitas_lib \
+          --cov-report=xml:results/CodeCoverage/cobertura-coverage.xml \
+          --cov-branch ./runtime-k3d/test \
+          --cov-branch ./runtime-local/test \
+          --cov-branch ./velocitas_lib/test
+
+      - name: Publish Unit Test Results
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          report_paths: ./results/UnitTest/junit.xml
+          summary: true
+          update_check: true
+          annotate_only: true
+
+      - uses: 5monkeys/cobertura-action@master
+        with:
+          path: results/CodeCoverage/cobertura-coverage.xml
+          minimum_coverage: 80
+          show_line: true
+          show_branch: true
+          fail_below_threshold: false
+
+  run-local-integration-tests:
+    name: Run Integration Tests for runtime-local
+    runs-on: ubuntu-22.04
+    env:
+      DAPR_HOST_IP: 127.0.0.1
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Set commit id
+        run: |
+          NEW_CONFIG="$(jq --arg GITHUB_SHA "$GITHUB_SHA" '.packages[0].version |= $GITHUB_SHA' runtime-local/test/.velocitas.json)"
+          echo "${NEW_CONFIG}" > runtime-local/test/.velocitas.json
+
+      - name: Install required packages
+        run: |
+          sudo curl -L https://github.com/eclipse-velocitas/cli/releases/latest/download/velocitas-linux-x64 -o /usr/bin/velocitas
+          sudo chmod +x /usr/bin/velocitas
+
+      - name: Init velocitas project
+        run: |
+          cd runtime-local/test
+          velocitas init
+
+      - name: Run integration tests for runtime-local
+        run: |
+          cd runtime-local/test
+          pip install -r requirements.txt
+          pytest -s ./integration/integration_test.py

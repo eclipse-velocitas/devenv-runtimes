@@ -17,10 +17,10 @@ echo "#######################################################"
 echo "### Running VehicleDataBroker CLI                   ###"
 echo "#######################################################"
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+SCRIPT_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # Needed because of how the databroker release is tagged
-DATABROKER_ASSET_FOLDER="$SCRIPT_DIR/../assets/databroker/$DATABROKER_TAG"
+DATABROKER_ASSET_FOLDER="$SCRIPT_PATH/../assets/databroker/$DATABROKER_TAG"
 #Detect host environment (distinguish for Mac M1 processor)
 if [[ `uname -m` == 'aarch64' || `uname -m` == 'arm64' ]]; then
     echo "Detected ARM architecture"

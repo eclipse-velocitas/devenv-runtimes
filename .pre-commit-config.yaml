@@ -1,12 +1,51 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
-    -   id: trailing-whitespace
-    -   id: end-of-file-fixer
-    -   id: check-yaml
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
         args: [--allow-multiple-documents]
-        exclude: ^runtime-k3d/src/deployment/config/helm/templates/|^runtime-k3d/src/runtime/config/helm/templates/|^runtime-k3d/src/runtime/config/volume/|^runtime-local/src/data/mappingDefault.yml
-    -   id: check-added-large-files
+        exclude: ^runtime-k3d/src/runtime/deployment/config/helm/templates/|^runtime-k3d/src/app_deployment/config/helm/templates/|^config/feedercan/
+      - id: check-added-large-files
+
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+
+  - repo: https://github.com/psf/black
+    rev: 23.3.0
+    hooks:
+      - id: black
+
+  - repo: https://github.com/PyCQA/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
+        additional_dependencies:
+          - flake8-bugbear
+          - flake8-unused-arguments
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        types: [python]
+        args: ["--ini", "setup.cfg"]
+
+  # Commented out because of mypy bug failing for "match case" syntax
+  # - repo: https://github.com/pre-commit/mirrors-mypy
+  #   rev: "v1.2.0"
+  #   hooks:
+  #     - id: mypy
+  #       args: [runtime-k3d, runtime-local]
+  #       language: system
+  #       pass_filenames: false
+
+  # - repo: https://github.com/pycqa/pydocstyle
+  #   rev: 6.3.0
+  #   hooks:
+  #     - id: pydocstyle
