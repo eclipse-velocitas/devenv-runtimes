@@ -31,7 +31,7 @@ def build_vehicleapp():
 
     print("Hint: Log files can be found in your workspace's logs directory")
     log_output = create_log_file("build-vapp", "runtime-k3d")
-    with yaspin(text="Building VehicleApp...") as spinner:
+    with yaspin(text="Building VehicleApp...", color="cyan") as spinner:
         try:
             status = "> Building VehicleApp image"
             app_name = get_app_manifest()["name"].lower()
@@ -73,7 +73,7 @@ def build_vehicleapp():
                 stderr=log_output,
                 cwd=get_workspace_dir(),
             )
-            spinner.ok("✔")
+            spinner.ok("✅")
         except Exception as err:
             log_output.write(str(err))
             spinner.fail("💥")

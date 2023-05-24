@@ -26,17 +26,17 @@ def runtime_up(skip_services: bool):
 
     print("Hint: Log files can be found in your workspace's logs directory")
     log_output = create_log_file("runtime-up", "runtime-k3d")
-    with yaspin(text="Configuring controlplane for k3d...") as spinner:
+    with yaspin(text="Configuring controlplane for k3d...", color="cyan") as spinner:
         try:
             configure_controlplane(spinner, log_output)
-            spinner.ok("✔")
+            spinner.ok("✅")
             spinner.start()
             if not skip_services:
                 spinner.text = "Starting k3d runtime..."
                 deploy_runtime(spinner, log_output)
             else:
                 spinner.write("Skipping services")
-            spinner.ok("✔")
+            spinner.ok("✅")
         except Exception as err:
             log_output.write(str(err))
             spinner.fail("💥")

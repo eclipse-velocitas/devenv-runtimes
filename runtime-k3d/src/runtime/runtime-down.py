@@ -24,11 +24,11 @@ def runtime_down():
 
     print("Hint: Log files can be found in your workspace's logs directory")
     log_output = create_log_file("runtime-down", "runtime-k3d")
-    with yaspin(text="Stopping k3d runtime...") as spinner:
+    with yaspin(text="Stopping k3d runtime...", color="cyan") as spinner:
         try:
             reset_controlplane(spinner, log_output)
             undeploy_runtime(spinner, log_output)
-            spinner.ok("✔")
+            spinner.ok("✅")
         except Exception as err:
             log_output.write(str(err))
             spinner.fail("💥")

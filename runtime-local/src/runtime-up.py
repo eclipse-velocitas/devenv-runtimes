@@ -29,14 +29,16 @@ def run_services() -> None:
     """Run all required services."""
 
     print("Hint: Log files can be found in your workspace's logs directory")
-    with yaspin(text="Starting runtime") as spinner:
+    with yaspin(text="Starting runtime...", color="cyan") as spinner:
         try:
             for service in get_services():
                 service_id = service["id"]
                 stop_service(service)
+                spinner.text = f"Starting {service_id}..."
                 spawned_processes[service_id] = run_service(service)
                 spinner.write(f"> {service_id} running")
-            spinner.ok("✔")
+            spinner.text = "Runtime is ready to use!"
+            spinner.ok("✅")
         except RuntimeError as error:
             spinner.write(error.args)
             spinner.fail("💥")
@@ -60,13 +62,13 @@ def wait_while_processes_are_running():
 
 
 def terminate_spawned_processes():
-    with yaspin(text="Stopping runtime") as spinner:
+    with yaspin(text="Stopping runtime...", color="cyan") as spinner:
         while len(spawned_processes) > 0:
             (service_id, process) = spawned_processes.popitem()
             process.terminate()
             stop_container(service_id, subprocess.DEVNULL)
             spinner.write(f"> {process.args[0]} (service_id='{service_id}') terminated")
-        spinner.ok("✔")
+        spinner.ok("✅")
 
 
 def handler(_signum, _frame):  # noqa: U101 unused arguments

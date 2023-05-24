@@ -38,11 +38,11 @@ def create_dummy_vspec_file():
 
 
 command: str = "velocitas exec runtime-local"
-regex_runtime_up: Pattern[str] = compile(r"✔.* Starting runtime")
-regex_mqtt: Pattern[str] = compile(r"✔.* Starting service mqtt")
-regex_vdb: Pattern[str] = compile(r"✔.* Starting service vehicledatabroker")
-regex_seatservice: Pattern[str] = compile(r"✔.* Starting service seatservice")
-regex_feedercan: Pattern[str] = compile(r"✔.* Starting service feedercan")
+regex_runtime_up: Pattern[str] = compile(r"✅.* Runtime is ready to use!")
+regex_mqtt: Pattern[str] = compile(r"✅.* Starting service mqtt")
+regex_vdb: Pattern[str] = compile(r"✅.* Starting service vehicledatabroker")
+regex_seatservice: Pattern[str] = compile(r"✅.* Starting service seatservice")
+regex_feedercan: Pattern[str] = compile(r"✅.* Starting service feedercan")
 timeout_sec: float = 180
 
 

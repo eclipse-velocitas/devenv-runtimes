@@ -29,12 +29,12 @@ spawned_processes: Dict[str, subprocess.Popen] = {}
 def run_specific_service(service_id: str) -> None:
     """Run specified service."""
 
-    with yaspin(text=f"Starting service {service_id}") as spinner:
+    with yaspin(text=f"Starting service {service_id}", color="cyan") as spinner:
         try:
             service = get_specific_service(service_id)
             stop_service(service)
             spawned_processes[service_id] = run_service(service)
-            spinner.ok("✔")
+            spinner.ok("✅")
         except RuntimeError as error:
             spinner.write(error.args)
             spinner.fail("💥")
@@ -58,13 +58,13 @@ def wait_while_processes_are_running():
 
 
 def terminate_spawned_processes():
-    with yaspin(text="Stopping service") as spinner:
+    with yaspin(text="Stopping service", color="cyan") as spinner:
         while len(spawned_processes) > 0:
             (service_id, process) = spawned_processes.popitem()
             process.terminate()
             stop_container(service_id, subprocess.DEVNULL)
             spinner.write(f"> {process.args[0]} (service-id='{service_id}') terminated")
-        spinner.ok("✔")
+        spinner.ok("✅")
 
 
 def handler(_signum, _frame):  # noqa: U101 unused arguments

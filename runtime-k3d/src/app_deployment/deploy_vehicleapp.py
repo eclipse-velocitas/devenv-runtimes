@@ -138,7 +138,7 @@ def deploy_vehicleapp():
 
     print("Hint: Log files can be found in your workspace's logs directory")
     log_output = create_log_file("deploy-vapp", "runtime-k3d")
-    with yaspin(text="Deploying VehicleApp...") as spinner:
+    with yaspin(text="Deploying VehicleApp...", color="cyan") as spinner:
         try:
             app_name = get_app_manifest()["name"].lower()
 
@@ -161,7 +161,7 @@ def deploy_vehicleapp():
 
             install_vehicleapp(app_name, log_output)
             spinner.write(f"> Installing vapp-chart for {app_name}... done!")
-            spinner.ok("✔")
+            spinner.ok("✅")
         except Exception as err:
             log_output.write(str(err))
             spinner.fail("💥")
