@@ -96,7 +96,7 @@ def append_proxy_var_if_set(proxy_args: List[str], var_name: str):  # noqa: U100
     """
     var_content = os.getenv(var_name)
     if var_content:
-        proxy_args += ["-e", f"{var_content}@server:0"]
+        proxy_args += ["-e", f"{var_name}={var_content}@server:0"]
 
 
 def create_cluster(
