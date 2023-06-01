@@ -35,6 +35,9 @@ spec:
           value: "sampleapp"
         - name: VEHICLEDATABROKER_DAPR_APP_ID
           value: "vehicledatabroker"
+        # required for C++ SDK
+        - name: MQTT_BROKER_URI
+          value: tcp://mqttbroker.default.svc.cluster.local:1883
 
       # local registry, Image needs to be pushed here first
       # docker tag localhost:12345/sampleapp:local k3d-registry.localhost:12345/sampleapp:local

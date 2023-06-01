@@ -39,3 +39,7 @@ spec:
         - name: {{.Values.imageVehicleApp.name}}
           image: "{{ .Values.imageVehicleApp.repository }}:{{ .Values.imageVehicleApp.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.imageVehicleApp.pullPolicy }}
+          env:
+          # required for C++ SDK
+          - name: MQTT_BROKER_URI
+            value: tcp://mqttbroker.default.svc.cluster.local:1883
