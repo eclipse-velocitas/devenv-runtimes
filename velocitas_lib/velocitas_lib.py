@@ -77,7 +77,7 @@ def get_cache_data() -> dict[str, Any]:
 def get_services() -> dict[str, Any]:
     """Return all specified services as Python object."""
     path = f"{get_package_path()}/runtime.json"
-    variable_value = require_env("RUNTIMEFILEPATH")
+    variable_value = require_env("runtimeFilePath")
 
     if variable_value is not None:
         overwritten_path = Path(variable_value)

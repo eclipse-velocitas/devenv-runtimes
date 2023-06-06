@@ -182,7 +182,7 @@ def test_json_obj_to_flat_map__obj_is_str__returns_replaced_cache_data_with_sepa
 def test_get_services__no_overwrite_provided__returns_default_services(
     mock_filesystem: FakeFilesystem,
 ):
-    os.environ["RUNTIMEFILEPATH"] = "runtime.json"
+    os.environ["runtimeFilePath"] = "runtime.json"
     mock_filesystem.create_file(
         f"{get_package_path()}/runtime.json", contents='[ { "id": "service1" } ]'
     )
@@ -196,7 +196,7 @@ def test_get_services__no_overwrite_provided__returns_default_services(
 def test_get_services__overwrite_provided__returns_overwritten_services(
     mock_filesystem: FakeFilesystem,
 ):
-    os.environ["RUNTIMEFILEPATH"] = "runtime.json"
+    os.environ["runtimeFilePath"] = "runtime.json"
 
     mock_filesystem.create_file(
         f"{get_package_path()}/runtime.json", contents='[ { "id": "service1" } ]'
