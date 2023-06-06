@@ -12,6 +12,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import inspect
 import json
 import os
 import re
@@ -55,9 +56,17 @@ def get_script_path() -> str:
 
 
 def get_package_path() -> Path:
-    """Return the absolute path to the package directory the invoked Python script
-    is located in."""
-    return Path(__file__).resolve().parents[1]
+    """Return the absolute path to the package directory the invoked Python
+    script belongs to."""
+    invoking_file_path = inspect.stack()[1].filename
+    parents = Path(invoking_file_path).resolve().parents
+    for parent in parents:
+        if parent.is_dir() and "manifest.json" in os.listdir(parent):
+            return parent
+
+    raise FileNotFoundError(
+        f"Unable to find the package path of '{invoking_file_path}'!"
+    )
 
 
 def get_cache_data() -> dict[str, Any]:
@@ -67,9 +76,21 @@ def get_cache_data() -> dict[str, Any]:
 
 def get_services() -> dict[str, Any]:
     """Return all specified services as Python object."""
+    path = f"{get_package_path()}/runtime.json"
+    variable_value = require_env("RUNTIMEFILEPATH")
+
+    if variable_value is not None:
+        overwritten_path = Path(variable_value)
+        if not overwritten_path.is_absolute():
+            overwritten_path = Path(get_workspace_dir()).joinpath(overwritten_path)
+
+        if overwritten_path.exists():
+            path = overwritten_path
+            print(f"Runtime.json path redirected to {path}")
+
     return json.load(
         open(
-            f"{get_package_path()}/runtime.json",
+            path,
             encoding="utf-8",
         )
     )

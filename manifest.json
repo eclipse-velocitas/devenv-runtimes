@@ -94,6 +94,12 @@
                     "type": "string",
                     "description": "Version of the dapr.io CLI to use.",
                     "default": "1.10.0"
+                },
+                {
+                    "name": "runtimeFilePath",
+                    "type": "string",
+                    "description": "Path to the file describing your custom runtime configuration.",
+                    "default": "runtime.json"
                 }
             ]
         },
@@ -155,6 +161,12 @@
                     "type": "string",
                     "description": "Version of the dapr.io CLI to use.",
                     "default": "1.10.0"
+                },
+                {
+                    "name": "runtimeFilePath",
+                    "type": "string",
+                    "description": "Path to the file describing your custom runtime configuration.",
+                    "default": "runtime.json"
                 }
             ]
         },
