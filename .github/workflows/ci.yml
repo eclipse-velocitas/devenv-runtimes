@@ -145,7 +145,7 @@ jobs:
         run: |
           sudo curl -L https://github.com/eclipse-velocitas/cli/releases/latest/download/velocitas-linux-x64 -o /usr/bin/velocitas
           sudo chmod +x /usr/bin/velocitas
-          brew install k3d kubernetes-cli helm dapr/tap/dapr-cli
+          brew install k3d dapr/tap/dapr-cli
 
       - name: Init velocitas project
         run: |
