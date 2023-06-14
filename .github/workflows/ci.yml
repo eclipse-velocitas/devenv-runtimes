@@ -22,7 +22,7 @@ on:
   push:
     # Run only on branches/commits and not tags
     branches:
-      - integration-test-k3d
+      - main
   pull_request:
     branches:
       - main
