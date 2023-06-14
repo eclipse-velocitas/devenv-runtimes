@@ -162,5 +162,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
+          name: "Log files"
           path: |
             ./runtime-k3d/test/logs/runtime-k3d
