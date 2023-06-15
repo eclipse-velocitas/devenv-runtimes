@@ -22,10 +22,10 @@ on:
   push:
     # Run only on branches/commits and not tags
     branches:
-      - main
+      - integration-test-k3d
   pull_request:
     branches:
-      - integration-test-k3d
+      - main
 
 jobs:
   lint-job:
