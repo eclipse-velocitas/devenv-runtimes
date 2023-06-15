@@ -25,7 +25,7 @@ on:
       - main
   pull_request:
     branches:
-      - main
+      - integration-test-k3d
 
 jobs:
   lint-job:
@@ -141,9 +141,6 @@ jobs:
         run: |
           sudo curl -L https://github.com/eclipse-velocitas/cli/releases/latest/download/velocitas-linux-x64 -o /usr/bin/velocitas
           sudo chmod +x /usr/bin/velocitas
-          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-          chmod +x ./kubectl
-          sudo mv ./kubectl /usr/local/bin/kubectl
           curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
           sudo wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O - | /bin/bash -s 1.10.0
 
