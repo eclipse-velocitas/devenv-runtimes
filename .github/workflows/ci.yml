@@ -118,3 +118,47 @@ jobs:
           cd runtime-local/test
           pip install -r requirements.txt
           pytest -s ./integration/integration_test.py
+
+  run-k3d-integration-tests:
+    name: Run Integration Tests for runtime-k3d
+    runs-on: ubuntu-22.04
+    env:
+      DAPR_HOST_IP: 127.0.0.1
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Set commit id
+        run: |
+          NEW_CONFIG="$(jq --arg GITHUB_SHA "$GITHUB_SHA" '.packages[0].version |= $GITHUB_SHA' runtime-k3d/test/.velocitas.json)"
+          echo "${NEW_CONFIG}" > runtime-k3d/test/.velocitas.json
+
+      - name: Install required packages
+        run: |
+          sudo curl -L https://github.com/eclipse-velocitas/cli/releases/latest/download/velocitas-linux-x64 -o /usr/bin/velocitas
+          sudo chmod +x /usr/bin/velocitas
+          curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+          sudo wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O - | /bin/bash -s 1.10.0
+
+      - name: Init velocitas project
+        run: |
+          cd runtime-k3d/test
+          velocitas init
+
+      - name: Run integration tests for k3d
+        run: |
+          cd runtime-k3d/test
+          pip install -r requirements.txt
+          pytest -s ./integration/integration_test.py
+
+      - name: Upload log files as artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: "Log files"
+          path: |
+            ./runtime-k3d/test/logs/runtime-k3d
