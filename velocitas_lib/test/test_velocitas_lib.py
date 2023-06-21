@@ -20,12 +20,14 @@ import sys
 from pathlib import Path
 
 import pytest
+from pyfakefs.fake_filesystem import FakeFilesystem
 
 from velocitas_lib import (
     get_app_manifest,
     get_cache_data,
     get_package_path,
     get_script_path,
+    get_services,
     get_workspace_dir,
     json_obj_to_flat_map,
     replace_variables,
@@ -57,6 +59,12 @@ def set_velocitas_cache_data() -> str:
     cache_data_mock = {"testPropA": "testValueA", "testPropB": "testValueB"}
     os.environ["VELOCITAS_CACHE_DATA"] = json.dumps(cache_data_mock)
     return os.environ["VELOCITAS_CACHE_DATA"]
+
+
+@pytest.fixture()
+def mock_filesystem(fs: FakeFilesystem) -> FakeFilesystem:
+    fs.add_real_file(os.path.join(Path(__file__).resolve().parents[2], "manifest.json"))
+    return fs
 
 
 def test_require_env__env_var_set__returns_env_value(set_test_env_var):  # type: ignore
@@ -169,3 +177,36 @@ def test_json_obj_to_flat_map__obj_is_str__returns_replaced_cache_data_with_sepa
     separator = "test.separator"
     cache_data_with_keys_to_replace = json_obj_to_flat_map("test", separator)
     assert cache_data_with_keys_to_replace[f"{separator}"] == "test"
+
+
+def test_get_services__no_overwrite_provided__returns_default_services(
+    mock_filesystem: FakeFilesystem,
+):
+    os.environ["runtimeFilePath"] = "runtime.json"
+    mock_filesystem.create_file(
+        f"{get_package_path()}/runtime.json", contents='[ { "id": "service1" } ]'
+    )
+
+    all_services = get_services()
+
+    assert len(all_services) == 1
+    assert all_services[0]["id"] == "service1"
+
+
+def test_get_services__overwrite_provided__returns_overwritten_services(
+    mock_filesystem: FakeFilesystem,
+):
+    os.environ["runtimeFilePath"] = "runtime.json"
+
+    mock_filesystem.create_file(
+        f"{get_package_path()}/runtime.json", contents='[ { "id": "service1" } ]'
+    )
+    mock_filesystem.create_file(
+        f"{get_workspace_dir()}/runtime.json",
+        contents='[ { "id": "my-custom-service" } ]',
+    )
+
+    all_services = get_services()
+
+    assert len(all_services) == 1
+    assert all_services[0]["id"] == "my-custom-service"
