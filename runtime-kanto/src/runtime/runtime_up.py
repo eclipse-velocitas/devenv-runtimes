@@ -12,29 +12,42 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import signal
+
+from controlplane_kanto import configure_controlplane
+from runtime_down import runtime_down
+from runtime_kanto import is_kanto_running, start_kanto
 from yaspin import yaspin
 
 from velocitas_lib import create_log_file
-from velocitas_lib.docker import build_vehicleapp_image
 
 
-def build_vehicleapp():
-    """Build VehicleApp docker image and display the progress using a spinner."""
+def runtime_up():
+    """Start up the K3D runtime."""
 
     print("Hint: Log files can be found in your workspace's logs directory")
-    log_output = create_log_file("build-vapp", "runtime-k3d")
-    with yaspin(text="Building VehicleApp...", color="cyan") as spinner:
+    log_output = create_log_file("runtime-up", "runtime-kanto")
+    with yaspin(text="Configuring controlplane for Kanto...", color="cyan") as spinner:
         try:
-            status = "> Building VehicleApp image"
-            spinner.write(status)
-
-            build_vehicleapp_image(log_output)
-
+            configure_controlplane(spinner, log_output)
             spinner.ok("✅")
+            spinner.text = "Starting Kanto..."
+            spinner.start()
+            if not is_kanto_running(log_output):
+                start_kanto(spinner, log_output)
+            else:
+                spinner.text = "Kanto is ready to use!"
+                spinner.ok("✅")
         except Exception as err:
             log_output.write(str(err))
             spinner.fail("💥")
 
 
+def handler(_signum, _frame):  # noqa: U101 unused arguments
+    runtime_down()
+
+
 if __name__ == "__main__":
-    build_vehicleapp()
+    signal.signal(signal.SIGINT, handler)
+    signal.signal(signal.SIGTERM, handler)
+    runtime_up()

@@ -24,41 +24,10 @@ from velocitas_lib import (
     get_script_path,
     require_env,
 )
-
-
-def is_docker_image_build_locally(app_name: str) -> bool:
-    """Check if vehicle app docker image is locally available
-
-    Args:
-        app_name (str): App name to check for
-    """
-    output = subprocess.check_output(
-        [
-            "docker",
-            "images",
-            "-a",
-            f"localhost:12345/{app_name}:local",
-            "--format",
-            "{{.Repository}}:{{.Tag}}",
-        ],
-    )
-    return output.decode("utf-8").strip() == f"localhost:12345/{app_name}:local"
-
-
-def push_docker_image_to_registry(
-    app_name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL
-):
-    """Push docker image to local k3d image registry
-
-    Args:
-        app_name (str): App name to push to registry
-        log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
-    """
-    subprocess.check_call(
-        ["docker", "push", f"localhost:12345/{app_name}:local"],
-        stdout=log_output,
-        stderr=log_output,
-    )
+from velocitas_lib.docker import (
+    is_docker_image_build_locally,
+    push_docker_image_to_registry,
+)
 
 
 def is_vehicleapp_installed(

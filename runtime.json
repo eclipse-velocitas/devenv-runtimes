@@ -127,7 +127,19 @@
             },
             {
                 "key": "env",
-                "value": "LOG_LEVEL=info,databroker=info,dbcfeeder.broker_client=info,dbcfeeder=info"
+                "value": "LOG_LEVEL=info"
+            },
+            {
+                "key": "env",
+                "value": "databroker=info"
+            },
+            {
+                "key": "env",
+                "value": "broker_client=info"
+            },
+            {
+                "key": "env",
+                "value": "dbcfeeder=info"
             },
             {
                 "key": "env",
