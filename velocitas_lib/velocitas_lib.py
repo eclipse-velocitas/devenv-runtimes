@@ -86,7 +86,7 @@ def get_services() -> dict[str, Any]:
 
         if overwritten_path.exists():
             path = overwritten_path
-            print(f"Runtime.json path redirected to {path}")
+            print(f"runtime.json path redirected to {path}")
 
     return json.load(
         open(
