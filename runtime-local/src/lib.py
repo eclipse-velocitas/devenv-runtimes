@@ -21,15 +21,8 @@ from re import Pattern, compile
 from threading import Timer
 from typing import Optional, Tuple
 
-from velocitas_lib import (
-    create_log_file,
-    get_cache_data,
-    get_package_path,
-    get_script_path,
-    get_services,
-    json_obj_to_flat_map,
-    replace_variables,
-)
+from velocitas_lib import create_log_file, get_script_path, get_services
+from velocitas_lib.variables import ProjectVariables
 
 
 class MiddlewareType(Enum):
@@ -123,29 +116,28 @@ def run_service(service_spec) -> subprocess.Popen:
     args = []
     patterns = []
 
-    variables = json_obj_to_flat_map(get_cache_data(), "builtin.cache")
-    variables["builtin.package_dir"] = get_package_path()
+    variables = ProjectVariables()
 
     for config_entry in service_spec["config"]:
         if config_entry["key"] == "image":
-            container_image = replace_variables(config_entry["value"], variables)
+            container_image = variables.replace_occurrences(config_entry["value"])
         elif config_entry["key"] == "env":
             pair = config_entry["value"].split("=", 1)
             env_vars[pair[0].strip()] = None
             if len(pair) > 1:
-                env_vars[pair[0].strip()] = replace_variables(
-                    pair[1].strip(), variables
+                env_vars[pair[0].strip()] = variables.replace_occurrences(
+                    pair[1].strip()
                 )
         elif config_entry["key"] == "port":
-            service_port = replace_variables(config_entry["value"], variables)
+            service_port = variables.replace_occurrences(config_entry["value"])
         elif config_entry["key"] == "no-dapr":
             no_dapr = config_entry["value"]
         elif config_entry["key"] == "arg":
-            args.append(replace_variables(config_entry["value"], variables))
+            args.append(variables.replace_occurrences(config_entry["value"]))
         elif config_entry["key"] == "port-forward":
-            port_forwards.append(replace_variables(config_entry["value"], variables))
+            port_forwards.append(variables.replace_occurrences(config_entry["value"]))
         elif config_entry["key"] == "mount":
-            mounts.append(replace_variables(config_entry["value"], variables))
+            mounts.append(variables.replace_occurrences(config_entry["value"]))
         elif config_entry["key"] == "start-pattern":
             patterns.append(compile(config_entry["value"]))
 
