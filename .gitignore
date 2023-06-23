@@ -2,4 +2,4 @@
 __pycache__
 
 runtime-k3d/src/runtime/deployment/config/helm/templates/values.yaml
-velocitas_lib/velocitas_lib.egg-info
+*.egg-info

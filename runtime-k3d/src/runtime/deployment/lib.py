@@ -14,12 +14,7 @@
 
 from typing import Any, List, NamedTuple, Optional
 
-from velocitas_lib import (
-    get_cache_data,
-    get_package_path,
-    json_obj_to_flat_map,
-    replace_variables,
-)
+from velocitas_lib.variables import ProjectVariables
 
 
 def generate_nodeport(port: int) -> int:
@@ -73,12 +68,11 @@ def parse_service_config(service_spec_config: dict) -> ServiceSpecConfig:
     mounts = []
     args = []
 
-    variables = json_obj_to_flat_map(get_cache_data(), "builtin.cache")
-    variables["builtin.package_dir"] = get_package_path()
+    variables = ProjectVariables()
 
     for config_entry in service_spec_config:
         if isinstance(config_entry["value"], str):
-            config_entry["value"] = replace_variables(config_entry["value"], variables)
+            config_entry["value"] = variables.replace_occurrences(config_entry["value"])
         match config_entry["key"]:  # noqa: E999
             case "image":
                 container_image = config_entry["value"]

@@ -30,7 +30,6 @@ from velocitas_lib import (
     get_services,
     get_workspace_dir,
     json_obj_to_flat_map,
-    replace_variables,
     require_env,
 )
 
@@ -108,47 +107,6 @@ def test_get_package_path__returns_package_path():
 def test_get_cache_data__returns_cache_data(set_velocitas_cache_data):  # type: ignore
     assert get_cache_data()["testPropA"] == "testValueA"
     assert get_cache_data()["testPropB"] == "testValueB"
-
-
-def test_replace_variables__returns_correct_resolved_string():
-    input_str_a = "${{ test.string.a }}"
-    input_str_b = "/test/${{ test.string.b }}/test"
-    variables_to_replace = {
-        "test.string.a": "testA",
-        "test.string.b": "testB",
-    }
-    assert (
-        replace_variables(input_str_a, variables_to_replace)
-        == variables_to_replace["test.string.a"]
-    )
-    assert (
-        replace_variables(input_str_b, variables_to_replace)
-        == f'/test/{variables_to_replace["test.string.b"]}/test'
-    )
-
-
-def test_replace_variables__variable_not_defined__raises_KeyError():
-    with pytest.raises(KeyError):
-        input_str_a = "${{ test.string.a }}"
-        variables_to_replace = {
-            "test.string.b": "testB",
-        }
-        replace_variables(input_str_a, variables_to_replace)
-
-
-def test_replace_variables__no_replacement_in_input_str__returns_input_str():
-    input_str_a = "test.string.a"
-    input_str_b = "/test/test.string.b/test"
-    input_str_c = "testImage:testVersion"
-    input_str_d = "url.com/owner/repo/service:version"
-    variables_to_replace = {
-        "test.string.a": "testA",
-        "test.string.b": "testB",
-    }
-    assert replace_variables(input_str_a, variables_to_replace) == input_str_a
-    assert replace_variables(input_str_b, variables_to_replace) == input_str_b
-    assert replace_variables(input_str_c, variables_to_replace) == input_str_c
-    assert replace_variables(input_str_d, variables_to_replace) == input_str_d
 
 
 def test_json_obj_to_flat_map__obj_is_dict__returns_replaced_cache_data_with_separator(

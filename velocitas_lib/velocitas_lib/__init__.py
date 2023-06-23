@@ -15,7 +15,6 @@
 import inspect
 import json
 import os
-import re
 import sys
 from io import TextIOWrapper
 from pathlib import Path
@@ -94,22 +93,6 @@ def get_services() -> dict[str, Any]:
             encoding="utf-8",
         )
     )
-
-
-def replace_variables(input_str: str, variables: dict[str, str]) -> str:
-    """Replace all occurrences of the defined variables in the input string"""
-    if "${{" not in input_str:
-        return input_str
-    input_str_match = re.search(r"(?<=\${{)(.*?)(?=}})", input_str)
-    if input_str_match:
-        input_str_value = input_str_match.group().strip()
-        if input_str_value not in variables:
-            raise KeyError(f"{input_str_value!r} not in {variables!r}")
-        for key, value in variables.items():
-            input_str = input_str.replace("${{ " + key + " }}", str(value))
-        return input_str
-    else:
-        raise ValueError(f"{input_str!r} not in the right format")
 
 
 def json_obj_to_flat_map(obj, prefix: str = "", separator: str = ".") -> dict[str, str]:
