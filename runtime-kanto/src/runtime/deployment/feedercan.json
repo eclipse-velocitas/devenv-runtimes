@@ -3,6 +3,13 @@
     "image": {
         "name": "ghcr.io/eclipse/kuksa.val.feeders/dbc2val:v0.1.1"
     },
+    "mount_points": [
+        {
+            "destination": "data",
+            "source": "/workspaces/vehicle-app-python-template/config/feedercan",
+            "propagation_mode": "rprivate"
+        }
+    ],
     "host_config": {
         "devices": [],
         "network_mode": "host",
@@ -11,26 +18,7 @@
             "maximum_retry_count": 0,
             "retry_timeout": 0,
             "type": "unless-stopped"
-        },
-        "runtime": "io.containerd.runc.v2",
-        "extra_hosts": [],
-        "log_config": {
-            "driver_config": {
-                "type": "json-file",
-                "max_files": 2,
-                "max_size": "1M",
-                "root_dir": ""
-            },
-            "mode_config": {
-                "mode": "blocking",
-                "max_buffer_size": ""
-            }
-        },
-        "resources": null
-    },
-    "io_config": {
-        "open_stdin": false,
-        "tty": false
+        }
     },
     "config": {
         "env": [
@@ -40,8 +28,10 @@
             "LOG_LEVEL=info",
             "databroker=info",
             "broker_client=info",
-            "dbcfeeder=info"
-        ],
-        "cmd": []
+            "dbcfeeder=info",
+            "CANDUMP_FILE=/data/candumpDefault.log",
+            "DBC_FILE=/data/dbcfileDefault.dbc",
+            "MAPPING_FILE=/data/mappingDefault.yml"
+        ]
     }
 }

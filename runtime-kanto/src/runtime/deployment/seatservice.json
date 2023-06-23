@@ -11,21 +11,6 @@
             "maximum_retry_count": 0,
             "retry_timeout": 0,
             "type": "unless-stopped"
-        },
-        "runtime": "io.containerd.runc.v2",
-        "extra_hosts": [],
-        "port_mappings": [],
-        "log_config": {
-            "driver_config": {
-                "type": "json-file",
-                "max_files": 2,
-                "max_size": "1M",
-                "root_dir": ""
-            },
-            "mode_config": {
-                "mode": "blocking",
-                "max_buffer_size": ""
-            }
         }
     },
     "config": {
@@ -33,7 +18,6 @@
             "BROKER_ADDR=127.0.0.1:55555",
             "RUST_LOG=info",
             "vehicle_data_broker=info"
-        ],
-        "cmd": []
+        ]
     }
 }
