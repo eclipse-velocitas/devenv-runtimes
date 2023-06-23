@@ -24,7 +24,7 @@ from velocitas_lib import get_services, parse_service_config
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "runtime"))
 
 
-def uninstall_runtime(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+def remove_container(log_output: TextIOWrapper | int = subprocess.DEVNULL):
     """Uninstall the runtime.
 
     Args:
@@ -32,6 +32,21 @@ def uninstall_runtime(log_output: TextIOWrapper | int = subprocess.DEVNULL):
     """
     subprocess.check_call(
         ["kanto-cm", "remove", "-f", "-n", "databroker"],
+        stdout=log_output,
+        stderr=log_output,
+    )
+    subprocess.check_call(
+        ["kanto-cm", "remove", "-f", "-n", "mosquitto"],
+        stdout=log_output,
+        stderr=log_output,
+    )
+    subprocess.check_call(
+        ["kanto-cm", "remove", "-f", "-n", "feedercan"],
+        stdout=log_output,
+        stderr=log_output,
+    )
+    subprocess.check_call(
+        ["kanto-cm", "remove", "-f", "-n", "seatservice"],
         stdout=log_output,
         stderr=log_output,
     )
@@ -48,6 +63,6 @@ def undeploy_runtime(
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
     status = "> Undeploying runtime... "
-    uninstall_runtime(log_output)
+    remove_container(log_output)
     status = status + "uninstalled!"
     spinner.write(status)

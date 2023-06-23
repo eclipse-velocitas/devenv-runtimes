@@ -12,14 +12,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import os
 import subprocess
 from io import TextIOWrapper
-from typing import List
 
 from yaspin.core import Yaspin
-
-from velocitas_lib import get_package_path, require_env
 
 
 def registry_exists(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bool:
@@ -31,43 +27,74 @@ def registry_exists(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> boo
     Returns:
         bool: True if the registry exists, False if not.
     """
-    return
+
+    return subprocess.check_output(
+        ["docker", "ps", "-a", "-q", "-f", "name=registry"],
+        stdout=log_output,
+        stderr=log_output,
+    )
 
 
-def create_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
-    """Create the Kanto registry.
+def registry_running(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bool:
+    """Check if the Kanto registry is running.
+
+    Args:
+        log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
+
+    Returns:
+        bool: True if the registry exists, False if not.
+    """
+
+    return subprocess.check_output(
+        ["docker", "container", "inspect", "-f", "'{{.State.Running}}'", "registry"],
+        stdout=log_output,
+        stderr=log_output,
+    ) == "true"
+
+
+def create_and_start_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+    """Create and start the Kanto registry.
 
     Args:
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
+    subprocess.check_call(
+        ["docker", "run", "-d", "-p", "12345:5000", "--name", "registry", "registry:2"],
+        stdout=log_output,
+        stderr=log_output,
+    )
 
 
-def delete_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
-    """Delete the Kanto registry.
+def start_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+    """Start the Kanto registry.
 
     Args:
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
+    subprocess.check_call(
+        ["docker", "start", "registry"],
+        stdout=log_output,
+        stderr=log_output,
+    )
 
 
-def append_proxy_var_if_set(proxy_args: List[str], var_name: str):  # noqa: U100
-    """Append the specified environment variable setting to the passed list,
-    if the variable exists in the calling environment
+def stop_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+    """Stop the Kanto registry.
 
     Args:
-        proxy_args (List[str]): List to append to
-        var_name (str): Enironment variable to append if existing
+        log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
-    var_content = os.getenv(var_name)
-    if var_content:
-        proxy_args += ["-e", f"{var_name}={var_content}@server:0"]
-
+    subprocess.check_call(
+        ["docker", "stop", "registry"],
+        stdout=log_output,
+        stderr=log_output,
+    )
 
 
 def configure_controlplane(
     spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DEVNULL
 ):
-    """Configure the K3D control plane and display the progress
+    """Configure the Kanto control plane and display the progress
     using the given spinner.
 
     Args:
@@ -77,10 +104,16 @@ def configure_controlplane(
 
     status = "> Checking Kanto registry... "
     if not registry_exists(log_output):
-        create_registry(log_output)
-        status = status + "created."
+        create_and_start_registry(log_output)
+        status = status + "started."
+        spinner.write(status)
     else:
         status = status + "registry already exists."
+        spinner.write(status)
+        if registry_running(log_output):
+            status = status + "registry already started."
+        else:
+            start_registry(log_output)
     spinner.write(status)
 
 
@@ -97,8 +130,8 @@ def reset_controlplane(
 
     status = "> Checking Kanto registry... "
     if registry_exists(log_output):
-        delete_registry(log_output)
-        status = status + "uninstalled."
+        stop_registry(log_output)
+        status = status + "stopped."
     else:
         status = status + "does not exist."
     spinner.write(status)
