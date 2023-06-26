@@ -32,7 +32,6 @@
     "deployment": {
         "enable": true,
         "mode": "update",
-        "home_dir": "/data/container-management",
-        "ctr_dir": "deployment"
+        "home_dir": "/data/container-management"
     }
 }

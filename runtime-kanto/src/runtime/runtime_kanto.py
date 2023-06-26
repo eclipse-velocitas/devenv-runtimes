@@ -21,7 +21,7 @@ import time
 
 from yaspin.core import Yaspin
 
-from velocitas_lib import get_services, parse_service_config
+from velocitas_lib import get_services, get_script_path
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "runtime"))
 
@@ -78,13 +78,25 @@ def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DE
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
     spinner.write("starting")
-    subprocess.Popen(["sudo", "container-management", "--cfg-file", "config.json"])
-
+    kanto = subprocess.Popen(
+        [
+            "sudo",
+            "container-management",
+            "--cfg-file",
+            get_script_path() + "/config.json",
+            "--deployment-ctr-dir",
+            get_script_path() + "/deployment",
+        ],
+        start_new_session=True,
+        stderr=log_output,
+        stdout=log_output,
+    )
     socket = Path("/run/container-management/container-management.sock")
     while not socket.exists():
-        time.sleep(0.1)
+        time.sleep(1)
+        print("waiting")
 
-    subprocess.check_call(
+    subprocess.call(
         [
             "sudo",
             "chmod",
@@ -94,5 +106,5 @@ def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DE
         stdout=log_output,
         stderr=log_output,
     )
-
     spinner.write("started")
+    kanto.wait()
