@@ -16,6 +16,8 @@ import os
 import subprocess
 import sys
 from io import TextIOWrapper
+from pathlib import Path
+import time
 
 from yaspin.core import Yaspin
 
@@ -66,3 +68,22 @@ def undeploy_runtime(
     remove_container(log_output)
     status = status + "uninstalled!"
     spinner.write(status)
+
+
+def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DEVNULL):
+    """Starting the Kanto process in background
+
+    Args:
+        spinner (Yaspin): The progress spinner to update.
+        log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
+    """
+    subprocess.Popen(["sudo", "container-management", "--cfg-file", "config.json"])
+    socket = Path("/run/container-management/container-management.sock")
+    while not socket.exists():
+        time.sleep(0.1)
+
+    subprocess.check_call(
+        ["sudo", "chmod", "a+rw", "/run/container-management/container-management.sock"],
+        stdout=log_output,
+        stderr=log_output,
+    )

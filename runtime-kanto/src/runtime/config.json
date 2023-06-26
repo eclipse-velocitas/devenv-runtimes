@@ -33,6 +33,6 @@
         "enable": true,
         "mode": "update",
         "home_dir": "/data/container-management",
-        "ctr_dir": "/workspaces/vehicle-app-python-template/kanto/deployments"
+        "ctr_dir": "deployment"
     }
 }

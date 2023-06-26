@@ -13,6 +13,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from controlplane_kanto import configure_controlplane
+from runtime_kanto import start_kanto
 from yaspin import yaspin
 
 from velocitas_lib import create_log_file
@@ -27,6 +28,9 @@ def runtime_up():
         try:
             configure_controlplane(spinner, log_output)
             spinner.ok("✅")
+            spinner.start()
+            spinner.text("Starting Kanto...")
+            start_kanto(spinner, log_output)
         except Exception as err:
             log_output.write(str(err))
             spinner.fail("💥")
