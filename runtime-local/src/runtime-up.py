@@ -17,10 +17,11 @@ import subprocess
 import time
 from typing import Dict
 
-from lib import get_services, run_service, stop_container, stop_service
+from lib import run_service, stop_container, stop_service
 from yaspin import yaspin
 
 from velocitas_lib import get_log_file_name
+from velocitas_lib.services import get_services
 
 spawned_processes: Dict[str, subprocess.Popen] = {}
 
@@ -32,26 +33,25 @@ def run_services() -> None:
     with yaspin(text="Starting runtime...", color="cyan") as spinner:
         try:
             for service in get_services():
-                service_id = service["id"]
                 stop_service(service)
-                spinner.text = f"Starting {service_id}..."
-                spawned_processes[service_id] = run_service(service)
-                spinner.write(f"> {service_id} running")
+                spinner.text = f"Starting {service.id}..."
+                spawned_processes[service.id] = run_service(service)
+                spinner.write(f"> {service.id} running")
             spinner.text = "Runtime is ready to use!"
             spinner.ok("✅")
         except RuntimeError as error:
             spinner.write(error.args)
             spinner.fail("💥")
             terminate_spawned_processes()
-            print(f"Starting {service_id=} failed")
+            print(f"Starting {service.id=} failed")
             with open(
-                get_log_file_name(service_id, "runtime-local"),
+                get_log_file_name(service.id, "runtime-local"),
                 mode="r",
                 encoding="utf-8",
             ) as log:
-                print(f">>>> Start log of {service_id} >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                print(f">>>> Start log of {service.id} >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 print(log.read(), end="")
-                print(f"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< End log of {service_id} <<<<")
+                print(f"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< End log of {service.id} <<<<")
 
 
 def wait_while_processes_are_running():
@@ -67,7 +67,7 @@ def terminate_spawned_processes():
             (service_id, process) = spawned_processes.popitem()
             process.terminate()
             stop_container(service_id, subprocess.DEVNULL)
-            spinner.write(f"> {process.args[0]} (service_id='{service_id}') terminated")
+            spinner.write(f"> {process.args!r} (service_id={service_id!r}) terminated")
         spinner.ok("✅")
 
 

@@ -19,11 +19,10 @@ from io import TextIOWrapper
 
 from yaspin.core import Yaspin
 
-from velocitas_lib import get_services
+from velocitas_lib.services import get_services
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "runtime"))
 from deployment.gen_helm import gen_helm  # noqa: E402
-from deployment.lib import parse_service_config  # noqa: E402
 
 
 def is_runtime_installed(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bool:
@@ -76,8 +75,7 @@ def retag_docker_images(log_output: TextIOWrapper | int = subprocess.DEVNULL):
     """
     services = get_services()
     for service in services:
-        service_config = parse_service_config(service["config"])
-        retag_docker_image(service_config.image, log_output)
+        retag_docker_image(service.config.image, log_output)
 
 
 def create_config_maps(log_output: TextIOWrapper | int = subprocess.DEVNULL):
@@ -88,8 +86,7 @@ def create_config_maps(log_output: TextIOWrapper | int = subprocess.DEVNULL):
     """
     services = get_services()
     for service in services:
-        service_config = parse_service_config(service["config"])
-        for mount in service_config.mounts:
+        for mount in service.config.mounts:
             local_path = mount.split(":")[0]
             # if folder, don't create configmap
             if "." not in local_path.split(os.sep)[-1]:

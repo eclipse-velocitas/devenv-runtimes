@@ -14,17 +14,25 @@
 
 # flake8: noqa: U100 unused argument (because of pytest.fixture)
 
+import json
 import os
 
 import pytest
 
-from velocitas_lib import get_package_path
-from velocitas_lib.variables import ProjectVariables
+from velocitas_lib import get_cache_data, get_package_path
+from velocitas_lib.variables import ProjectVariables, json_obj_to_flat_map
 
 
 @pytest.fixture()
 def set_test_env_var():
     os.environ["VELOCITAS_CACHE_DATA"] = '{"cache_key":"cache_value"}'
+
+
+@pytest.fixture()
+def set_velocitas_cache_data() -> str:
+    cache_data_mock = {"testPropA": "testValueA", "testPropB": "testValueB"}
+    os.environ["VELOCITAS_CACHE_DATA"] = json.dumps(cache_data_mock)
+    return os.environ["VELOCITAS_CACHE_DATA"]
 
 
 def test_replace_occurrences__returns_correct_resolved_string(set_test_env_var):
@@ -84,3 +92,31 @@ def test_replace_occurrences__builtins_provided(set_test_env_var):
         )
         == f"This is the package path: {get_package_path().__str__()!r}"
     )
+
+
+def test_json_obj_to_flat_map__obj_is_dict__returns_replaced_cache_data_with_separator(
+    set_velocitas_cache_data,  # type: ignore
+):
+    separator = "test.separator"
+    cache_data_with_keys_to_replace = json_obj_to_flat_map(get_cache_data(), separator)
+    assert cache_data_with_keys_to_replace[f"{separator}.testPropA"] == "testValueA"
+    assert cache_data_with_keys_to_replace[f"{separator}.testPropB"] == "testValueB"
+
+
+def test_json_obj_to_flat_map__obj_is_list__returns_replaced_cache_data_with_separator(
+    set_velocitas_cache_data,  # type: ignore
+):
+    separator = "test.separator"
+    cache_data_with_keys_to_replace = json_obj_to_flat_map(
+        list(get_cache_data()), separator
+    )
+    assert cache_data_with_keys_to_replace[f"{separator}.0"] == "testPropA"
+    assert cache_data_with_keys_to_replace[f"{separator}.1"] == "testPropB"
+
+
+def test_json_obj_to_flat_map__obj_is_str__returns_replaced_cache_data_with_separator(
+    set_velocitas_cache_data,  # type: ignore
+):
+    separator = "test.separator"
+    cache_data_with_keys_to_replace = json_obj_to_flat_map("test", separator)
+    assert cache_data_with_keys_to_replace[f"{separator}"] == "test"
