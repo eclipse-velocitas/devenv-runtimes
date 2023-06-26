@@ -28,8 +28,8 @@ def runtime_up():
         try:
             configure_controlplane(spinner, log_output)
             spinner.ok("✅")
+            spinner.text = "Starting Kanto..."
             spinner.start()
-            spinner.text("Starting Kanto...")
             start_kanto(spinner, log_output)
         except Exception as err:
             log_output.write(str(err))

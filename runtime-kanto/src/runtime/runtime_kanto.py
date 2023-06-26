@@ -77,13 +77,22 @@ def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DE
         spinner (Yaspin): The progress spinner to update.
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
+    spinner.write("starting")
     subprocess.Popen(["sudo", "container-management", "--cfg-file", "config.json"])
+
     socket = Path("/run/container-management/container-management.sock")
     while not socket.exists():
         time.sleep(0.1)
 
     subprocess.check_call(
-        ["sudo", "chmod", "a+rw", "/run/container-management/container-management.sock"],
+        [
+            "sudo",
+            "chmod",
+            "a+rw",
+            "/run/container-management/container-management.sock",
+        ],
         stdout=log_output,
         stderr=log_output,
     )
+
+    spinner.write("started")
