@@ -204,6 +204,47 @@
                     "default": 50008
                 }
             ]
+        },
+        {
+            "id": "runtime-kanto",
+            "alias": "kanto",
+            "type": "runtime",
+            "programs": [
+                {
+                    "id": "install-deps",
+                    "executable": "python3",
+                    "args": [
+                        "./runtime-kanto/src/install_deps.py"
+                    ]
+                },
+                {
+                    "id": "up",
+                    "executable": "python3",
+                    "args": [
+                        "./runtime-kanto/src/runtime/runtime-up.py"
+                    ]
+                },
+                {
+                    "id": "down",
+                    "executable": "python3",
+                    "args": [
+                        "./runtime-kanto/src/runtime/runtime-down.py"
+                    ]
+                }
+            ],
+            "onPostInit": [
+                {
+                    "ref": "install-deps"
+                }
+            ],
+            "variables": [
+                {
+                    "name": "runtimeFilePath",
+                    "type": "string",
+                    "description": "Path to the file describing your custom runtime configuration.",
+                    "default": "runtime.json"
+                }
+            ]
         }
     ]
 }
