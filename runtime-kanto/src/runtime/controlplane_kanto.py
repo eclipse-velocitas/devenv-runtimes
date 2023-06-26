@@ -27,11 +27,11 @@ def registry_exists(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> boo
     Returns:
         bool: True if the registry exists, False if not.
     """
-
-    return subprocess.check_output(
-        ["docker", "ps", "-a", "-q", "-f", "name=registry"],
-        stdout=log_output,
-        stderr=log_output,
+    return "" != str(
+        subprocess.check_output(
+            ["docker", "ps", "-a", "-q", "-f", "name=registry"], stderr=log_output
+        ),
+        "utf-8",
     )
 
 
@@ -44,12 +44,20 @@ def registry_running(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bo
     Returns:
         bool: True if the registry exists, False if not.
     """
-
-    return subprocess.check_output(
-        ["docker", "container", "inspect", "-f", "'{{.State.Running}}'", "registry"],
-        stdout=log_output,
-        stderr=log_output,
-    ) == "true"
+    return "true" in str(
+        subprocess.check_output(
+            [
+                "docker",
+                "container",
+                "inspect",
+                "-f",
+                "'{{.State.Running}}'",
+                "registry",
+            ],
+            stderr=log_output,
+        ),
+        "utf-8",
+    )
 
 
 def create_and_start_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
@@ -104,17 +112,17 @@ def configure_controlplane(
 
     status = "> Checking Kanto registry... "
     if not registry_exists(log_output):
+        spinner.write(status + "starting registry.")
         create_and_start_registry(log_output)
-        status = status + "started."
-        spinner.write(status)
+        spinner.write(status + "started.")
     else:
-        status = status + "registry already exists."
-        spinner.write(status)
+        spinner.write(status + "registry already exists.")
         if registry_running(log_output):
-            status = status + "registry already started."
+            spinner.write(status + "registry already started.")
         else:
+            spinner.write(status + "starting registry.")
             start_registry(log_output)
-    spinner.write(status)
+            spinner.write(status + "started.")
 
 
 def reset_controlplane(
@@ -128,7 +136,7 @@ def reset_controlplane(
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
 
-    status = "> Checking Kanto registry... "
+    status = "> Stopping Kanto registry... "
     if registry_exists(log_output):
         stop_registry(log_output)
         status = status + "stopped."
