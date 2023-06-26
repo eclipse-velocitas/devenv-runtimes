@@ -12,7 +12,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from controlplane import configure_controlplane
+from controlplane_kanto import configure_controlplane
 from yaspin import yaspin
 
 from velocitas_lib import create_log_file

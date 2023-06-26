@@ -12,8 +12,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from controlplane import reset_controlplane
-from runtime import undeploy_runtime
+from controlplane_kanto import reset_controlplane
+from runtime_kanto import undeploy_runtime
 from yaspin import yaspin
 
 from velocitas_lib import create_log_file
@@ -23,7 +23,7 @@ def runtime_down():
     """Stop the K3D runtime."""
 
     print("Hint: Log files can be found in your workspace's logs directory")
-    log_output = create_log_file("runtime-down", "runtime-k3d")
+    log_output = create_log_file("runtime-down", "runtime-kanto")
     with yaspin(text="Stopping k3d runtime...", color="cyan") as spinner:
         try:
             reset_controlplane(spinner, log_output)
