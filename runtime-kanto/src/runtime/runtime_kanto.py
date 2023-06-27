@@ -53,13 +53,17 @@ def remove_container(log_output: TextIOWrapper | int = subprocess.DEVNULL):
 
 
 def adapt_feedercan_deployment_file():
-    with open(os.path.join(get_script_path(), "deployment", "feedercan.json"),
-              "r+",
-              encoding="utf-8",) as f:
+    with open(
+        os.path.join(get_script_path(), "deployment", "feedercan.json"),
+        "r+",
+        encoding="utf-8",
+    ) as f:
         data = json.load(f)
-        data["mount_points"]["source"] = os.path.join(
-            get_workspace_dir(), "config", "feedercan")
-        json.dump(data, f)
+        data["mount_points"][0]["source"] = os.path.join(
+            get_package_path(), "config", "feedercan"
+        )
+        f.seek(0)
+        json.dump(data, f, indent=4)
 
 
 def undeploy_runtime(
