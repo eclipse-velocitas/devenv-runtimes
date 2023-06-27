@@ -3,7 +3,6 @@
         "home_dir": "/data/container-management"
     },
     "log": {
-        "log_file": "container-management.log",
         "log_level": "DEBUG"
     },
     "containers": {

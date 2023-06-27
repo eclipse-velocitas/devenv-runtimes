@@ -221,14 +221,14 @@
                     "id": "up",
                     "executable": "python3",
                     "args": [
-                        "./runtime-kanto/src/runtime/runtime-up.py"
+                        "./runtime-kanto/src/runtime/runtime_up.py"
                     ]
                 },
                 {
                     "id": "down",
                     "executable": "python3",
                     "args": [
-                        "./runtime-kanto/src/runtime/runtime-down.py"
+                        "./runtime-kanto/src/runtime/runtime_down.py"
                     ]
                 }
             ],

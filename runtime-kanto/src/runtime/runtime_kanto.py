@@ -12,18 +12,14 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import os
 import subprocess
-import sys
 from io import TextIOWrapper
 from pathlib import Path
 import time
 
 from yaspin.core import Yaspin
 
-from velocitas_lib import get_services, get_script_path
-
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "runtime"))
+from velocitas_lib import get_workspace_dir, get_script_path
 
 
 def remove_container(log_output: TextIOWrapper | int = subprocess.DEVNULL):
@@ -86,6 +82,8 @@ def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DE
             get_script_path() + "/config.json",
             "--deployment-ctr-dir",
             get_script_path() + "/deployment",
+            "--log-file",
+            get_workspace_dir() + "/logs/container-management.log"
 
         ],
         start_new_session=True,
@@ -94,8 +92,8 @@ def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DE
     )
     socket = Path("/run/container-management/container-management.sock")
     while not socket.exists():
-        time.sleep(1)
         print("waiting")
+        time.sleep(1)
 
     subprocess.call(
         [
@@ -107,7 +105,15 @@ def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DE
         stdout=log_output,
         stderr=log_output,
     )
-    spinner.text = "Runtime is ready to use!"
+
+    # sleep a bit to properly get the errors
+    time.sleep(0.1)
+    if kanto.poll() == 1:
+        spinner.text = "Starting Kanto failed!"
+        spinner.fail("💥")
+        return
+
+    spinner.text = "Kanto is ready to use!"
     spinner.ok("✅")
     kanto.wait()
 

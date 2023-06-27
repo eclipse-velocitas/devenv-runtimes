@@ -25,13 +25,17 @@ def runtime_down():
     print("Hint: Log files can be found in your workspace's logs directory")
     log_output = create_log_file("runtime-down", "runtime-kanto")
     with yaspin(text="Stopping Kanto...", color="cyan") as spinner:
-        spinner.write("Removing containers...")
-        undeploy_runtime(spinner, log_output)
-        spinner.write("Stopping registry...")
-        reset_controlplane(spinner, log_output)
-        spinner.write("Stopping Kanto...")
-        stop_kanto(log_output)
-        spinner.ok("✅")
+        try:
+            spinner.write("Removing containers...")
+            undeploy_runtime(spinner, log_output)
+            spinner.write("Stopping registry...")
+            reset_controlplane(spinner, log_output)
+            spinner.write("Stopping Kanto...")
+            stop_kanto(log_output)
+            spinner.ok("✅")
+        except Exception as err:
+            log_output.write(str(err))
+            spinner.fail("💥")
 
 
 if __name__ == "__main__":
