@@ -13,6 +13,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import subprocess
+import json
 from io import TextIOWrapper
 
 from build_vehicleapp import build_vehicleapp
@@ -21,9 +22,16 @@ from yaspin import yaspin
 from velocitas_lib import (
     create_log_file,
     get_app_manifest,
-    get_script_path,
-    require_env, build_vehicleapp
+    get_workspace_dir,
+    build_vehicleapp
 )
+
+
+def get_service_port(runtime: dict, service_id: str) -> str:
+    service_config = [ service for service in runtime
+                       if service['id'] == service_id ][0]['config']
+    return [config for config in service_config
+            if config['key'] == 'port'][0]['value']
 
 
 def is_docker_image_build_locally(app_name: str) -> bool:
@@ -48,7 +56,7 @@ def is_docker_image_build_locally(app_name: str) -> bool:
 def push_docker_image_to_registry(
     app_name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL
 ):
-    """Push docker image to local k3d image registry
+    """Push docker image to local image registry
 
     Args:
         app_name (str): App name to push to registry
@@ -62,16 +70,18 @@ def push_docker_image_to_registry(
 
 
 def is_vehicleapp_installed(
+    app_name: str,
     log_output: TextIOWrapper | int = subprocess.DEVNULL,
 ) -> bool:
     """Return whether the runtime is installed or not.
 
     Args:
+        app_name (str): App name
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
     return (
         subprocess.call(
-            ["helm", "status", "vapp-chart"],
+            ["kanto-cm", "get", "--name", app_name],
             stdout=log_output,
             stderr=log_output,
         )
@@ -79,53 +89,78 @@ def is_vehicleapp_installed(
     )
 
 
-def uninstall_vehicleapp(log_output: TextIOWrapper | int = subprocess.DEVNULL):
-    """Uninstall VehicleApp helm chart
+def uninstall_vehicleapp(app_name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL):
+    """Uninstall VehicleApp container
 
     Args:
+        app_name (str): App name to remove container for
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
     subprocess.check_call(
-        ["helm", "uninstall", "vapp-chart", "--wait"],
+        ["kanto-cm", "remove", "--name", app_name],
         stdout=log_output,
         stderr=log_output,
     )
 
 
-def install_vehicleapp(
+def create_container(
     app_name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL
 ):
-    """Install VehicleApp helm chart
+    """Create kanto container
 
     Args:
-        app_name (str): App name to install
+        app_name (str): App name for container creation
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
-    app_port = require_env("vehicleAppPort")
-    app_registry = "k3d-registry.localhost:12345"
-    script_path = get_script_path()
-    helm_config_path = script_path + "/config/helm"
+    with open(f"{get_workspace_dir()}/runtime.json") as f:
+        runtime = json.loads(f.read())
+
+    middleware_type = "native"
+    app_registry = "localhost:12345"
+    vdb_port = get_service_port(runtime, 'vehicledatabroker')
+    vdb_address = "grpc://127.0.0.1"
+    mqtt_port = get_service_port(runtime, 'mqtt-broker')
+    mqtt_address = "mqtt://127.0.0.1"
 
     subprocess.check_call(
         [
-            "helm",
-            "install",
-            "vapp-chart",
-            helm_config_path,
-            "--values",
-            f"{helm_config_path}/values.yaml",
-            "--set",
-            f"imageVehicleApp.repository={app_registry}/{app_name}",
-            "--set",
-            f"imageVehicleApp.name={app_name}",
-            "--set",
-            f"imageVehicleApp.daprAppid={app_name}",
-            "--set",
-            f"imageVehicleApp.daprPort={app_port}",
-            "--wait",
-            "--timeout",
-            "60s",
-            "--debug",
+            "kanto-cm",
+            "create",
+            "--i",
+            "--t",
+            "--network",
+            "host",
+            "--e",
+            f"SDV_MIDDLEWARE_TYPE={middleware_type}",
+            "--e",
+            f"SDV_VEHICLEDATABROKER_ADDRESS={vdb_address}:{vdb_port}",
+            "--e",
+            f"SDV_MQTT_ADDRESS={mqtt_address}:{mqtt_port}",
+            "-n",
+            app_name,
+            f"{app_registry}/{app_name}:local"
+        ],
+        stdout=log_output,
+        stderr=log_output,
+    )
+
+
+def start_container(
+     app_name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL
+):
+    """Start VehicleApp container
+
+    Args:
+        app_name (str): App name for container start
+        log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
+    """
+
+    subprocess.check_call(
+        [
+            "kanto-cm",
+            "start",
+            "-n",
+            app_name,
         ],
         stdout=log_output,
         stderr=log_output,
@@ -133,11 +168,11 @@ def install_vehicleapp(
 
 
 def deploy_vehicleapp():
-    """Deploy VehicleApp docker image via helm to k3d cluster
+    """Deploy VehicleApp docker image via kanto-cm
     and display the progress using a given spinner."""
 
     print("Hint: Log files can be found in your workspace's logs directory")
-    log_output = create_log_file("deploy-vapp", "runtime-k3d")
+    log_output = create_log_file("deploy-vapp", "runtime-kanto")
     with yaspin(text="Deploying VehicleApp...", color="cyan") as spinner:
         try:
             app_name = get_app_manifest()["name"].lower()
@@ -153,14 +188,15 @@ def deploy_vehicleapp():
             spinner.write(status)
 
             status = "> Uninstalling vapp-chart..."
-            if is_vehicleapp_installed(log_output):
-                uninstall_vehicleapp(log_output)
+            if is_vehicleapp_installed(app_name, log_output):
+                uninstall_vehicleapp(app_name, log_output)
                 spinner.write(f"{status} done!")
             else:
                 spinner.write(f"{status} vapp-chart not yet installed.")
 
-            install_vehicleapp(app_name, log_output)
-            spinner.write(f"> Installing vapp-chart for {app_name}... done!")
+            create_container(app_name, log_output)
+            start_container(app_name, log_output)
+            spinner.write(f"> Deploying vapp container for {app_name}... done!")
             spinner.ok("✅")
         except Exception as err:
             log_output.write(str(err))
