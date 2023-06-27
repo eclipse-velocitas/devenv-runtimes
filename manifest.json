@@ -245,6 +245,28 @@
                     "default": "runtime.json"
                 }
             ]
+        },
+        {
+            "id": "deployment-kanto",
+            "alias": "kanto",
+            "type": "deployment",
+            "programs": [
+                {
+                    "id": "build-vehicleapp",
+                    "executable": "python3",
+                    "args": [
+                        "./runtime-kanto/src/app_deployment/build_vehicleapp.py"
+                    ]
+                },
+                {
+                    "id": "deploy-vehicleapp",
+                    "executable": "python3",
+                    "args": [
+                        "./runtime-kanto/src/app_deployment/deploy_vehicleapp.py"
+                    ]
+                }
+            ],
+            "variables": []
         }
     ]
 }
