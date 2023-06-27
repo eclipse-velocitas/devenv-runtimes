@@ -16,10 +16,12 @@ import subprocess
 from io import TextIOWrapper
 from pathlib import Path
 import time
+import json
+import os
 
 from yaspin.core import Yaspin
 
-from velocitas_lib import get_workspace_dir, get_script_path
+from velocitas_lib import get_workspace_dir, get_script_path, get_package_path
 
 
 def remove_container(log_output: TextIOWrapper | int = subprocess.DEVNULL):
@@ -50,6 +52,16 @@ def remove_container(log_output: TextIOWrapper | int = subprocess.DEVNULL):
     )
 
 
+def adapt_feedercan_deployment_file():
+    with open(os.path.join(get_script_path(), "deployment", "feedercan.json"),
+              "r+",
+              encoding="utf-8",) as f:
+        data = json.load(f)
+        data["mount_points"]["source"] = os.path.join(
+            get_workspace_dir(), "config", "feedercan")
+        json.dump(data, f)
+
+
 def undeploy_runtime(
     spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DEVNULL
 ):
@@ -73,6 +85,7 @@ def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DE
         spinner (Yaspin): The progress spinner to update.
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
+    adapt_feedercan_deployment_file()
     spinner.write("starting")
     kanto = subprocess.Popen(
         [
