@@ -86,6 +86,7 @@ def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DE
             get_script_path() + "/config.json",
             "--deployment-ctr-dir",
             get_script_path() + "/deployment",
+
         ],
         start_new_session=True,
         stderr=log_output,
@@ -106,5 +107,22 @@ def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DE
         stdout=log_output,
         stderr=log_output,
     )
-    spinner.write("started")
+    spinner.text = "Runtime is ready to use!"
+    spinner.ok("✅")
     kanto.wait()
+
+
+def stop_kanto(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+    """Starting the Kanto process in background
+
+    Args:
+        spinner (Yaspin): The progress spinner to update.
+        log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
+    """
+    subprocess.check_call(
+        [
+            "sudo", "pkill", "-1", "-f", "container-management",
+        ],
+        stdout=log_output,
+        stderr=log_output,
+    )
