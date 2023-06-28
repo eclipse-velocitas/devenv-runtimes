@@ -96,11 +96,11 @@ def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DE
             "sudo",
             "container-management",
             "--cfg-file",
-            get_script_path() + "/config.json",
+            f"{get_script_path()}/config.json",
             "--deployment-ctr-dir",
-            get_script_path() + "/deployment",
+            f"{get_script_path()}/deployment",
             "--log-file",
-            get_workspace_dir() + "/logs/container-management.log"
+            f"{get_workspace_dir()}/logs/runtime-kanto/container-management.log"
 
         ],
         start_new_session=True,

@@ -27,7 +27,7 @@ from velocitas_lib import (
     get_package_path,
     is_docker_image_build_locally,
     get_service_port,
-    push_docker_image_to_registry
+    push_docker_image_to_registry,
 )
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "app_deployment"))
@@ -45,7 +45,7 @@ def is_vehicleapp_installed(
     """
     return (
         subprocess.call(
-            ["kanto-cm", "get", "--name", app_name],
+            ["kanto-cm", "get", "-n", app_name],
             stdout=log_output,
             stderr=log_output,
         )
@@ -53,7 +53,9 @@ def is_vehicleapp_installed(
     )
 
 
-def remove_vehicleapp(app_name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL):
+def remove_vehicleapp(
+    app_name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL
+):
     """Uninstall VehicleApp container
 
     Args:
@@ -61,7 +63,7 @@ def remove_vehicleapp(app_name: str, log_output: TextIOWrapper | int = subproces
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
     subprocess.check_call(
-        ["kanto-cm", "remove", "--name", app_name],
+        ["kanto-cm", "remove", "-f", "-n", app_name],
         stdout=log_output,
         stderr=log_output,
     )
@@ -81,9 +83,9 @@ def create_container(
 
     middleware_type = "native"
     app_registry = "localhost:12345"
-    vdb_port = get_service_port(runtime, 'vehicledatabroker')
+    vdb_port = get_service_port(runtime, "vehicledatabroker")
     vdb_address = "grpc://127.0.0.1"
-    mqtt_port = get_service_port(runtime, 'mqtt-broker')
+    mqtt_port = get_service_port(runtime, "mqtt-broker")
     mqtt_address = "mqtt://127.0.0.1"
 
     subprocess.check_call(
@@ -102,7 +104,7 @@ def create_container(
             f"SDV_MQTT_ADDRESS={mqtt_address}:{mqtt_port}",
             "-n",
             app_name,
-            f"{app_registry}/{app_name}:local"
+            f"{app_registry}/{app_name}:local",
         ],
         stdout=log_output,
         stderr=log_output,
@@ -148,7 +150,7 @@ def deploy_vehicleapp():
 
             spinner.start()
             push_docker_image_to_registry(app_name, log_output)
-            status = f"> Pushing {app_name} docker image to k3d registry done!"
+            status = f"> Pushing {app_name} docker image to registry done!"
             spinner.write(status)
 
             status = "> Removing old vehicleapp..."
