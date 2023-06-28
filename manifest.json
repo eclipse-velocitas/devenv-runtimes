@@ -266,7 +266,14 @@
                     ]
                 }
             ],
-            "variables": []
+            "variables": [
+                {
+                    "name": "dockerfilePath",
+                    "type": "string",
+                    "description": "Path of Dockerfile to use",
+                    "default": "./app/Dockerfile"
+                }
+            ]
         }
     ]
 }

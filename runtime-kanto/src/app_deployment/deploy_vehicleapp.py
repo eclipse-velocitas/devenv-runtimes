@@ -12,61 +12,25 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+from build_vehicleapp import build_vehicleapp
+import os
 import subprocess
 import json
 from io import TextIOWrapper
+import sys
 
-from build_vehicleapp import build_vehicleapp
 from yaspin import yaspin
 
 from velocitas_lib import (
     create_log_file,
     get_app_manifest,
-    get_workspace_dir,
-    build_vehicleapp
+    get_package_path,
+    is_docker_image_build_locally,
+    get_service_port,
+    push_docker_image_to_registry
 )
 
-
-def get_service_port(runtime: dict, service_id: str) -> str:
-    service_config = [ service for service in runtime
-                       if service['id'] == service_id ][0]['config']
-    return [config for config in service_config
-            if config['key'] == 'port'][0]['value']
-
-
-def is_docker_image_build_locally(app_name: str) -> bool:
-    """Check if vehicle app docker image is locally available
-
-    Args:
-        app_name (str): App name to check for
-    """
-    output = subprocess.check_output(
-        [
-            "docker",
-            "images",
-            "-a",
-            f"localhost:12345/{app_name}:local",
-            "--format",
-            "{{.Repository}}:{{.Tag}}",
-        ],
-    )
-    return output.decode("utf-8").strip() == f"localhost:12345/{app_name}:local"
-
-
-def push_docker_image_to_registry(
-    app_name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL
-):
-    """Push docker image to local image registry
-
-    Args:
-        app_name (str): App name to push to registry
-        log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
-    """
-    subprocess.check_call(
-        ["docker", "push", f"localhost:12345/{app_name}:local"],
-        stdout=log_output,
-        stderr=log_output,
-    )
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "app_deployment"))
 
 
 def is_vehicleapp_installed(
@@ -89,7 +53,7 @@ def is_vehicleapp_installed(
     )
 
 
-def uninstall_vehicleapp(app_name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL):
+def remove_vehicleapp(app_name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL):
     """Uninstall VehicleApp container
 
     Args:
@@ -112,7 +76,7 @@ def create_container(
         app_name (str): App name for container creation
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
-    with open(f"{get_workspace_dir()}/runtime.json") as f:
+    with open(f"{get_package_path()}/runtime.json") as f:
         runtime = json.loads(f.read())
 
     middleware_type = "native"
@@ -146,7 +110,7 @@ def create_container(
 
 
 def start_container(
-     app_name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL
+    app_name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL
 ):
     """Start VehicleApp container
 
@@ -187,16 +151,16 @@ def deploy_vehicleapp():
             status = f"> Pushing {app_name} docker image to k3d registry done!"
             spinner.write(status)
 
-            status = "> Uninstalling vapp-chart..."
+            status = "> Removing old vehicleapp..."
             if is_vehicleapp_installed(app_name, log_output):
-                uninstall_vehicleapp(app_name, log_output)
+                remove_vehicleapp(app_name, log_output)
                 spinner.write(f"{status} done!")
             else:
-                spinner.write(f"{status} vapp-chart not yet installed.")
+                spinner.write(f"{status} vehicleapp not yet installed.")
 
             create_container(app_name, log_output)
             start_container(app_name, log_output)
-            spinner.write(f"> Deploying vapp container for {app_name}... done!")
+            spinner.write(f"> Deploying vehicleapp container for {app_name}... done!")
             spinner.ok("✅")
         except Exception as err:
             log_output.write(str(err))
