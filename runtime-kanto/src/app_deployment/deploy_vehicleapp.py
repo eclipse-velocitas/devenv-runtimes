@@ -62,7 +62,7 @@ def remove_vehicleapp(
         app_name (str): App name to remove container for
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
-    subprocess.check_call(
+    subprocess.call(
         ["kanto-cm", "remove", "-f", "-n", app_name],
         stdout=log_output,
         stderr=log_output,

@@ -21,7 +21,13 @@ import os
 
 from yaspin.core import Yaspin
 
-from velocitas_lib import get_workspace_dir, get_script_path, get_package_path
+from velocitas_lib import (
+    get_workspace_dir,
+    get_script_path,
+    get_package_path,
+    get_app_manifest
+)
+from app_deployment.deploy_vehicleapp import remove_vehicleapp
 
 
 def remove_container(log_output: TextIOWrapper | int = subprocess.DEVNULL):
@@ -50,6 +56,9 @@ def remove_container(log_output: TextIOWrapper | int = subprocess.DEVNULL):
         stdout=log_output,
         stderr=log_output,
     )
+
+    app_name = get_app_manifest()["name"].lower()
+    remove_vehicleapp(app_name, log_output)
 
 
 def adapt_feedercan_deployment_file():

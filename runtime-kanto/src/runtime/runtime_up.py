@@ -34,6 +34,9 @@ def runtime_up():
             spinner.start()
             if not is_kanto_running(log_output):
                 start_kanto(spinner, log_output)
+            else:
+                spinner.text = "Kanto is ready to use!"
+                spinner.ok("✅")
         except Exception as err:
             log_output.write(str(err))
             spinner.fail("💥")
