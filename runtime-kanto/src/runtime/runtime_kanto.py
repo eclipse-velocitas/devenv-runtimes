@@ -18,6 +18,7 @@ from pathlib import Path
 import time
 import json
 import os
+import sys
 
 from yaspin.core import Yaspin
 
@@ -27,7 +28,9 @@ from velocitas_lib import (
     get_package_path,
     get_app_manifest
 )
-from app_deployment.deploy_vehicleapp import remove_vehicleapp
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "app_deployment"))
+from deploy_vehicleapp import remove_vehicleapp  # noqa: E402
 
 
 def remove_container(log_output: TextIOWrapper | int = subprocess.DEVNULL):

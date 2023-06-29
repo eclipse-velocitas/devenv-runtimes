@@ -12,7 +12,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from build_vehicleapp import build_vehicleapp
 import os
 import subprocess
 import json
@@ -31,6 +30,7 @@ from velocitas_lib import (
 )
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "app_deployment"))
+from build_vehicleapp import build_vehicleapp  # noqa: E402
 
 
 def is_vehicleapp_installed(
