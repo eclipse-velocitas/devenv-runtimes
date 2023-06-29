@@ -119,6 +119,13 @@ jobs:
           pip install -r requirements.txt
           pytest -s ./integration/integration_test.py
 
+      - name: Upload log files as artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: "Log files local"
+          path: runtime-local/test/logs/runtime-local
+
   run-k3d-integration-tests:
     name: Run Integration Tests for runtime-k3d
     runs-on: ubuntu-22.04
@@ -159,6 +166,5 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: "Log files"
-          path: |
-            ./runtime-k3d/test/logs/runtime-k3d
+          name: "Log files K3D"
+          path: runtime-k3d/test/logs/runtime-k3d
