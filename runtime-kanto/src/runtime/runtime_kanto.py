@@ -30,22 +30,22 @@ def remove_container(log_output: TextIOWrapper | int = subprocess.DEVNULL):
     Args:
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
-    subprocess.check_call(
+    subprocess.call(
         ["kanto-cm", "remove", "-f", "-n", "databroker"],
         stdout=log_output,
         stderr=log_output,
     )
-    subprocess.check_call(
+    subprocess.call(
         ["kanto-cm", "remove", "-f", "-n", "mosquitto"],
         stdout=log_output,
         stderr=log_output,
     )
-    subprocess.check_call(
+    subprocess.call(
         ["kanto-cm", "remove", "-f", "-n", "feedercan"],
         stdout=log_output,
         stderr=log_output,
     )
-    subprocess.check_call(
+    subprocess.call(
         ["kanto-cm", "remove", "-f", "-n", "seatservice"],
         stdout=log_output,
         stderr=log_output,
@@ -90,7 +90,6 @@ def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DE
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
     adapt_feedercan_deployment_file()
-    spinner.write("starting")
     kanto = subprocess.Popen(
         [
             "sudo",
@@ -128,6 +127,7 @@ def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DE
     if kanto.poll() == 1:
         spinner.text = "Starting Kanto failed!"
         spinner.fail("💥")
+        stop_kanto(log_output)
         return
 
     spinner.text = "Kanto is ready to use!"
