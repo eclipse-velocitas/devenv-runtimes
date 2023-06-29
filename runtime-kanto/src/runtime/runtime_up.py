@@ -14,7 +14,7 @@
 
 import signal
 from controlplane_kanto import configure_controlplane
-from runtime_kanto import start_kanto
+from runtime_kanto import start_kanto, is_kanto_running
 from runtime_down import runtime_down
 from yaspin import yaspin
 
@@ -32,7 +32,8 @@ def runtime_up():
             spinner.ok("✅")
             spinner.text = "Starting Kanto..."
             spinner.start()
-            start_kanto(spinner, log_output)
+            if not is_kanto_running(log_output):
+                start_kanto(spinner, log_output)
         except Exception as err:
             log_output.write(str(err))
             spinner.fail("💥")

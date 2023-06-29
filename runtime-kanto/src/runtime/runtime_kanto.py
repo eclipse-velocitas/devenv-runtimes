@@ -82,6 +82,23 @@ def undeploy_runtime(
     spinner.write(status)
 
 
+def is_kanto_running(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bool:
+    try:
+        subprocess.check_call(
+            [
+                "kanto-cm",
+                "sysinfo",
+                "--timeout",
+                "1",
+            ],
+            stdout=log_output,
+            stderr=log_output,
+        )
+    except Exception:
+        return False
+    return True
+
+
 def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DEVNULL):
     """Starting the Kanto process in background
 
