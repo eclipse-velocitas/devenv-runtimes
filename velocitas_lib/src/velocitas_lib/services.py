@@ -146,3 +146,18 @@ def get_services() -> List[Service]:
             services.append(Service(service_id, service_config))
 
     return services
+
+def get_specific_service(service_id: str) -> Service:
+    """Return the specified service as Python object."""
+    services = get_services()
+    services = list(filter(lambda service: service.id == service_id, services))
+    if len(services) == 0:
+        raise RuntimeError(f"Service with id '{service_id}' not defined")
+    if len(services) > 1:
+        raise RuntimeError(
+            f"Multiple service definitions of id '{service_id}' found, which to take?"
+        )
+    return services[0]
+
+def get_service_port(service_id: str) -> str:
+    return get_specific_service(service_id).config.ports[0]

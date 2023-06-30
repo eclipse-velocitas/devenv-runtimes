@@ -23,9 +23,8 @@ from velocitas_lib import (
     get_app_manifest,
     get_script_path,
     require_env,
-    is_docker_image_build_locally,
-    push_docker_image_to_registry
 )
+from velocitas_lib.docker import is_docker_image_build_locally, push_docker_image_to_registry
 
 
 def is_vehicleapp_installed(

@@ -14,9 +14,8 @@
 
 from yaspin import yaspin
 
-from velocitas_lib import (
-    create_log_file, build_vehicleapp_image
-)
+from velocitas_lib.docker import build_vehicleapp_image
+from velocitas_lib import create_log_file
 
 
 def build_vehicleapp():

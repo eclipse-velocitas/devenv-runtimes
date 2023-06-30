@@ -14,7 +14,6 @@
 
 import os
 import subprocess
-import json
 from io import TextIOWrapper
 import sys
 
@@ -22,12 +21,10 @@ from yaspin import yaspin
 
 from velocitas_lib import (
     create_log_file,
-    get_app_manifest,
-    get_package_path,
-    is_docker_image_build_locally,
-    get_service_port,
-    push_docker_image_to_registry,
+    get_app_manifest
 )
+from velocitas_lib.services import get_service_port
+from velocitas_lib.docker import is_docker_image_build_locally, push_docker_image_to_registry
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "app_deployment"))
 from build_vehicleapp import build_vehicleapp  # noqa: E402
@@ -78,14 +75,11 @@ def create_container(
         app_name (str): App name for container creation
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
-    with open(f"{get_package_path()}/runtime.json") as f:
-        runtime = json.loads(f.read())
-
     middleware_type = "native"
     app_registry = "localhost:12345"
-    vdb_port = get_service_port(runtime, "vehicledatabroker")
+    vdb_port = get_service_port("vehicledatabroker")
     vdb_address = "grpc://127.0.0.1"
-    mqtt_port = get_service_port(runtime, "mqtt-broker")
+    mqtt_port = get_service_port("mqtt-broker")
     mqtt_address = "mqtt://127.0.0.1"
 
     subprocess.check_call(
