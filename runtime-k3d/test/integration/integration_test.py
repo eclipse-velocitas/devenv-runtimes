@@ -37,8 +37,7 @@ image_reg = {compile(r"localhost:12345/sampleapp\s+local.+"): False}
 pods_regs = {
     compile(r".*mqttbroker-.+-.+\s+1/1\s+Running.*"): False,
     compile(r".*bash-.+-.+\s+1/1\s+Running.*"): False,
-    compile(r".*seatservice-.+-.+\s+2/2\s+Running.*"): False,
-    compile(r".*feedercan-.+-.+\s+2/2\s+Running.*"): False,
+    compile(r".*mockservice-.+-.+\s+2/2\s+Running.*"): False,
     compile(r".*vehicledatabroker-.+-.+\s+2/2\s+Running.*"): False,
     compile(r".*zipkin-.+-.+\s+1/1\s+Running.*"): False,
     compile(r".*sampleapp-.+-.+\s+2/2\s+Running.*"): False,

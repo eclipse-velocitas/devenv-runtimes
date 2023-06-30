@@ -15,39 +15,40 @@
 import argparse
 import signal
 import subprocess
+import sys
 import time
-from typing import Dict
+from typing import Dict, Optional
 
-from lib import get_specific_service, run_service, stop_container, stop_service
+from local_lib import run_service, stop_container, stop_service
 from yaspin import yaspin
 
 from velocitas_lib import get_log_file_name
+from velocitas_lib.services import Service, get_services, get_specific_service
 
 spawned_processes: Dict[str, subprocess.Popen] = {}
 
 
-def run_specific_service(service_id: str) -> None:
+def run_specific_service(service: Service) -> None:
     """Run specified service."""
 
-    with yaspin(text=f"Starting service {service_id}", color="cyan") as spinner:
+    with yaspin(text=f"Starting service {service.id}", color="cyan") as spinner:
         try:
-            service = get_specific_service(service_id)
             stop_service(service)
-            spawned_processes[service_id] = run_service(service)
+            spawned_processes[service.id] = run_service(service)
             spinner.ok("✅")
         except RuntimeError as error:
             spinner.write(error.args)
             spinner.fail("💥")
             terminate_spawned_processes()
-            print(f"Starting {service_id=} failed")
+            print(f"Starting {service.id=} failed")
             with open(
-                get_log_file_name(service_id, "runtime-local"),
+                get_log_file_name(service.id, "runtime-local"),
                 mode="r",
                 encoding="utf-8",
             ) as log:
-                print(f">>>> Start log of {service_id} >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                print(f">>>> Start log of {service.id} >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
                 print(log.read(), end="")
-                print(f"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< End log of {service_id} <<<<")
+                print(f"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< End log of {service.id} <<<<")
 
 
 def wait_while_processes_are_running():
@@ -71,6 +72,22 @@ def handler(_signum, _frame):  # noqa: U101 unused arguments
     terminate_spawned_processes()
 
 
+def main(service_id: str) -> bool:
+    service: Optional[Service] = None
+    try:
+        service = get_specific_service(service_id)
+    except RuntimeError as e:
+        print(f"Error: {e.__str__()}")
+        print("Available services:")
+        for service in get_services(verbose=False):
+            print(f" * {service.id!r}")
+        return False
+
+    run_specific_service(service)
+    wait_while_processes_are_running()
+    return True
+
+
 if __name__ == "__main__":
     # The arguments we accept
     parser = argparse.ArgumentParser(
@@ -85,5 +102,5 @@ if __name__ == "__main__":
 
     signal.signal(signal.SIGINT, handler)
     signal.signal(signal.SIGTERM, handler)
-    run_specific_service(args.service_id)
-    wait_while_processes_are_running()
+
+    sys.exit(0 if main(args.service_id) else -1)
