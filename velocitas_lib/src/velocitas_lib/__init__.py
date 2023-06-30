@@ -18,7 +18,7 @@ import os
 import sys
 from io import TextIOWrapper
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict
 
 
 def require_env(name: str) -> str:
@@ -68,50 +68,9 @@ def get_package_path() -> Path:
     )
 
 
-def get_cache_data() -> dict[str, Any]:
+def get_cache_data() -> Dict[str, Any]:
     """Return the data of the cache as Python object."""
     return json.loads(require_env("VELOCITAS_CACHE_DATA"))
-
-
-def get_services() -> dict[str, Any]:
-    """Return all specified services as Python object."""
-    path = f"{get_package_path()}/runtime.json"
-    variable_value = require_env("runtimeFilePath")
-
-    if variable_value is not None:
-        overwritten_path = Path(variable_value)
-        if not overwritten_path.is_absolute():
-            overwritten_path = Path(get_workspace_dir()).joinpath(overwritten_path)
-
-        if overwritten_path.exists():
-            path = overwritten_path
-            print(f"runtime.json path redirected to {path}")
-
-    return json.load(
-        open(
-            path,
-            encoding="utf-8",
-        )
-    )
-
-
-def json_obj_to_flat_map(obj, prefix: str = "", separator: str = ".") -> dict[str, str]:
-    """Flatten a JSON Object into a one dimensional dict by joining the keys
-    with the specified separator."""
-    result = dict[str, str]()
-    if isinstance(obj, dict):
-        for key, value in obj.items():
-            nested_key = f"{prefix}{separator}{key}"
-            result.update(json_obj_to_flat_map(value, nested_key, separator))
-    elif isinstance(obj, list):
-        for index, value in enumerate(obj):
-            nested_key = f"{prefix}{separator}{index}"
-            result.update(json_obj_to_flat_map(value, nested_key, separator))
-    else:
-        nested_key = f"{prefix}"
-        result[nested_key] = obj
-
-    return result
 
 
 def get_log_file_name(service_id: str, runtime_id: str) -> str:

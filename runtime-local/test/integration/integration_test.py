@@ -13,6 +13,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
+import sys
 from pathlib import Path
 from re import Pattern, compile
 from subprocess import PIPE, Popen
@@ -56,7 +57,7 @@ def run_command_until_logs_match(command: str, regex_service: Pattern[str]) -> b
         if proc.poll() is not None:
             print(f"Timeout reached after {timeout_sec} seconds, process killed!")
             return False
-        print(line)
+        sys.stdout.write(line)
         if regex_service is not None and regex_service.search(line):
             timer.cancel()
             break

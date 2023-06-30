@@ -16,7 +16,26 @@ import os
 import re
 from typing import Dict
 
-from velocitas_lib import get_cache_data, get_package_path, json_obj_to_flat_map
+from velocitas_lib import get_cache_data, get_package_path
+
+
+def json_obj_to_flat_map(obj, prefix: str = "", separator: str = ".") -> Dict[str, str]:
+    """Flatten a JSON Object into a one dimensional dict by joining the keys
+    with the specified separator."""
+    result = dict[str, str]()
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            nested_key = f"{prefix}{separator}{key}"
+            result.update(json_obj_to_flat_map(value, nested_key, separator))
+    elif isinstance(obj, list):
+        for index, value in enumerate(obj):
+            nested_key = f"{prefix}{separator}{index}"
+            result.update(json_obj_to_flat_map(value, nested_key, separator))
+    else:
+        nested_key = f"{prefix}"
+        result[nested_key] = obj
+
+    return result
 
 
 class ProjectVariables:

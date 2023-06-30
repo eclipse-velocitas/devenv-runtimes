@@ -27,11 +27,10 @@ from velocitas_lib import (
     get_cache_data,
     get_package_path,
     get_script_path,
-    get_services,
     get_workspace_dir,
-    json_obj_to_flat_map,
     require_env,
 )
+from velocitas_lib.services import get_services
 
 
 @pytest.fixture()
@@ -109,46 +108,20 @@ def test_get_cache_data__returns_cache_data(set_velocitas_cache_data):  # type: 
     assert get_cache_data()["testPropB"] == "testValueB"
 
 
-def test_json_obj_to_flat_map__obj_is_dict__returns_replaced_cache_data_with_separator(
-    set_velocitas_cache_data,  # type: ignore
-):
-    separator = "test.separator"
-    cache_data_with_keys_to_replace = json_obj_to_flat_map(get_cache_data(), separator)
-    assert cache_data_with_keys_to_replace[f"{separator}.testPropA"] == "testValueA"
-    assert cache_data_with_keys_to_replace[f"{separator}.testPropB"] == "testValueB"
-
-
-def test_json_obj_to_flat_map__obj_is_list__returns_replaced_cache_data_with_separator(
-    set_velocitas_cache_data,  # type: ignore
-):
-    separator = "test.separator"
-    cache_data_with_keys_to_replace = json_obj_to_flat_map(
-        list(get_cache_data()), separator
-    )
-    assert cache_data_with_keys_to_replace[f"{separator}.0"] == "testPropA"
-    assert cache_data_with_keys_to_replace[f"{separator}.1"] == "testPropB"
-
-
-def test_json_obj_to_flat_map__obj_is_str__returns_replaced_cache_data_with_separator(
-    set_velocitas_cache_data,  # type: ignore
-):
-    separator = "test.separator"
-    cache_data_with_keys_to_replace = json_obj_to_flat_map("test", separator)
-    assert cache_data_with_keys_to_replace[f"{separator}"] == "test"
-
-
 def test_get_services__no_overwrite_provided__returns_default_services(
     mock_filesystem: FakeFilesystem,
 ):
     os.environ["runtimeFilePath"] = "runtime.json"
     mock_filesystem.create_file(
-        f"{get_package_path()}/runtime.json", contents='[ { "id": "service1" } ]'
+        f"{get_package_path()}/runtime.json",
+        contents='[ { "id": "service1", "config": [ { "key": "image", "value": "image-service1" } ] } ]',
     )
 
     all_services = get_services()
 
     assert len(all_services) == 1
-    assert all_services[0]["id"] == "service1"
+    assert all_services[0].id == "service1"
+    assert all_services[0].config.image == "image-service1"
 
 
 def test_get_services__overwrite_provided__returns_overwritten_services(
@@ -157,14 +130,16 @@ def test_get_services__overwrite_provided__returns_overwritten_services(
     os.environ["runtimeFilePath"] = "runtime.json"
 
     mock_filesystem.create_file(
-        f"{get_package_path()}/runtime.json", contents='[ { "id": "service1" } ]'
+        f"{get_package_path()}/runtime.json",
+        contents='[ { "id": "service1", "config": [ { "key": "image", "value": "image-service1" } ] } ]',
     )
     mock_filesystem.create_file(
         f"{get_workspace_dir()}/runtime.json",
-        contents='[ { "id": "my-custom-service" } ]',
+        contents='[ { "id": "my-custom-service", "config": [ { "key": "image", "value": "image-my-custom-service" } ] } ]',
     )
 
     all_services = get_services()
 
     assert len(all_services) == 1
-    assert all_services[0]["id"] == "my-custom-service"
+    assert all_services[0].id == "my-custom-service"
+    assert all_services[0].config.image == "image-my-custom-service"

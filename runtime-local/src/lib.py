@@ -14,33 +14,21 @@
 
 import subprocess
 import time
-from enum import Enum
 from io import TextIOWrapper
 from itertools import filterfalse
 from re import Pattern, compile
 from threading import Timer
-from typing import Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
-from velocitas_lib import create_log_file, get_script_path, get_services
-from velocitas_lib.variables import ProjectVariables
-
-
-class MiddlewareType(Enum):
-    """Enumeration containing all possible middleware types."""
-
-    NATIVE = (0,)
-    DAPR = 1
+from velocitas_lib import create_log_file, get_script_path
+from velocitas_lib.middleware import MiddlewareType, get_middleware_type
+from velocitas_lib.services import Service, get_services
 
 
-def get_middleware_type() -> MiddlewareType:
-    """Return the current middleware type."""
-    return MiddlewareType.DAPR
-
-
-def get_specific_service(service_id: str):
+def get_specific_service(service_id: str) -> Service:
     """Return the specified service as Python object."""
     services = get_services()
-    services = list(filter(lambda service: service["id"] == service_id, services))
+    services = list(filter(lambda service: service.id == service_id, services))
     if len(services) == 0:
         raise RuntimeError(f"Service with id '{service_id}' not defined")
     if len(services) > 1:
@@ -55,9 +43,9 @@ def get_dapr_sidecar_args(
     app_port: Optional[str] = None,
     grpc_port: Optional[str] = None,
     http_port: Optional[str] = None,
-) -> Tuple[list[str], dict[str, Optional[str]]]:
+) -> Tuple[List[str], Dict[str, Optional[str]]]:
     """Return all arguments to spawn a dapr sidecar for the given app."""
-    env = dict()
+    env: Dict[str, Optional[str]] = dict()
     env["DAPR_GRPC_PORT"] = None
     env["DAPR_HTTP_PORT"] = None
 
@@ -92,69 +80,40 @@ dapr_pattern: Pattern[str] = compile(
 )
 
 
-def run_service(service_spec) -> subprocess.Popen:
+def run_service(service: Service) -> subprocess.Popen:
     """Run a single service.
 
     Args:
-        service_spec: The specification of the service.
+        service: The service.
 
     Returns:
        The Popen object representing the root process running the required service
     """
-    service_id = service_spec["id"]
+    log = create_log_file(service.id, "runtime-local")
+    log.write(f"Starting {service.id!r}\n")
 
-    log = create_log_file(service_id, "runtime-local")
-    log.write(f"Starting {service_id!r}\n")
-
-    no_dapr = False
-
-    container_image = None
-    service_port = None
     env_vars = dict[str, Optional[str]]()
-    port_forwards = []
-    mounts = []
-    args = []
-    patterns = []
-
-    variables = ProjectVariables()
-
-    for config_entry in service_spec["config"]:
-        if config_entry["key"] == "image":
-            container_image = variables.replace_occurrences(config_entry["value"])
-        elif config_entry["key"] == "env":
-            pair = config_entry["value"].split("=", 1)
-            env_vars[pair[0].strip()] = None
-            if len(pair) > 1:
-                env_vars[pair[0].strip()] = variables.replace_occurrences(
-                    pair[1].strip()
-                )
-        elif config_entry["key"] == "port":
-            service_port = variables.replace_occurrences(config_entry["value"])
-        elif config_entry["key"] == "no-dapr":
-            no_dapr = config_entry["value"]
-        elif config_entry["key"] == "arg":
-            args.append(variables.replace_occurrences(config_entry["value"]))
-        elif config_entry["key"] == "port-forward":
-            port_forwards.append(variables.replace_occurrences(config_entry["value"]))
-        elif config_entry["key"] == "mount":
-            mounts.append(variables.replace_occurrences(config_entry["value"]))
-        elif config_entry["key"] == "start-pattern":
-            patterns.append(compile(config_entry["value"]))
-
-    dapr_args = []
-    if not no_dapr and get_middleware_type() == MiddlewareType.DAPR:
-        dapr_args, dapr_env = get_dapr_sidecar_args(service_id, service_port)
+    env_vars.update(service.config.env_vars)
+    dapr_args: List[str] = []
+    patterns: List[Pattern[str]] = [
+        compile(pattern) for pattern in service.config.startup_log_patterns
+    ]
+    if service.config.use_dapr and get_middleware_type() == MiddlewareType.DAPR:
+        dapr_args, dapr_env = get_dapr_sidecar_args(
+            service.id,
+            service.config.ports[0] if len(service.config.ports) > 0 else None,
+        )
         dapr_args = dapr_args + ["--"]
         env_vars.update(dapr_env)
         patterns.append(dapr_pattern)
 
     port_forward_args = []
-    for port_forward in port_forwards:
+    for port_forward in service.config.port_forwards:
         port_forward_args.append("-p")
         port_forward_args.append(port_forward)
 
     mount_args = []
-    for mount in mounts:
+    for mount in service.config.mounts:
         mount_args.append("-v")
         mount_args.append(mount)
 
@@ -173,23 +132,23 @@ def run_service(service_spec) -> subprocess.Popen:
         "--rm",
         "--init",
         "--name",
-        service_id,
+        service.id,
         *env_forward_args,
         *port_forward_args,
         *mount_args,
         "--network",
         "host",
-        container_image,
-        *args,
+        service.config.image,
+        *service.config.args,
     ]
 
     return spawn_process(docker_args, log, patterns, startup_timeout_sec=60)
 
 
 def spawn_process(
-    args: list[str],
+    args: List[str],
     log: TextIOWrapper,
-    patterns: list[Pattern[str]],
+    patterns: List[Pattern[str]],
     startup_timeout_sec: int,
 ) -> subprocess.Popen:
     """Spawn the process defined by the passed args.
@@ -259,27 +218,20 @@ def stop_container(service_id, log=None):
     )
 
 
-def stop_service(service_spec):
+def stop_service(service: Service):
     """Stop the given service.
 
     Args:
-        service_spec (_type_): The service to stop.
+        service (Service): The service to stop.
     """
-    service_id = service_spec["id"]
-    no_dapr = False
+    log = create_log_file(service.id, "runtime-local")
+    log.write(f"Stopping {service.id!r}\n")
 
-    log = create_log_file(service_id, "runtime-local")
-    log.write(f"Stopping {service_id!r}\n")
-
-    for config_entry in service_spec["config"]:
-        if config_entry["key"] == "no-dapr":
-            no_dapr = config_entry["value"]
-
-    if not no_dapr and get_middleware_type() == MiddlewareType.DAPR:
+    if service.config.use_dapr and get_middleware_type() == MiddlewareType.DAPR:
         subprocess.call(
-            ["dapr", "stop", "--app-id", service_id],
+            ["dapr", "stop", "--app-id", service.id],
             stderr=subprocess.STDOUT,
             stdout=log,
         )
 
-    stop_container(service_id, log)
+    stop_container(service.id, log)

@@ -19,15 +19,17 @@ from typing import Optional
 
 import pytest
 
+from velocitas_lib.services import ServiceSpecConfig
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src/runtime"))
 import deployment.gen_podspec as gen_podspec
-from deployment.lib import ServiceSpecConfig, generate_nodeport
+from deployment.lib import generate_nodeport
 
 
 @pytest.mark.parametrize("ports", [["1234"], ["0"], ["4567", "1234"]])
 def test_gen_port_spec(ports):
     port_spec = gen_podspec.generate_port_spec(
-        ServiceSpecConfig(None, None, None, None, ports, None)
+        ServiceSpecConfig(image="image", ports=ports)
     )
     desired = [
         {
@@ -43,7 +45,7 @@ def test_gen_port_spec(ports):
 @pytest.mark.parametrize("ports", [["1234"], ["0"], ["4567", "1234"]])
 def test_gen_clusterIp_port_spec(ports):
     port_spec = gen_podspec.generate_clusterIP_port_spec(
-        ServiceSpecConfig(None, None, None, None, ports, None)
+        ServiceSpecConfig(image="image", ports=ports)
     )
     desired = [
         {
@@ -119,9 +121,7 @@ def test_get_mount_file(mount):
     ],
 )
 def test_get_volumes_file(mount):
-    volumes = gen_podspec.get_volumes(
-        ServiceSpecConfig(None, None, None, None, None, [mount])
-    )
+    volumes = gen_podspec.get_volumes(ServiceSpecConfig(image="image", mounts=[mount]))
     file_name = os.path.splitext(gen_podspec.get_mount_folder_and_file(mount)[1])[0]
     desired = [
         {
@@ -141,9 +141,7 @@ def test_get_volumes_file(mount):
     ],
 )
 def test_get_volumes_folder(mount):
-    volumes = gen_podspec.get_volumes(
-        ServiceSpecConfig(None, None, None, None, None, [mount])
-    )
+    volumes = gen_podspec.get_volumes(ServiceSpecConfig(image="image", mounts=[mount]))
     desired = [
         {
             "name": "pv-storage",
@@ -163,7 +161,7 @@ def test_get_volumes_folder(mount):
 )
 def test_get_container_mount_file(mount):
     mounts = gen_podspec.generate_container_mount(
-        ServiceSpecConfig(None, None, None, None, None, [mount])
+        ServiceSpecConfig(image="image", mounts=[mount])
     )
     path, file = gen_podspec.get_mount_folder_and_file(mount)
     desired = [
@@ -186,7 +184,7 @@ def test_get_container_mount_file(mount):
 )
 def test_get_container_mount_folder(mount):
     mounts = gen_podspec.generate_container_mount(
-        ServiceSpecConfig(None, None, None, None, None, [mount])
+        ServiceSpecConfig(image="image", mounts=[mount])
     )
     path, _ = gen_podspec.get_mount_folder_and_file(mount)
     desired = [{"mountPath": f"{path}", "name": "pv-storage"}]
@@ -200,9 +198,7 @@ def test_get_container_mount_folder(mount):
 def test_get_env(key, value):
     env = dict[str, Optional[str]]()
     env[key] = value
-    env_array = gen_podspec.get_env(
-        ServiceSpecConfig(None, env, None, None, None, None)
-    )
+    env_array = gen_podspec.get_env(ServiceSpecConfig(image="image", env_vars=env))
 
     desired = [{"name": key, "value": value}]
     assert env_array == desired

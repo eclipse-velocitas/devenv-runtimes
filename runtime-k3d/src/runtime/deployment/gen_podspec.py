@@ -19,16 +19,12 @@ from typing import Any, Tuple
 
 import ruamel.yaml as yaml
 
+from velocitas_lib import get_script_path, get_workspace_dir  # noqa: E402
+from velocitas_lib.services import ServiceSpecConfig, get_services, parse_service_config
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "deployment"))
 
-from lib import (  # noqa: E402
-    ServiceSpecConfig,
-    create_cluster_ip_spec,
-    generate_nodeport,
-    parse_service_config,
-)
-
-from velocitas_lib import get_script_path, get_services, get_workspace_dir  # noqa: E402
+from lib import create_cluster_ip_spec, generate_nodeport  # noqa: E402
 
 
 def find_service_spec(lst: list[dict[str, Any]], kind: str, name: str) -> int:
@@ -71,7 +67,7 @@ def create_podspec(templates, service_spec) -> list[dict[str, Any]]:
     """
     service_id = service_spec["id"]
     pods = []
-    service_config = parse_service_config(service_spec["config"])
+    service_config = parse_service_config(service_id, service_spec["config"])
 
     template_pod = templates[find_service_spec(templates, "Deployment", service_id)]
 

@@ -21,15 +21,13 @@ from typing import Any
 
 import ruamel.yaml as yaml
 
+from velocitas_lib.services import Service, ServiceSpecConfig, get_services
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "deployment"))
 
-from lib import ServiceSpecConfig, generate_nodeport, parse_service_config  # noqa: E402
+from lib import generate_nodeport  # noqa: E402
 
-from velocitas_lib import (  # noqa: E402
-    get_package_path,
-    get_services,
-    get_workspace_dir,
-)
+from velocitas_lib import get_package_path, get_workspace_dir  # noqa: E402
 
 
 def generate_env_vars_spec(
@@ -54,33 +52,31 @@ def generate_ports_spec(service_spec_config: ServiceSpecConfig) -> list[dict[str
     return ports
 
 
-def generate_values_by_service(service_spec: dict[str, Any]) -> dict[str, Any]:
+def generate_values_by_service(service: Service) -> dict[str, Any]:
     """Generates values specification from the given service spec.
     Args:
-        service_spec: The spec of the service.
+        service: The spec of the service.
     """
-    service_id = re.sub(r"[^a-zA-Z\s]", "", service_spec["id"])
-
-    service_spec_config = parse_service_config(service_spec["config"])
+    service_id = re.sub(r"[^a-zA-Z\s]", "", service.id)
 
     value_spec_key = f"image{service_id.capitalize()}"
     value_spec: dict[str, Any] = {value_spec_key: {}}
 
     value_spec[value_spec_key]["name"] = service_id
-    value_spec[value_spec_key]["repository"] = service_spec_config.image.split(":")[0]
-    value_spec[value_spec_key]["tag"] = service_spec_config.image.split(":")[1]
+    value_spec[value_spec_key]["repository"] = service.config.image.split(":")[0]
+    value_spec[value_spec_key]["tag"] = service.config.image.split(":")[1]
     value_spec[value_spec_key]["pullPolicy"] = "Always"
 
-    if service_spec_config.env_vars:
+    if service.config.env_vars:
         value_spec[value_spec_key]["environmentVariables"] = generate_env_vars_spec(
-            service_spec_config
+            service.config
         )
 
-    if service_spec_config.args:
-        value_spec[value_spec_key]["args"] = service_spec_config.args
+    if service.config.args:
+        value_spec[value_spec_key]["args"] = service.config.args
 
-    if service_spec_config.ports:
-        value_spec[value_spec_key]["ports"] = generate_ports_spec(service_spec_config)
+    if service.config.ports:
+        value_spec[value_spec_key]["ports"] = generate_ports_spec(service.config)
 
     return value_spec
 

@@ -18,9 +18,11 @@ import sys
 
 import pytest
 
+from velocitas_lib.services import ServiceSpecConfig
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src/runtime"))
 import deployment.gen_helm as gen_helm
-from deployment.lib import ServiceSpecConfig, generate_nodeport
+from deployment.lib import generate_nodeport
 
 
 @pytest.mark.parametrize(
@@ -29,7 +31,7 @@ from deployment.lib import ServiceSpecConfig, generate_nodeport
 )
 def test_generate_env_vars_spec(env_vars):
     env_vars_spec = gen_helm.generate_env_vars_spec(
-        ServiceSpecConfig(None, env_vars, None, None, None, None)
+        ServiceSpecConfig(image="image", env_vars=env_vars)
     )
     desired = [
         {
@@ -44,7 +46,7 @@ def test_generate_env_vars_spec(env_vars):
 @pytest.mark.parametrize("ports", [["9834"], ["0"], ["4567", "6789"]])
 def test_gen_port_spec(ports):
     port_spec = gen_helm.generate_ports_spec(
-        ServiceSpecConfig(None, None, None, None, ports, None)
+        ServiceSpecConfig(image="image", ports=ports)
     )
     desired = [
         {
