@@ -46,4 +46,3 @@ spec:
           # deprecated, required for C++ SDK based apps up to SDK v0.3.2
           - name: MQTT_BROKER_URI
             value: tcp://mqttbroker.default.svc.cluster.local:1883
-
