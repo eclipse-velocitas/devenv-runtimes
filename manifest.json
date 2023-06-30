@@ -272,6 +272,12 @@
                     "type": "string",
                     "description": "Path of Dockerfile to use",
                     "default": "./app/Dockerfile"
+                },
+                {
+                    "name": "runtimeFilePath",
+                    "type": "string",
+                    "description": "Path to the file describing your custom runtime configuration.",
+                    "default": "runtime.json"
                 }
             ]
         }
