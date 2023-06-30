@@ -113,13 +113,15 @@ def test_get_services__no_overwrite_provided__returns_default_services(
 ):
     os.environ["runtimeFilePath"] = "runtime.json"
     mock_filesystem.create_file(
-        f"{get_package_path()}/runtime.json", contents='[ { "id": "service1" } ]'
+        f"{get_package_path()}/runtime.json",
+        contents='[ { "id": "service1", "config": [ { "key": "image", "value": "image-service1" } ] } ]',
     )
 
     all_services = get_services()
 
     assert len(all_services) == 1
     assert all_services[0].id == "service1"
+    assert all_services[0].config.image == "image-service1"
 
 
 def test_get_services__overwrite_provided__returns_overwritten_services(
@@ -128,14 +130,16 @@ def test_get_services__overwrite_provided__returns_overwritten_services(
     os.environ["runtimeFilePath"] = "runtime.json"
 
     mock_filesystem.create_file(
-        f"{get_package_path()}/runtime.json", contents='[ { "id": "service1" } ]'
+        f"{get_package_path()}/runtime.json",
+        contents='[ { "id": "service1", "config": [ { "key": "image", "value": "image-service1" } ] } ]',
     )
     mock_filesystem.create_file(
         f"{get_workspace_dir()}/runtime.json",
-        contents='[ { "id": "my-custom-service" } ]',
+        contents='[ { "id": "my-custom-service", "config": [ { "key": "image", "value": "image-my-custom-service" } ] } ]',
     )
 
     all_services = get_services()
 
     assert len(all_services) == 1
     assert all_services[0].id == "my-custom-service"
+    assert all_services[0].config.image == "image-my-custom-service"

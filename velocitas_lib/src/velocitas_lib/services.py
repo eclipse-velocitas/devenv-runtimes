@@ -133,7 +133,6 @@ def get_services() -> List[Service]:
     services: List[Service] = list()
     for service_json in json_array:
         service_id = service_json["id"]
-        # service_interfaces = service_json['interfaces']
         service_config = None
         is_service_enabled = True
         if "config" in service_json:
