@@ -57,8 +57,13 @@ def run_services() -> None:
 def wait_while_processes_are_running():
     while len(spawned_processes) > 0:
         time.sleep(1)
-        for process in spawned_processes.values():
-            process.poll()
+        for name, process in spawned_processes.items():
+            poll_result = process.poll()
+
+            if isinstance(poll_result, int):
+                print(f'Process terminated: {name!r} result: {poll_result}')
+                del spawned_processes[name]
+                break
 
 
 def terminate_spawned_processes():

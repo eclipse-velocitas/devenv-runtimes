@@ -100,6 +100,18 @@
                     "type": "string",
                     "description": "Path to the file describing your custom runtime configuration.",
                     "default": "runtime.json"
+                },
+                {
+                    "name": "useFeederCan",
+                    "type": "string",
+                    "description": "Indicates if the CAN feeder service shall be used. This service provides replay of pre-recorded CAN file.",
+                    "default": "false"
+                },
+                {
+                    "name": "useVehicleMock",
+                    "type": "string",
+                    "description": "Indicates if the vehicle mock service shall be used. This service provides a mockable interface for all VSS datapoints.",
+                    "default": "true"
                 }
             ]
         },
@@ -167,6 +179,18 @@
                     "type": "string",
                     "description": "Path to the file describing your custom runtime configuration.",
                     "default": "runtime.json"
+                },
+                {
+                    "name": "useFeederCan",
+                    "type": "string",
+                    "description": "Indicates if the CAN feeder service shall be used. This service provides replay of pre-recorded CAN file.",
+                    "default": "false"
+                },
+                {
+                    "name": "useVehicleMock",
+                    "type": "string",
+                    "description": "Indicates if the vehicle mock service shall be used. This service provides a mockable interface for all VSS datapoints.",
+                    "default": "true"
                 }
             ]
         },
