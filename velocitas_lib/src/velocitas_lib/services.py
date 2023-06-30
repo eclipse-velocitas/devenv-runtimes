@@ -37,7 +37,9 @@ class Service(NamedTuple):
     config: ServiceSpecConfig
 
 
-def parse_service_config(service_spec_config: Dict) -> ServiceSpecConfig:
+def parse_service_config(
+    service_id: str, service_spec_config: Dict
+) -> ServiceSpecConfig:
     """Parse service spec configuration and return it as an named tuple.
 
     Args:
@@ -92,7 +94,7 @@ def parse_service_config(service_spec_config: Dict) -> ServiceSpecConfig:
             patterns.append(value)
 
     if container_image is None:
-        raise RuntimeError("Container image needs to be provided!")
+        raise KeyError(f"Service {service_id!r} does not provide an image!")
 
     return ServiceSpecConfig(
         image=container_image,
@@ -132,13 +134,16 @@ def get_services() -> List[Service]:
     for service_json in json_array:
         service_id = service_json["id"]
         # service_interfaces = service_json['interfaces']
-        service_config = ServiceSpecConfig(image="none")
+        service_config = None
         is_service_enabled = True
         if "config" in service_json:
-            service_config = parse_service_config(service_json["config"])
+            service_config = parse_service_config(service_id, service_json["config"])
             is_service_enabled = service_config.is_enabled
 
         if is_service_enabled:
+            if service_config is None:
+                raise KeyError(f"Service {service_id!r} does not have a config entry!")
+
             services.append(Service(service_id, service_config))
 
     return services

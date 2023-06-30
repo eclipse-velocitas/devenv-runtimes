@@ -67,7 +67,7 @@ def create_podspec(templates, service_spec) -> list[dict[str, Any]]:
     """
     service_id = service_spec["id"]
     pods = []
-    service_config = parse_service_config(service_spec["config"])
+    service_config = parse_service_config(service_id, service_spec["config"])
 
     template_pod = templates[find_service_spec(templates, "Deployment", service_id)]
 
