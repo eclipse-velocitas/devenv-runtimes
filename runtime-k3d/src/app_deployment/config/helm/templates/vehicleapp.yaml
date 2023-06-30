@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Robert Bosch GmbH and Microsoft Corporation
+# Copyright (c) 2022-2023 Robert Bosch GmbH and Microsoft Corporation
 #
 # This program and the accompanying materials are made available under the
 # terms of the Apache License, Version 2.0 which is available at
@@ -40,6 +40,10 @@ spec:
           image: "{{ .Values.imageVehicleApp.repository }}:{{ .Values.imageVehicleApp.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.imageVehicleApp.pullPolicy }}
           env:
-          # required for C++ SDK
+          # required for C++ SDK based apps
+          - name: SDV_MQTT_ADDRESS
+            value: tcp://mqttbroker.default.svc.cluster.local:1883
+          # deprecated, required for C++ SDK based apps up to SDK v0.3.2
           - name: MQTT_BROKER_URI
             value: tcp://mqttbroker.default.svc.cluster.local:1883
+
