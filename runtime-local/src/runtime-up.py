@@ -61,7 +61,7 @@ def wait_while_processes_are_running():
             poll_result = process.poll()
 
             if isinstance(poll_result, int):
-                print(f'Process terminated: {name!r} result: {poll_result}')
+                print(f"Process terminated: {name!r} result: {poll_result}")
                 del spawned_processes[name]
                 break
 
