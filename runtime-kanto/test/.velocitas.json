@@ -1,0 +1,12 @@
+{
+    "packages": [
+        {
+            "name": "devenv-runtimes",
+            "version": "hash_id"
+        },
+        {
+            "name": "devenv-devcontainer-setup",
+            "version": "v1.1.8"
+        }
+    ]
+}
