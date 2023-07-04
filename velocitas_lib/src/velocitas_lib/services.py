@@ -13,6 +13,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
+import os
+import re
 from pathlib import Path
 from typing import Dict, List, NamedTuple, Optional
 
@@ -35,6 +37,28 @@ class ServiceSpecConfig(NamedTuple):
 class Service(NamedTuple):
     id: str
     config: ServiceSpecConfig
+
+
+def resolve_functions(input_str: str) -> str:
+    input_str_match = re.search(r"\$(\w+)\((.*)\s*\)", input_str)
+    if not input_str_match:
+        return input_str
+
+    function_name = input_str_match.group(1).strip()
+    parameter = input_str_match.group(2).strip()
+
+    if function_name == "pathInWorkspaceOrPackage":
+        path_in_workspace = os.path.join(get_workspace_dir(), parameter)
+        if os.path.isfile(path_in_workspace):
+            return path_in_workspace
+
+        path_in_package = os.path.join(get_package_path(), parameter)
+        if os.path.isfile(path_in_package):
+            return path_in_package
+
+        raise RuntimeError(f"Path {parameter!r} not found in workspace or package!")
+    else:
+        raise RuntimeError(f"Unsupported function: {function_name!r}!")
 
 
 def parse_service_config(
@@ -64,6 +88,7 @@ def parse_service_config(
 
         if isinstance(value, str):
             value = variables.replace_occurrences(value)
+            value = resolve_functions(value)
 
         if key == "enabled":
             is_enabled = value is True or value == "true"

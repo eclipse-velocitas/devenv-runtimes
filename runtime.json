@@ -176,6 +176,10 @@
                 "value": "VEHICLEDATABROKER_DAPR_APP_ID=vehicledatabroker"
             },
             {
+                "key": "mount",
+                "value": "$pathInWorkspaceOrPackage( ${{ mockFilePath }} ):/mock.py"
+            },
+            {
                 "key": "start-pattern",
                 "value": ".*[cC]onnected to data broker.*"
             }

@@ -71,6 +71,12 @@
                     "type": "string",
                     "description": "Path to the file describing your custom runtime configuration.",
                     "default": "runtime.json"
+                },
+                {
+                    "name": "mockFilePath",
+                    "type": "string",
+                    "description": "Path to the mocking configuration for the mock service",
+                    "default": "mock.py"
                 }
             ]
         },
@@ -138,6 +144,12 @@
                     "type": "string",
                     "description": "Path to the file describing your custom runtime configuration.",
                     "default": "runtime.json"
+                },
+                {
+                    "name": "mockFilePath",
+                    "type": "string",
+                    "description": "Path to the mocking configuration for the mock service",
+                    "default": "mock.py"
                 }
             ]
         },
