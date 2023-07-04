@@ -109,7 +109,7 @@ def parse_service_config(
     )
 
 
-def get_services() -> List[Service]:
+def get_services(verbose: bool = True) -> List[Service]:
     """Return all specified services as Python object."""
     path = Path(f"{get_package_path()}/runtime.json")
     variable_value = require_env("runtimeFilePath")
@@ -121,7 +121,9 @@ def get_services() -> List[Service]:
 
         if overwritten_path.exists():
             path = overwritten_path
-            print(f"runtime.json path redirected to {path}")
+
+            if verbose:
+                print(f"runtime.json path redirected to {path}")
 
     json_array: List[Dict] = json.load(
         open(
@@ -146,3 +148,16 @@ def get_services() -> List[Service]:
             services.append(Service(service_id, service_config))
 
     return services
+
+
+def get_specific_service(service_id: str) -> Service:
+    """Return the specified service as Python object."""
+    services = get_services()
+    services = list(filter(lambda service: service.id == service_id, services))
+    if len(services) == 0:
+        raise RuntimeError(f"Service with id {service_id!r} not defined")
+    if len(services) > 1:
+        raise RuntimeError(
+            f"Multiple service definitions of id {service_id!r} found, which to take?"
+        )
+    return services[0]

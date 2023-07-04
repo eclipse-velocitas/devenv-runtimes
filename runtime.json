@@ -88,6 +88,10 @@
         ],
         "config": [
             {
+                "key": "enabled",
+                "value": "false"
+            },
+            {
                 "key": "image",
                 "value": "ghcr.io/eclipse/kuksa.val.services/seat_service:v0.2.0"
             },
@@ -119,7 +123,7 @@
         "config": [
             {
                 "key": "enabled",
-                "value": "${{ useFeederCan }}"
+                "value": "false"
             },
             {
                 "key": "image",
@@ -163,10 +167,6 @@
         "id": "mockservice",
         "interfaces": [],
         "config": [
-            {
-                "key": "enabled",
-                "value": "${{ useVehicleMock }}"
-            },
             {
                 "key": "image",
                 "value": "ghcr.io/boschglobal/kuksa.val.services/mock_service:latest"
