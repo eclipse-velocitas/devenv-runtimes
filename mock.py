@@ -11,6 +11,7 @@
 # * SPDX-License-Identifier: Apache-2.0
 # ********************************************************************************/
 
+from lib.animator import RepeatMode
 from lib.dsl import (
     create_animation_action,
     create_behavior,
@@ -19,8 +20,6 @@ from lib.dsl import (
     mock_datapoint,
 )
 from lib.trigger import ClockTrigger, EventTrigger, EventType
-
-from lib.animator import RepeatMode
 
 mock_datapoint(
     path="Vehicle.Speed",
