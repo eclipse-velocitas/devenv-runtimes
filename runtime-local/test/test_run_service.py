@@ -29,6 +29,8 @@ def set_env_vars():
     os.environ["runtimeFilePath"] = "./runtime.json"
     os.environ["VELOCITAS_WORKSPACE_DIR"] = "."
     os.environ["VELOCITAS_CACHE_DATA"] = '{"vspec_file_path":""}'
+    os.environ['mockFilePath'] = 'mock.py'
+
 
 
 def test_run_service__invalid_service_id__prints_available_services(
