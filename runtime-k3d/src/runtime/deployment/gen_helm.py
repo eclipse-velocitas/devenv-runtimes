@@ -19,7 +19,7 @@ import shutil
 import sys
 from typing import Any
 
-import yaml
+import ruamel.yaml as yaml
 
 from velocitas_lib.services import Service, ServiceSpecConfig, get_services
 
