@@ -40,25 +40,37 @@ class Service(NamedTuple):
 
 
 def resolve_functions(input_str: str) -> str:
-    input_str_match = re.search(r"\$(\w+)\((.*)\s*\)", input_str)
-    if not input_str_match:
-        return input_str
+    while True:
+        input_str_match = re.search(r"\$(\w+)\((.*)\s*\)", input_str)
 
-    function_name = input_str_match.group(1).strip()
-    parameter = input_str_match.group(2).strip()
+        if not input_str_match:
+            return input_str
 
-    if function_name == "pathInWorkspaceOrPackage":
-        path_in_workspace = os.path.join(get_workspace_dir(), parameter)
-        if os.path.isfile(path_in_workspace):
-            return path_in_workspace
+        function_name = input_str_match.group(1).strip()
+        parameter = input_str_match.group(2).strip()
 
-        path_in_package = os.path.join(get_package_path(), parameter)
-        if os.path.isfile(path_in_package):
-            return path_in_package
+        return_value = None
+        if function_name == "pathInWorkspaceOrPackage":
+            path_in_workspace = os.path.join(get_workspace_dir(), parameter)
+            if os.path.isfile(path_in_workspace):
+                return_value = path_in_workspace
 
-        raise RuntimeError(f"Path {parameter!r} not found in workspace or package!")
-    else:
-        raise RuntimeError(f"Unsupported function: {function_name!r}!")
+            if return_value is None:
+                path_in_package = os.path.join(get_package_path(), parameter)
+                if os.path.isfile(path_in_package):
+                    return_value = path_in_package
+
+            if return_value is None:
+                raise RuntimeError(
+                    f"Path {parameter!r} not found in workspace or package!"
+                )
+        else:
+            raise RuntimeError(f"Unsupported function: {function_name!r}!")
+
+        match_span = input_str_match.span(0)
+        input_str = (
+            input_str[0 : match_span[0]] + return_value + input_str[match_span[1] :]
+        )
 
 
 def parse_service_config(

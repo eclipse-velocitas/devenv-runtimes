@@ -78,6 +78,13 @@ def generate_values_by_service(service: Service) -> dict[str, Any]:
     if service.config.ports:
         value_spec[value_spec_key]["ports"] = generate_ports_spec(service.config)
 
+    value_spec[value_spec_key]["mounts"] = list()
+    for mount in service.config.mounts:
+        from_to = mount.split(":")
+        value_spec[value_spec_key]["mounts"].append(
+            {"id": "foo", "from": from_to[0], "to": from_to[1]}
+        )
+
     return value_spec
 
 
