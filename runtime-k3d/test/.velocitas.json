@@ -8,5 +8,8 @@
             "name": "devenv-devcontainer-setup",
             "version": "v1.1.8"
         }
-    ]
+    ],
+    "variables": {
+        "language": "python"
+    }
 }

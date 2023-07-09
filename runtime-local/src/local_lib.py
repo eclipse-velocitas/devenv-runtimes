@@ -22,20 +22,7 @@ from typing import Dict, List, Optional, Tuple
 
 from velocitas_lib import create_log_file, get_script_path
 from velocitas_lib.middleware import MiddlewareType, get_middleware_type
-from velocitas_lib.services import Service, get_services
-
-
-def get_specific_service(service_id: str) -> Service:
-    """Return the specified service as Python object."""
-    services = get_services()
-    services = list(filter(lambda service: service.id == service_id, services))
-    if len(services) == 0:
-        raise RuntimeError(f"Service with id '{service_id}' not defined")
-    if len(services) > 1:
-        raise RuntimeError(
-            f"Multiple service definitions of id '{service_id}' found, which to take?"
-        )
-    return services[0]
+from velocitas_lib.services import Service
 
 
 def get_dapr_sidecar_args(
