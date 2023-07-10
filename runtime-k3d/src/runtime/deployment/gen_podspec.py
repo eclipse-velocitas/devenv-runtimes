@@ -20,7 +20,7 @@ from typing import Any, Tuple
 import ruamel.yaml as yaml
 
 from velocitas_lib import get_script_path, get_workspace_dir  # noqa: E402
-from velocitas_lib.services import ServiceSpecConfig, get_services, parse_service_config
+from velocitas_lib.services import ServiceSpecConfig, get_services
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "deployment"))
 
