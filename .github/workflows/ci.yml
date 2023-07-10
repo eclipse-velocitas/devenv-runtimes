@@ -111,7 +111,7 @@ jobs:
       - name: Init velocitas project
         run: |
           cd runtime-local/test
-          velocitas init
+          velocitas init -v
 
       - name: Run integration tests for runtime-local
         run: |
@@ -154,7 +154,7 @@ jobs:
       - name: Init velocitas project
         run: |
           cd runtime-k3d/test
-          velocitas init
+          velocitas init -v
 
       - name: Run integration tests for k3d
         run: |
@@ -213,7 +213,7 @@ jobs:
       - name: Init velocitas project
         run: |
           cd runtime-kanto/test
-          velocitas init
+          velocitas init -v
 
       - name: Run integration tests for kanto
         run: |
