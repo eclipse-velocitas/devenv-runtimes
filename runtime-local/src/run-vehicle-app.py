@@ -18,7 +18,7 @@ from typing import Optional
 
 from lib import MiddlewareType, get_dapr_sidecar_args, get_middleware_type
 
-from velocitas_lib import get_services
+from velocitas_lib.services import get_services
 
 
 def get_dapr_app_id(service_id: str) -> str:
@@ -34,7 +34,7 @@ def run_app(
     program_args = [executable_path, *args]
     envs = dict()
     for service in get_services():
-        service_id = service["id"]
+        service_id = service.id
         envs[get_dapr_app_id(service_id)] = service_id
 
     if get_middleware_type() == MiddlewareType.DAPR:

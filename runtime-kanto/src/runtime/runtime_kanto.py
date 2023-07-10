@@ -65,6 +65,8 @@ def remove_container(log_output: TextIOWrapper | int = subprocess.DEVNULL):
 
 
 def adapt_feedercan_deployment_file():
+    """Update the feedercan config with the correct mount path.
+    """
     with open(
         os.path.join(get_script_path(), "deployment", "feedercan.json"),
         "r+",
@@ -95,6 +97,11 @@ def undeploy_runtime(
 
 
 def is_kanto_running(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bool:
+    """Check if Kanto is already running.
+
+    Args:
+        log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
+    """
     if Path("/run/container-management/container-management.sock").exists():
         adapt_socket(log_output)
     else:
@@ -118,6 +125,12 @@ def is_kanto_running(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bo
 
 
 def adapt_socket(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+    """Adapt the access rights for the Kanto socket.
+
+    Args:
+        log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
+    """
+
     subprocess.call(
         [
             "sudo",
@@ -175,10 +188,9 @@ def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DE
 
 
 def stop_kanto(log_output: TextIOWrapper | int = subprocess.DEVNULL):
-    """Starting the Kanto process in background
+    """Stopping the Kanto process.
 
     Args:
-        spinner (Yaspin): The progress spinner to update.
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
     subprocess.check_call(

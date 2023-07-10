@@ -21,7 +21,11 @@ from velocitas_lib import get_app_manifest, get_workspace_dir, require_env
 
 
 def build_vehicleapp_image(log_output: TextIOWrapper | int = subprocess.DEVNULL):
-    """Build VehicleApp docker image and display the progress using a spinner."""
+    """Build VehicleApp docker image and display the progress using a spinner.
+
+    Args:
+        log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
+    """
     app_name = get_app_manifest()["name"].lower()
     image_tag = f"localhost:12345/{app_name}:local"
     dockerfile_path = require_env("dockerfilePath")
