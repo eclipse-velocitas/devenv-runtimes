@@ -65,8 +65,7 @@ def remove_container(log_output: TextIOWrapper | int = subprocess.DEVNULL):
 
 
 def adapt_feedercan_deployment_file():
-    """Update the feedercan config with the correct mount path.
-    """
+    """Update the feedercan config with the correct mount path."""
     with open(
         os.path.join(get_script_path(), "deployment", "feedercan.json"),
         "r+",
