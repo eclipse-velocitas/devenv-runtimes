@@ -86,7 +86,7 @@ jobs:
           fail_below_threshold: false
 
   run-local-integration-tests:
-    name: Run Integration Tests for runtime-local
+    name: Run Integration Tests for local runtime
     runs-on: ubuntu-22.04
     env:
       DAPR_HOST_IP: 127.0.0.1
@@ -111,7 +111,7 @@ jobs:
       - name: Init velocitas project
         run: |
           cd runtime-local/test
-          velocitas init
+          velocitas init -v
 
       - name: Run integration tests for runtime-local
         run: |
@@ -127,7 +127,7 @@ jobs:
           path: runtime-local/test/logs/runtime-local
 
   run-k3d-integration-tests:
-    name: Run Integration Tests for runtime-k3d
+    name: Run Integration Tests for k3d
     runs-on: ubuntu-22.04
     env:
       DAPR_HOST_IP: 127.0.0.1
@@ -154,7 +154,7 @@ jobs:
       - name: Init velocitas project
         run: |
           cd runtime-k3d/test
-          velocitas init
+          velocitas init -v
 
       - name: Run integration tests for k3d
         run: |
@@ -168,3 +168,64 @@ jobs:
         with:
           name: "Log files K3D"
           path: runtime-k3d/test/logs/runtime-k3d
+
+  run-kanto-integration-tests:
+    name: Run Integration Tests for kanto
+    runs-on: ubuntu-22.04
+    env:
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Set commit id
+        run: |
+          NEW_CONFIG="$(jq --arg GITHUB_SHA "$GITHUB_SHA" '.packages[0].version |= $GITHUB_SHA' runtime-kanto/test/.velocitas.json)"
+          echo "${NEW_CONFIG}" > runtime-kanto/test/.velocitas.json
+
+      - name: Install required packages
+        run: |
+          sudo curl -L https://github.com/eclipse-velocitas/cli/releases/latest/download/velocitas-linux-x64 -o /usr/bin/velocitas
+          sudo chmod +x /usr/bin/velocitas
+
+          sudo apt-get update && sudo apt-get install -y mosquitto
+          wget https://github.com/eclipse-kanto/kanto/releases/download/v0.1.0-M3/kanto_0.1.0-M3_linux_x86_64.deb && \
+          sudo apt install ./kanto_0.1.0-M3_linux_x86_64.deb
+
+          pip install -r runtime-kanto/test/requirements.txt
+
+      - name: Stop Kanto services
+        run: |
+          sudo systemctl stop \
+          suite-connector.service \
+          container-management.service \
+          software-update.service \
+          file-upload.service \
+          file-backup.service \
+          system-metrics.service
+
+          sudo pkill -f mosquitto
+
+      - name: Init velocitas project
+        run: |
+          cd runtime-kanto/test
+          velocitas init -v
+
+      - name: Run integration tests for kanto
+        run: |
+          cd runtime-kanto/test
+          # the socket on the ci is different to the devcontainer
+          sudo ln -s /run/containerd/containerd.sock /run/docker/containerd/containerd.sock
+          pytest -s -x ./integration/integration_test.py
+
+      - name: Upload log files as artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: "Log files Kanto"
+          path: |
+            runtime-kanto/test/logs

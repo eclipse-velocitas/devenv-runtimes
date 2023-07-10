@@ -6,7 +6,10 @@
         },
         {
             "name": "devenv-devcontainer-setup",
-            "version": "v1.1.8"
+            "version": "v1.1.11"
         }
-    ]
+    ],
+    "variables": {
+        "language": "python"
+    }
 }

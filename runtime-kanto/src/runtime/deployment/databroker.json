@@ -1,0 +1,21 @@
+{
+    "container_name": "databroker",
+    "image": {
+        "name": "ghcr.io/eclipse/kuksa.val/databroker:0.3.0"
+    },
+    "host_config": {
+        "devices": [],
+        "network_mode": "host",
+        "privileged": false,
+        "restart_policy": {
+            "maximum_retry_count": 0,
+            "retry_timeout": 0,
+            "type": "unless-stopped"
+        }
+    },
+    "config": {
+        "env": [
+            "KUKSA_DATA_BROKER_PORT=55555"
+        ]
+    }
+}

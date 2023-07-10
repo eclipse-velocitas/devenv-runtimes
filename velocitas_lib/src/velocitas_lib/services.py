@@ -43,6 +43,7 @@ def parse_service_config(
     """Parse service spec configuration and return it as an named tuple.
 
     Args:
+        service_id: The ID of the service to be parsed.
         service_spec_config: The specificon of the services from config file.
     """
 
@@ -146,3 +147,29 @@ def get_services() -> List[Service]:
             services.append(Service(service_id, service_config))
 
     return services
+
+
+def get_specific_service(service_id: str) -> Service:
+    """Return the specified service as Python object.
+
+    Args:
+        service_id: The ID of the service to be parsed.
+    """
+    services = get_services()
+    services = list(filter(lambda service: service.id == service_id, services))
+    if len(services) == 0:
+        raise RuntimeError(f"Service with id '{service_id}' not defined")
+    if len(services) > 1:
+        raise RuntimeError(
+            f"Multiple service definitions of id '{service_id}' found, which to take?"
+        )
+    return services[0]
+
+
+def get_service_port(service_id: str) -> str:
+    """Return the service port as string for the specified service.
+
+    Args:
+        service_id: The ID of the service to be parsed.
+    """
+    return get_specific_service(service_id).config.ports[0]

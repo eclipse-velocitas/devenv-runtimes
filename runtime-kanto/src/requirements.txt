@@ -1,0 +1,2 @@
+yaspin==2.3.0
+velocitas_lib
