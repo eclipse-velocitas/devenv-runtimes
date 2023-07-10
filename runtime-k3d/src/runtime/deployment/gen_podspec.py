@@ -65,9 +65,9 @@ def create_podspec(templates, service_spec) -> list[dict[str, Any]]:
         templates: The list of the template specifications.
         service_spec: The specification of the service.
     """
-    service_id = service_spec["id"]
     pods = []
-    service_config = parse_service_config(service_id, service_spec["config"])
+    service_id = service_spec.id
+    service_config = service_spec.config
 
     template_pod = templates[find_service_spec(templates, "Deployment", service_id)]
 
