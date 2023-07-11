@@ -1,0 +1,57 @@
+# Copyright (c) 2023 Robert Bosch GmbH and Microsoft Corporation
+#
+# This program and the accompanying materials are made available under the
+# terms of the Apache License, Version 2.0 which is available at
+# https://www.apache.org/licenses/LICENSE-2.0.
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.imageMockservice.name}}
+  labels:
+    app: {{.Values.imageMockservice.name}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{.Values.imageMockservice.name}}
+  template:
+    metadata:
+      labels:
+        app: {{.Values.imageMockservice.name}}
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "{{.Values.imageMockservice.name}}"
+        dapr.io/log-level: "debug"
+        dapr.io/config: "config"
+        dapr.io/app-protocol: "grpc"
+    spec:
+      containers:
+        - name: {{.Values.imageMockservice.name}}
+          image: {{.Values.imageMockservice.repository}}:{{.Values.imageMockservice.tag}}
+          imagePullPolicy: {{.Values.imageMockservice.pullPolicy}}
+        {{- if .Values.imageMockservice.environmentVariables}}
+          env:
+          {{- range .Values.imageMockservice.environmentVariables }}
+            - name: {{ .name }}
+              value: "{{ .value }}"
+          {{- end }}
+        {{- end }}
+          volumeMounts:
+            - name: mock
+              {{- with (index .Values.imageMockservice.mounts 0) }}
+              mountPath: {{ .from }}
+              {{- end }}
+              subPath: mock.py
+      volumes:
+        - name: mock
+          configMap:
+            name: mock-config
