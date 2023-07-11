@@ -21,7 +21,7 @@ from deployment.lib import generate_nodeport
 from yaspin.core import Yaspin
 
 from velocitas_lib import get_package_path, require_env
-from velocitas_lib.services import get_service_port
+from velocitas_lib.services import get_services
 
 
 def registry_exists(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bool:
@@ -122,8 +122,7 @@ def create_cluster(
     else:
         spinner.write("> Creating cluster without proxy configuration.")
 
-    services_to_expose = ["vehicledatabroker", "mqtt-broker", "seatservice"]
-    exposed_services_ports = generate_ports_to_expose(services_to_expose)
+    exposed_services_ports = generate_ports_to_expose()
 
     subprocess.check_call(
         [
@@ -145,18 +144,16 @@ def create_cluster(
     )
 
 
-def generate_ports_to_expose(services_to_expose: List[str]) -> List[str]:
-    """Generate a List of node ports to expose during cluster creation.
-
-    Args:
-        services_to_expose (List[str]): List of service_ids to generate ports to expose.
-    """
+def generate_ports_to_expose() -> List[str]:
+    """Generate a List of node ports to expose during cluster creation."""
     exposed_services = []
-    for service in services_to_expose:
-        exposed_services.append("-p")
-        service_nodeport = generate_nodeport(int(get_service_port(service)))
-        port_forward = f"{service_nodeport}:{service_nodeport}"
-        exposed_services.append(port_forward)
+    for service in get_services():
+        if service.config.ports:
+            for port in service.config.ports:
+                exposed_services.append("-p")
+                service_nodeport = generate_nodeport(int(port))
+                port_forward = f"{service_nodeport}:{service_nodeport}"
+                exposed_services.append(port_forward)
     return exposed_services
 
 
