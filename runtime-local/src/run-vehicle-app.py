@@ -16,7 +16,7 @@ import argparse
 import subprocess
 from typing import Optional
 
-from lib import MiddlewareType, get_dapr_sidecar_args, get_middleware_type
+from local_lib import MiddlewareType, get_dapr_sidecar_args, get_middleware_type
 
 from velocitas_lib.services import get_services
 

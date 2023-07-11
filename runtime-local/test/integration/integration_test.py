@@ -44,6 +44,7 @@ regex_mqtt: Pattern[str] = compile(r"✅.* Starting service mqtt")
 regex_vdb: Pattern[str] = compile(r"✅.* Starting service vehicledatabroker")
 regex_seatservice: Pattern[str] = compile(r"✅.* Starting service seatservice")
 regex_feedercan: Pattern[str] = compile(r"✅.* Starting service feedercan")
+regex_mockservice: Pattern[str] = compile(r"✅.* Starting service mockservice")
 timeout_sec: float = 180
 
 
@@ -71,9 +72,12 @@ def test_runtime_up_successfully():
 
 def test_run_sevices_separately_successfully():
     create_dummy_vspec_file()
-    assert run_command_until_logs_match(f"{command} run-mosquitto", regex_mqtt)
-    assert run_command_until_logs_match(f"{command} run-vehicledatabroker", regex_vdb)
     assert run_command_until_logs_match(
-        f"{command} run-vehicleservices", regex_seatservice
+        f"{command} run-service mqtt-broker", regex_mqtt
     )
-    assert run_command_until_logs_match(f"{command} run-feedercan", regex_feedercan)
+    assert run_command_until_logs_match(
+        f"{command} run-service vehicledatabroker", regex_vdb
+    )
+    assert run_command_until_logs_match(
+        f"{command} run-service mockservice", regex_mockservice
+    )
