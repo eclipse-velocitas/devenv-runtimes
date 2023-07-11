@@ -1,0 +1,10 @@
+{
+    "python.testing.pytestArgs": [
+        "runtime-local",
+        "runtime-k3d",
+        "runtime-kanto",
+        "velocitas_lib"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}

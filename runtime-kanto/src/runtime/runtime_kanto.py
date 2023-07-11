@@ -149,7 +149,7 @@ def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DE
         spinner (Yaspin): The progress spinner to update.
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
-    adapt_feedercan_deployment_file()
+    # adapt_feedercan_deployment_file()
     kanto = subprocess.Popen(
         [
             "sudo",
