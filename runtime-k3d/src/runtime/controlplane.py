@@ -17,9 +17,11 @@ import subprocess
 from io import TextIOWrapper
 from typing import List
 
+from deployment.lib import generate_nodeport
 from yaspin.core import Yaspin
 
 from velocitas_lib import get_package_path, require_env
+from velocitas_lib.services import get_services
 
 
 def registry_exists(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bool:
@@ -126,12 +128,9 @@ def create_cluster(
             "cluster",
             "create",
             "cluster",
-            "-p",
-            "30555:30555",
-            "-p",
-            "31883:31883",
-            "-p",
-            "30051:30051",
+        ]
+        + generate_ports_to_expose()
+        + [
             "--volume",
             f"{config_dir_path}/feedercan:/mnt/data@server:0",
             "--registry-use",
@@ -141,6 +140,19 @@ def create_cluster(
         stdout=log_output,
         stderr=log_output,
     )
+
+
+def generate_ports_to_expose() -> List[str]:
+    """Generate a List of node ports to expose during cluster creation."""
+    exposed_services = []
+    for service in get_services():
+        if service.config.ports:
+            for port in service.config.ports:
+                exposed_services.append("-p")
+                service_nodeport = generate_nodeport(int(port))
+                port_forward = f"{service_nodeport}:{service_nodeport}"
+                exposed_services.append(port_forward)
+    return exposed_services
 
 
 def delete_cluster(log_output: TextIOWrapper | int = subprocess.DEVNULL):
@@ -184,6 +196,7 @@ def deploy_zipkin(log_output: TextIOWrapper | int = subprocess.DEVNULL):
     Args:
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
+    zipkin_default_port = 9411
     subprocess.check_call(
         ["kubectl", "create", "deployment", "zipkin", "--image", "openzipkin/zipkin"],
         stdout=log_output,
@@ -199,7 +212,7 @@ def deploy_zipkin(log_output: TextIOWrapper | int = subprocess.DEVNULL):
             "--type",
             "ClusterIP",
             "--port",
-            "9411",
+            str(zipkin_default_port),
         ],
         stdout=log_output,
         stderr=log_output,
