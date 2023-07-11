@@ -122,8 +122,6 @@ def create_cluster(
     else:
         spinner.write("> Creating cluster without proxy configuration.")
 
-    exposed_services_ports = generate_ports_to_expose()
-
     subprocess.check_call(
         [
             "k3d",
@@ -131,7 +129,7 @@ def create_cluster(
             "create",
             "cluster",
         ]
-        + exposed_services_ports
+        + generate_ports_to_expose()
         + [
             "--volume",
             f"{config_dir_path}/feedercan:/mnt/data@server:0",
