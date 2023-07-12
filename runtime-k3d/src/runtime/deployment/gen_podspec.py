@@ -24,7 +24,7 @@ from velocitas_lib.services import ServiceSpecConfig, get_services
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "deployment"))
 
-from lib import create_cluster_ip_spec, generate_nodeport  # noqa: E402
+from deployment.lib import create_cluster_ip_spec, generate_nodeport  # noqa: E402
 
 
 def find_service_spec(lst: list[dict[str, Any]], kind: str, name: str) -> int:

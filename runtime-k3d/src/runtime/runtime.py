@@ -31,14 +31,22 @@ def is_runtime_installed(log_output: TextIOWrapper | int = subprocess.DEVNULL) -
     Args:
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
-    return (
-        subprocess.call(
-            ["helm", "status", "vehicleappruntime"],
-            stdout=log_output,
-            stderr=log_output,
-        )
-        == 0
+    process = subprocess.run(
+        ["helm", "status", "vehicleappruntime"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
     )
+    for line in process.stdout.splitlines():
+        key_value = line.split(":", 1)
+        key = key_value[0].strip()
+        value = key_value[1].strip()
+        if key == "STATUS" and value == "deployed":
+            return True
+
+    log_output.write(process.stdout)
+
+    return False
 
 
 def retag_docker_image(
@@ -127,6 +135,7 @@ def install_runtime(
         [
             "helm",
             "install",
+            "--replace",
             "vehicleappruntime",
             f"{helm_chart_path}",
             "--values",

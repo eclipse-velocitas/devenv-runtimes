@@ -88,6 +88,10 @@
         ],
         "config": [
             {
+                "key": "enabled",
+                "value": "false"
+            },
+            {
                 "key": "image",
                 "value": "ghcr.io/eclipse/kuksa.val.services/seat_service:v0.2.0"
             },
@@ -117,6 +121,10 @@
         "id": "feedercan",
         "interfaces": [],
         "config": [
+            {
+                "key": "enabled",
+                "value": "false"
+            },
             {
                 "key": "image",
                 "value": "ghcr.io/eclipse/kuksa.val.feeders/dbc2val:v0.1.1"
@@ -160,6 +168,28 @@
             {
                 "key": "mount",
                 "value": "${{ builtin.package_dir }}/config/feedercan/:/data"
+            },
+            {
+                "key": "start-pattern",
+                "value": ".*[cC]onnected to data broker.*"
+            }
+        ]
+    },
+    {
+        "id": "mockservice",
+        "interfaces": [],
+        "config": [
+            {
+                "key": "image",
+                "value": "ghcr.io/boschglobal/kuksa.val.services/mock_service:latest"
+            },
+            {
+                "key": "env",
+                "value": "VEHICLEDATABROKER_DAPR_APP_ID=vehicledatabroker"
+            },
+            {
+                "key": "mount",
+                "value": "$pathInWorkspaceOrPackage( ${{ mockFilePath }} ):/mock.py"
             },
             {
                 "key": "start-pattern",

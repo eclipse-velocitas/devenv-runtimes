@@ -16,7 +16,7 @@ import argparse
 import subprocess
 from typing import Optional
 
-from lib import get_dapr_sidecar_args
+from local_lib import get_dapr_sidecar_args
 
 
 def start_sidecar(
