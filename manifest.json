@@ -171,6 +171,12 @@
                     "args": [
                         "./runtime-k3d/src/app_deployment/deploy_vehicleapp.py"
                     ]
+                },
+                {
+                    "name": "mockFilePath",
+                    "type": "string",
+                    "description": "Path to the mocking configuration for the mock service",
+                    "default": "mock.py"
                 }
             ],
             "variables": [
@@ -196,17 +202,23 @@
                 {
                     "id": "install-deps",
                     "executable": "python3",
-                    "args": ["./runtime-kanto/src/install_deps.py"]
+                    "args": [
+                        "./runtime-kanto/src/install_deps.py"
+                    ]
                 },
                 {
                     "id": "up",
                     "executable": "python3",
-                    "args": ["./runtime-kanto/src/runtime/runtime_up.py"]
+                    "args": [
+                        "./runtime-kanto/src/runtime/runtime_up.py"
+                    ]
                 },
                 {
                     "id": "down",
                     "executable": "python3",
-                    "args": ["./runtime-kanto/src/runtime/runtime_down.py"]
+                    "args": [
+                        "./runtime-kanto/src/runtime/runtime_down.py"
+                    ]
                 }
             ],
             "onPostInit": [
@@ -220,6 +232,12 @@
                     "type": "string",
                     "description": "Path to the file describing your custom runtime configuration.",
                     "default": "runtime.json"
+                },
+                {
+                    "name": "mockFilePath",
+                    "type": "string",
+                    "description": "Path to the mocking configuration for the mock service",
+                    "default": "mock.py"
                 }
             ]
         },
@@ -231,12 +249,16 @@
                 {
                     "id": "build-vehicleapp",
                     "executable": "python3",
-                    "args": ["./runtime-kanto/src/app_deployment/build_vehicleapp.py"]
+                    "args": [
+                        "./runtime-kanto/src/app_deployment/build_vehicleapp.py"
+                    ]
                 },
                 {
                     "id": "deploy-vehicleapp",
                     "executable": "python3",
-                    "args": ["./runtime-kanto/src/app_deployment/deploy_vehicleapp.py"]
+                    "args": [
+                        "./runtime-kanto/src/app_deployment/deploy_vehicleapp.py"
+                    ]
                 }
             ],
             "variables": [
@@ -251,6 +273,12 @@
                     "type": "string",
                     "description": "Path to the file describing your custom runtime configuration.",
                     "default": "runtime.json"
+                },
+                {
+                    "name": "mockFilePath",
+                    "type": "string",
+                    "description": "Path to the mocking configuration for the mock service",
+                    "default": "mock.py"
                 }
             ]
         }

@@ -59,7 +59,11 @@ def remove_container(log_output: TextIOWrapper | int = subprocess.DEVNULL):
         stdout=log_output,
         stderr=log_output,
     )
-
+    subprocess.call(
+        ["kanto-cm", "remove", "-f", "-n", "mockservice"],
+        stdout=log_output,
+        stderr=log_output,
+    )
     app_name = get_app_manifest()["name"].lower()
     remove_vehicleapp(app_name, log_output)
 
@@ -75,6 +79,19 @@ def adapt_feedercan_deployment_file():
         data["mount_points"][0]["source"] = os.path.join(
             get_package_path(), "config", "feedercan"
         )
+        f.seek(0)
+        json.dump(data, f, indent=4)
+
+
+def adapt_mockservice_deployment_file():
+    """Update the mockservice config with the correct mount path."""
+    with open(
+        os.path.join(get_script_path(), "deployment", "mockservice.json"),
+        "r+",
+        encoding="utf-8",
+    ) as f:
+        data = json.load(f)
+        data["mount_points"][0]["source"] = os.path.join(get_package_path(), "mock.py")
         f.seek(0)
         json.dump(data, f, indent=4)
 
@@ -150,6 +167,7 @@ def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DE
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
     adapt_feedercan_deployment_file()
+    adapt_mockservice_deployment_file()
     kanto = subprocess.Popen(
         [
             "sudo",

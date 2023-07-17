@@ -69,7 +69,7 @@ def resolve_functions(input_str: str) -> str:
 
         match_span = input_str_match.span(0)
         input_str = (
-            input_str[0:match_span[0]] + return_value + input_str[match_span[1]:]
+            input_str[0 : match_span[0]] + return_value + input_str[match_span[1] :]
         )
 
 
