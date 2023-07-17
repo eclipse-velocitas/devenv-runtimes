@@ -10,6 +10,7 @@ This package contains the following runtimes:
 
 * [Local](./runtime-local/README.md)
 * [Kubernetes (K3D)](./runtime-k3d/README.md)
+* [Kanto](./runtime-kanto/README.md)
 
 ## Runtime Configuration (runtime.json)
 
@@ -43,7 +44,7 @@ In addition to CLI variables, some builtin variables are available:
 | Variable name | Description |
 |:---|:----|
 `builtin.package_dir` | The path to the current package root which contains the package's `manifest.json`
- `builtin.cache.cache_key` | The value of the cache entry with key *cache_key*, e.g. `builtin.cache.vspec_file_path`
+`builtin.cache.cache_key` | The value of the cache entry with key *cache_key*, e.g. `builtin.cache.vspec_file_path`
 
 Finally, sometimes a single variable substitution is not enough. Among others, you may want to look up a file in a directory and - if it does not exist - fall back to a default file provided by the package. This is where function execution within value entries comes to your rescue.
 
