@@ -6,3 +6,5 @@ runtime-k3d/src/runtime/deployment/config/helm/templates/values.yaml
 dist
 build
 logs
+results
+helm
