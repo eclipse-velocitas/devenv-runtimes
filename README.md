@@ -12,7 +12,7 @@ This package contains the following runtimes:
 * [Kubernetes (K3D)](./runtime-k3d/README.md)
 * [Kanto](./runtime-kanto/README.md)
 
-## Runtime Configuration (runtime.json)
+## Runtime Configuration: `runtime.json`
 
 This JSON file contains an array of services which should be started by all runtimes. Every service entry
 consists of a unique `id`, its provided `interfaces` and its key-value based `config`.
@@ -53,3 +53,7 @@ Available functions:
 Function | Description
 :---|:---
 `$pathInWorkspaceOrPackage( <relative_path> )` | Resolves a path dynamically either to the local project workspace, if the file is available or falls back to a file in the package repository. If none of these files is available an exception is raised.
+
+## Development hints 
+
+To create a better local environment, you can execute `source ./set_cli_env.sh` to export all CLI provided variables to test your scripts without invoking them via CLI exec.
