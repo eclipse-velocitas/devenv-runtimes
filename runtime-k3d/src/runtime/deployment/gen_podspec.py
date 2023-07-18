@@ -24,11 +24,11 @@ from velocitas_lib.services import ServiceSpecConfig, get_services
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "deployment"))
 
-from deployment.lib import create_cluster_ip_spec, generate_nodeport  # noqa: E402
+from lib import create_cluster_ip_spec, generate_nodeport  # noqa: E402
 
 
-def find_service_spec(lst: list[dict[str, Any]], kind: str, name: str) -> int:
-    """Returns index of spec for given kind and name. -1 if not found.
+def find_service_spec_index(lst: list[dict[str, Any]], kind: str, name: str) -> int:
+    """Returns index of spec for given kind and name.
     Args:
         lst: The list of the template specifications.
         kind: The kind of the pod.
@@ -38,7 +38,7 @@ def find_service_spec(lst: list[dict[str, Any]], kind: str, name: str) -> int:
         if elem["kind"] == kind and elem["metadata"]["name"] == name:
             return i
 
-    return -1
+    raise IndexError(f"No index for {kind=} {name=}")
 
 
 def init_template(templates: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -47,12 +47,12 @@ def init_template(templates: list[dict[str, Any]]) -> list[dict[str, Any]]:
         templates: The list of the template specifications.
     """
     template = []
-    template.append(templates[find_service_spec(templates, "Pod", "bash")])
+    template.append(templates[find_service_spec_index(templates, "Pod", "bash")])
     template.append(
-        templates[find_service_spec(templates, "PersistentVolume", "pv-volume")]
+        templates[find_service_spec_index(templates, "PersistentVolume", "pv-volume")]
     )
     template.append(
-        templates[find_service_spec(templates, "PersistentVolumeClaim", "pv-claim")]
+        templates[find_service_spec_index(templates, "PersistentVolumeClaim", "pv-claim")]
     )
 
     return template
@@ -69,7 +69,7 @@ def create_podspec(templates, service_spec) -> list[dict[str, Any]]:
     service_id = service_spec.id
     service_config = service_spec.config
 
-    template_pod = templates[find_service_spec(templates, "Deployment", service_id)]
+    template_pod = templates[find_service_spec_index(templates, "Deployment", service_id)]
 
     pod = generate_pod_spec(template_pod, service_config)
     pods.append(pod)
@@ -172,11 +172,12 @@ def generate_container_mount(service_config: ServiceSpecConfig) -> list[dict[str
     mounts = []
     for mount in service_config.mounts:
         mount_path, file = get_mount_folder_and_file(mount)
+        print(mount)
         if file != "":
             mounts.append(
                 {
                     "name": f"{os.path.splitext(file)[0]}",
-                    "mountPath": f"{mount_path}/{file}",
+                    "mountPath": f"{os.path.join(mount_path, file)}",
                     "subPath": f"{file}",
                 }
             )
@@ -320,7 +321,7 @@ def gen_podspec(output_file_path: str):
         "w",
         encoding="utf-8",
     ) as f:
-        yaml.dump_all(pods, f, default_flow_style=None, block_seq_indent=2, indent=4)
+        yaml.dump_all(pods, f, default_flow_style=False)
 
 
 def main():
