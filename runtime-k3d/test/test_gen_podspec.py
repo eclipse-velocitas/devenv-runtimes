@@ -155,8 +155,8 @@ def test_get_volumes_folder(mount):
     "mount",
     [
         pytest.param("test:test", marks=pytest.mark.xfail),
-        "test/test.json:test/test.json",
-        "test/test.json:test.json",
+        "test/test.json:/test/test.json",
+        "test/test.json:/test.json",
     ],
 )
 def test_get_container_mount_file(mount):
@@ -167,7 +167,7 @@ def test_get_container_mount_file(mount):
     desired = [
         {
             "name": f"{os.path.splitext(file)[0]}",
-            "mountPath": f"{path}/{file}",
+            "mountPath": f"{os.path.join(path, file)}",
             "subPath": f"{file}",
         }
     ]

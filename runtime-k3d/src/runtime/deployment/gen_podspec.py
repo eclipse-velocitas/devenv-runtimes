@@ -52,7 +52,9 @@ def init_template(templates: list[dict[str, Any]]) -> list[dict[str, Any]]:
         templates[find_service_spec_index(templates, "PersistentVolume", "pv-volume")]
     )
     template.append(
-        templates[find_service_spec_index(templates, "PersistentVolumeClaim", "pv-claim")]
+        templates[
+            find_service_spec_index(templates, "PersistentVolumeClaim", "pv-claim")
+        ]
     )
 
     return template
@@ -69,7 +71,9 @@ def create_podspec(templates, service_spec) -> list[dict[str, Any]]:
     service_id = service_spec.id
     service_config = service_spec.config
 
-    template_pod = templates[find_service_spec_index(templates, "Deployment", service_id)]
+    template_pod = templates[
+        find_service_spec_index(templates, "Deployment", service_id)
+    ]
 
     pod = generate_pod_spec(template_pod, service_config)
     pods.append(pod)
