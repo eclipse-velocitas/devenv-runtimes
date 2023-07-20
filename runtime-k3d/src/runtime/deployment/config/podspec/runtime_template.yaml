@@ -264,3 +264,41 @@ spec:
     - port: 50051
       targetPort: 50051
       nodePort: 30051
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mockservice
+  labels:
+    app: mockservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mockservice
+  template:
+    metadata:
+      labels:
+        app: mockservice
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "mockservice"
+        dapr.io/log-level: "debug"
+        dapr.io/config: "config"
+        dapr.io/app-protocol: "grpc"
+    spec:
+      volumes:
+        - name: pv-storage
+          persistentVolumeClaim:
+            claimName: pv-claim
+      containers:
+        - name: mockservice
+          image: ghcr.io/boschglobal/kuksa.val.services/mock_service:latest
+          imagePullPolicy: Always
+          env:
+            - name: VEHICLEDATABROKER_DAPR_APP_ID
+              value: vehicledatabroker
+          volumeMounts:
+          - mountPath: "/data"
+            name: pv-storage

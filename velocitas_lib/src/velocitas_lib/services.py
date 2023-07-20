@@ -13,6 +13,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
+import os
+import re
 from pathlib import Path
 from typing import Dict, List, NamedTuple, Optional
 
@@ -35,6 +37,40 @@ class ServiceSpecConfig(NamedTuple):
 class Service(NamedTuple):
     id: str
     config: ServiceSpecConfig
+
+
+def resolve_functions(input_str: str) -> str:
+    while True:
+        input_str_match = re.search(r"\$(\w+)\((.*)\s*\)", input_str)
+
+        if not input_str_match:
+            return input_str
+
+        function_name = input_str_match.group(1).strip()
+        parameter = input_str_match.group(2).strip()
+
+        return_value = None
+        if function_name == "pathInWorkspaceOrPackage":
+            path_in_workspace = os.path.join(get_workspace_dir(), parameter)
+            if os.path.isfile(path_in_workspace):
+                return_value = path_in_workspace
+
+            if return_value is None:
+                path_in_package = os.path.join(get_package_path(), parameter)
+                if os.path.isfile(path_in_package):
+                    return_value = path_in_package
+
+            if return_value is None:
+                raise RuntimeError(
+                    f"Path {parameter!r} not found in workspace or package!"
+                )
+        else:
+            raise RuntimeError(f"Unsupported function: {function_name!r}!")
+
+        match_span = input_str_match.span(0)
+        input_str = (
+            input_str[0 : match_span[0]] + return_value + input_str[match_span[1] :]
+        )
 
 
 def parse_service_config(
@@ -65,6 +101,7 @@ def parse_service_config(
 
         if isinstance(value, str):
             value = variables.replace_occurrences(value)
+            value = resolve_functions(value)
 
         if key == "enabled":
             is_enabled = value is True or value == "true"
@@ -110,7 +147,7 @@ def parse_service_config(
     )
 
 
-def get_services() -> List[Service]:
+def get_services(verbose: bool = True) -> List[Service]:
     """Return all specified services as Python object."""
     path = Path(f"{get_package_path()}/runtime.json")
     variable_value = require_env("runtimeFilePath")
@@ -122,7 +159,9 @@ def get_services() -> List[Service]:
 
         if overwritten_path.exists():
             path = overwritten_path
-            print(f"runtime.json path redirected to {path}")
+
+            if verbose:
+                print(f"runtime.json path redirected to {path}")
 
     json_array: List[Dict] = json.load(
         open(

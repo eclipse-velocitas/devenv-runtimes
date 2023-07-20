@@ -78,6 +78,13 @@ def generate_values_by_service(service: Service) -> dict[str, Any]:
     if service.config.ports:
         value_spec[value_spec_key]["ports"] = generate_ports_spec(service.config)
 
+    value_spec[value_spec_key]["mounts"] = list()
+    for mount in service.config.mounts:
+        from_to = mount.split(":")
+        value_spec[value_spec_key]["mounts"].append(
+            {"from": from_to[0], "to": from_to[1]}
+        )
+
     return value_spec
 
 
@@ -89,7 +96,7 @@ def generate_values_file(output_path: str):
         f.write(yaml.dump_all(services).replace("---", ""))
 
 
-def copy_helm_chart(output_path: str):
+def copy_helm_chart_and_templates(output_path: str):
     shutil.copytree(
         f"{get_package_path()}/runtime-k3d/src/runtime/deployment/config/helm",
         output_path,
@@ -100,10 +107,20 @@ def copy_helm_chart(output_path: str):
         dirs_exist_ok=True,
     )
 
+    # only keep the templates of the services we use
+    templates_path = os.path.join(output_path, "templates")
+    allowed_files_in_templates = [
+        f"{service.id}.yaml" for service in get_services(verbose=False)
+    ]
+    allowed_files_in_templates += ["_helpers.tpl", "bash.yaml", "persistentVolume.yaml"]
+    for template_file in os.listdir(templates_path):
+        if template_file not in allowed_files_in_templates:
+            os.remove(os.path.join(templates_path, template_file))
+
 
 def gen_helm(output_path: str):
     os.makedirs(output_path, exist_ok=True)
-    copy_helm_chart(output_path)
+    copy_helm_chart_and_templates(output_path)
     generate_values_file(output_path)
 
 

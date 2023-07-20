@@ -1,0 +1,28 @@
+{
+    "container_name": "mockservice",
+    "image": {
+        "name": "ghcr.io/boschglobal/kuksa.val.services/mock_service:latest"
+    },
+    "mount_points": [
+        {
+            "destination": "mock.py",
+            "source": "/workspaces/vehicle-app-python-template/mock.py",
+            "propagation_mode": "rprivate"
+        }
+    ],
+    "host_config": {
+        "devices": [],
+        "network_mode": "host",
+        "privileged": false,
+        "restart_policy": {
+            "maximum_retry_count": 0,
+            "retry_timeout": 0,
+            "type": "unless-stopped"
+        }
+    },
+    "config": {
+        "env": [
+            "VEHICLEDATABROKER_DAPR_APP_ID=vehicledatabroker"
+        ]
+    }
+}
