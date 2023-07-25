@@ -151,6 +151,11 @@ jobs:
           curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
           sudo wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O - | /bin/bash -s 1.10.0
 
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20.4.0
+          cache: npm
+      
       - name: Init velocitas project
         run: |
           cd runtime-k3d/test
