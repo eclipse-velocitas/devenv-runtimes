@@ -98,3 +98,20 @@ def push_docker_image_to_registry(
         stdout=log_output,
         stderr=log_output,
     )
+
+
+def container_exists(name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bool:
+    """Check if a container with a given name exists.
+
+    Args:
+        log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
+
+    Returns:
+        bool: True if the container exists, False if not.
+    """
+    return "" != str(
+        subprocess.check_output(
+            ["docker", "ps", "-a", "-q", "-f", f"name={name}"], stderr=log_output
+        ),
+        "utf-8",
+    )

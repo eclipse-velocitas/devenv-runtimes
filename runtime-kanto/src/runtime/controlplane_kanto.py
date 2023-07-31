@@ -17,22 +17,7 @@ from io import TextIOWrapper
 
 from yaspin.core import Yaspin
 
-
-def registry_exists(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bool:
-    """Check if the Kanto registry exists.
-
-    Args:
-        log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
-
-    Returns:
-        bool: True if the registry exists, False if not.
-    """
-    return "" != str(
-        subprocess.check_output(
-            ["docker", "ps", "-a", "-q", "-f", "name=registry"], stderr=log_output
-        ),
-        "utf-8",
-    )
+from velocitas_lib.docker import container_exists
 
 
 def registry_running(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bool:
@@ -109,9 +94,11 @@ def configure_controlplane(
         spinner (Yaspin): The progress spinner to update.
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
+    if container_exists("k3d-registry", log_output):
+        raise RuntimeError("K3D runtime seems to be up. Please stop all other runtimes first.")
 
     status = "> Checking Kanto registry... "
-    if not registry_exists(log_output):
+    if not container_exists("registry", log_output):
         spinner.write(status + "starting registry.")
         create_and_start_registry(log_output)
         spinner.write(status + "started.")
