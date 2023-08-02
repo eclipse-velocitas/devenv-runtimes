@@ -98,7 +98,7 @@ def generate_values_file(output_path: str):
 
 def copy_helm_chart_and_templates(output_path: str):
     shutil.copytree(
-        f"{get_package_path()}/runtime-k3d/src/runtime/deployment/config/helm",
+        f"{get_package_path()}/runtime_k3d/src/runtime/deployment/config/helm",
         output_path,
         symlinks=False,
         ignore=None,

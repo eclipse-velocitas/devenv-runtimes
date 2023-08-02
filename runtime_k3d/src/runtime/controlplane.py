@@ -284,7 +284,7 @@ def configure_controlplane(
     config_dir_path = os.path.join(get_package_path(), "config")
     dapr_config_dir_path = os.path.join(
         get_package_path(),
-        "runtime-k3d",
+        "runtime_k3d",
         "src",
         "runtime",
         "deployment",

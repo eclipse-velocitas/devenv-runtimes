@@ -12,31 +12,42 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from controlplane_kanto import reset_controlplane
-from runtime_kanto import stop_kanto, undeploy_runtime
+import signal
+
+from controlplane_kanto import configure_controlplane
+from runtime_down import runtime_down
 from yaspin import yaspin
 
+from runtime_kanto import is_kanto_running, start_kanto
 from velocitas_lib import create_log_file
 
 
-def runtime_down():
-    """Stop the Kanto runtime."""
+def runtime_up():
+    """Start up the K3D runtime."""
 
     print("Hint: Log files can be found in your workspace's logs directory")
-    log_output = create_log_file("runtime-down", "runtime-kanto")
-    with yaspin(text="Stopping Kanto...", color="cyan") as spinner:
+    log_output = create_log_file("runtime-up", "runtime_kanto")
+    with yaspin(text="Configuring controlplane for Kanto...", color="cyan") as spinner:
         try:
-            spinner.write("Removing containers...")
-            undeploy_runtime(spinner, log_output)
-            spinner.write("Stopping registry...")
-            reset_controlplane(spinner, log_output)
-            spinner.write("Stopping Kanto...")
-            stop_kanto(log_output)
+            configure_controlplane(spinner, log_output)
             spinner.ok("✅")
+            spinner.text = "Starting Kanto..."
+            spinner.start()
+            if not is_kanto_running(log_output):
+                start_kanto(spinner, log_output)
+            else:
+                spinner.text = "Kanto is ready to use!"
+                spinner.ok("✅")
         except Exception as err:
             log_output.write(str(err))
             spinner.fail("💥")
 
 
-if __name__ == "__main__":
+def handler(_signum, _frame):  # noqa: U101 unused arguments
     runtime_down()
+
+
+if __name__ == "__main__":
+    signal.signal(signal.SIGINT, handler)
+    signal.signal(signal.SIGTERM, handler)
+    runtime_up()

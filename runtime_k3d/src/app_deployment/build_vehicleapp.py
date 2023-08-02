@@ -22,7 +22,7 @@ def build_vehicleapp():
     """Build VehicleApp docker image and display the progress using a spinner."""
 
     print("Hint: Log files can be found in your workspace's logs directory")
-    log_output = create_log_file("build-vapp", "runtime-k3d")
+    log_output = create_log_file("build-vapp", "runtime_k3d")
     with yaspin(text="Building VehicleApp...", color="cyan") as spinner:
         try:
             status = "> Building VehicleApp image"

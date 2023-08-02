@@ -25,7 +25,7 @@ def runtime_up(skip_services: bool):
     """Start up the K3D runtime."""
 
     print("Hint: Log files can be found in your workspace's logs directory")
-    log_output = create_log_file("runtime-up", "runtime-k3d")
+    log_output = create_log_file("runtime-up", "runtime_k3d")
     with yaspin(text="Configuring controlplane for k3d...", color="cyan") as spinner:
         try:
             configure_controlplane(spinner, log_output)

@@ -12,42 +12,27 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import signal
-
-from controlplane_kanto import configure_controlplane
-from runtime_down import runtime_down
-from runtime_kanto import is_kanto_running, start_kanto
+from controlplane import reset_controlplane
+from runtime import undeploy_runtime
 from yaspin import yaspin
 
 from velocitas_lib import create_log_file
 
 
-def runtime_up():
-    """Start up the K3D runtime."""
+def runtime_down():
+    """Stop the K3D runtime."""
 
     print("Hint: Log files can be found in your workspace's logs directory")
-    log_output = create_log_file("runtime-up", "runtime-kanto")
-    with yaspin(text="Configuring controlplane for Kanto...", color="cyan") as spinner:
+    log_output = create_log_file("runtime-down", "runtime_k3d")
+    with yaspin(text="Stopping k3d runtime...", color="cyan") as spinner:
         try:
-            configure_controlplane(spinner, log_output)
+            reset_controlplane(spinner, log_output)
+            undeploy_runtime(spinner, log_output)
             spinner.ok("✅")
-            spinner.text = "Starting Kanto..."
-            spinner.start()
-            if not is_kanto_running(log_output):
-                start_kanto(spinner, log_output)
-            else:
-                spinner.text = "Kanto is ready to use!"
-                spinner.ok("✅")
         except Exception as err:
             log_output.write(str(err))
             spinner.fail("💥")
 
 
-def handler(_signum, _frame):  # noqa: U101 unused arguments
-    runtime_down()
-
-
 if __name__ == "__main__":
-    signal.signal(signal.SIGINT, handler)
-    signal.signal(signal.SIGTERM, handler)
-    runtime_up()
+    runtime_down()

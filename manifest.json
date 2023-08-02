@@ -7,41 +7,41 @@
             "programs": [
                 {
                     "id": "ensure-dapr",
-                    "executable": "./runtime-local/src/ensure-dapr.sh"
+                    "executable": "./runtime_local/src/ensure-dapr.sh"
                 },
                 {
                     "id": "run-service",
                     "executable": "python3",
                     "args": [
-                        "./runtime-local/src/run_service.py"
+                        "./runtime_local/src/run_service.py"
                     ]
                 },
                 {
                     "id": "up",
                     "executable": "python3",
                     "args": [
-                        "./runtime-local/src/runtime-up.py"
+                        "./runtime_local/src/runtime-up.py"
                     ]
                 },
                 {
                     "id": "install-deps",
                     "executable": "python3",
                     "args": [
-                        "./runtime-local/src/install_deps.py"
+                        "./runtime_local/src/install_deps.py"
                     ]
                 },
                 {
                     "id": "run-vehicle-app",
                     "executable": "python3",
                     "args": [
-                        "./runtime-local/src/run-vehicle-app.py"
+                        "./runtime_local/src/run-vehicle-app.py"
                     ]
                 },
                 {
                     "id": "run-dapr-sidecar",
                     "executable": "python3",
                     "args": [
-                        "./runtime-local/src/run-dapr-sidecar.py"
+                        "./runtime_local/src/run-dapr-sidecar.py"
                     ]
                 }
             ],
@@ -89,35 +89,35 @@
                     "id": "install-deps",
                     "executable": "python3",
                     "args": [
-                        "./runtime-k3d/src/install_deps.py"
+                        "./runtime_k3d/src/install_deps.py"
                     ]
                 },
                 {
                     "id": "up",
                     "executable": "python3",
                     "args": [
-                        "./runtime-k3d/src/runtime/runtime-up.py"
+                        "./runtime_k3d/src/runtime/runtime-up.py"
                     ]
                 },
                 {
                     "id": "down",
                     "executable": "python3",
                     "args": [
-                        "./runtime-k3d/src/runtime/runtime-down.py"
+                        "./runtime_k3d/src/runtime/runtime-down.py"
                     ]
                 },
                 {
                     "id": "generate-podspec",
                     "executable": "python3",
                     "args": [
-                        "./runtime-k3d/src/runtime/deployment/gen_podspec.py"
+                        "./runtime_k3d/src/runtime/deployment/gen_podspec.py"
                     ]
                 },
                 {
                     "id": "generate-helm",
                     "executable": "python3",
                     "args": [
-                        "./runtime-k3d/src/runtime/deployment/gen_helm.py"
+                        "./runtime_k3d/src/runtime/deployment/gen_helm.py"
                     ]
                 }
             ],
@@ -162,14 +162,14 @@
                     "id": "build-vehicleapp",
                     "executable": "python3",
                     "args": [
-                        "./runtime-k3d/src/app_deployment/build_vehicleapp.py"
+                        "./runtime_k3d/src/app_deployment/build_vehicleapp.py"
                     ]
                 },
                 {
                     "id": "deploy-vehicleapp",
                     "executable": "python3",
                     "args": [
-                        "./runtime-k3d/src/app_deployment/deploy_vehicleapp.py"
+                        "./runtime_k3d/src/app_deployment/deploy_vehicleapp.py"
                     ]
                 },
                 {
@@ -203,21 +203,21 @@
                     "id": "install-deps",
                     "executable": "python3",
                     "args": [
-                        "./runtime-kanto/src/install_deps.py"
+                        "./runtime_kanto/src/install_deps.py"
                     ]
                 },
                 {
                     "id": "up",
                     "executable": "python3",
                     "args": [
-                        "./runtime-kanto/src/runtime/runtime_up.py"
+                        "./runtime_kanto/src/runtime/runtime_up.py"
                     ]
                 },
                 {
                     "id": "down",
                     "executable": "python3",
                     "args": [
-                        "./runtime-kanto/src/runtime/runtime_down.py"
+                        "./runtime_kanto/src/runtime/runtime_down.py"
                     ]
                 }
             ],
@@ -250,14 +250,14 @@
                     "id": "build-vehicleapp",
                     "executable": "python3",
                     "args": [
-                        "./runtime-kanto/src/app_deployment/build_vehicleapp.py"
+                        "./runtime_kanto/src/app_deployment/build_vehicleapp.py"
                     ]
                 },
                 {
                     "id": "deploy-vehicleapp",
                     "executable": "python3",
                     "args": [
-                        "./runtime-kanto/src/app_deployment/deploy_vehicleapp.py"
+                        "./runtime_kanto/src/app_deployment/deploy_vehicleapp.py"
                     ]
                 }
             ],

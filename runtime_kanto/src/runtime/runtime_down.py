@@ -12,22 +12,26 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from controlplane import reset_controlplane
-from runtime import undeploy_runtime
+from controlplane_kanto import reset_controlplane
 from yaspin import yaspin
 
+from runtime_kanto import stop_kanto, undeploy_runtime
 from velocitas_lib import create_log_file
 
 
 def runtime_down():
-    """Stop the K3D runtime."""
+    """Stop the Kanto runtime."""
 
     print("Hint: Log files can be found in your workspace's logs directory")
-    log_output = create_log_file("runtime-down", "runtime-k3d")
-    with yaspin(text="Stopping k3d runtime...", color="cyan") as spinner:
+    log_output = create_log_file("runtime-down", "runtime_kanto")
+    with yaspin(text="Stopping Kanto...", color="cyan") as spinner:
         try:
-            reset_controlplane(spinner, log_output)
+            spinner.write("Removing containers...")
             undeploy_runtime(spinner, log_output)
+            spinner.write("Stopping registry...")
+            reset_controlplane(spinner, log_output)
+            spinner.write("Stopping Kanto...")
+            stop_kanto(log_output)
             spinner.ok("✅")
         except Exception as err:
             log_output.write(str(err))

@@ -106,7 +106,7 @@ def deploy_vehicleapp():
     and display the progress using a given spinner."""
 
     print("Hint: Log files can be found in your workspace's logs directory")
-    log_output = create_log_file("deploy-vapp", "runtime-k3d")
+    log_output = create_log_file("deploy-vapp", "runtime_k3d")
     with yaspin(text="Deploying VehicleApp...", color="cyan") as spinner:
         try:
             app_name = get_app_manifest()["name"].lower()

@@ -8,9 +8,9 @@ A Velocitas CLI package containing all available and supported Velocitas runtime
 
 This package contains the following runtimes:
 
-* [Local](./runtime-local/README.md)
-* [Kubernetes (K3D)](./runtime-k3d/README.md)
-* [Kanto](./runtime-kanto/README.md)
+* [Local](./runtime_local/README.md)
+* [Kubernetes (K3D)](./runtime_k3d/README.md)
+* [Kanto](./runtime_kanto/README.md)
 
 ## Runtime Configuration: `runtime.json`
 

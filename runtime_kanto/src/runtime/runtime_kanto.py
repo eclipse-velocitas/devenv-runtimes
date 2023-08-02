@@ -177,7 +177,7 @@ def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DE
             "--deployment-ctr-dir",
             f"{get_script_path()}/deployment",
             "--log-file",
-            f"{get_workspace_dir()}/logs/runtime-kanto/container-management.log",
+            f"{get_workspace_dir()}/logs/runtime_kanto/container-management.log",
         ],
         start_new_session=True,
         stderr=log_output,

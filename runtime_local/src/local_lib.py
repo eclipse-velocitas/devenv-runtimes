@@ -76,7 +76,7 @@ def run_service(service: Service) -> subprocess.Popen:
     Returns:
        The Popen object representing the root process running the required service
     """
-    log = create_log_file(service.id, "runtime-local")
+    log = create_log_file(service.id, "runtime_local")
     log.write(f"Starting {service.id!r}\n")
 
     env_vars = dict[str, Optional[str]]()
@@ -211,7 +211,7 @@ def stop_service(service: Service):
     Args:
         service (Service): The service to stop.
     """
-    log = create_log_file(service.id, "runtime-local")
+    log = create_log_file(service.id, "runtime_local")
     log.write(f"Stopping {service.id!r}\n")
 
     if service.config.use_dapr and get_middleware_type() == MiddlewareType.DAPR:

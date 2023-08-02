@@ -12,32 +12,29 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import argparse
 import signal
 import subprocess
+import sys
 import time
-from typing import Dict
+from typing import Dict, Optional
 
 from local_lib import run_service, stop_container, stop_service
 from yaspin import yaspin
 
 from velocitas_lib import get_log_file_name
-from velocitas_lib.services import get_services
+from velocitas_lib.services import Service, get_services, get_specific_service
 
 spawned_processes: Dict[str, subprocess.Popen] = {}
 
 
-def run_services() -> None:
-    """Run all required services."""
+def run_specific_service(service: Service) -> None:
+    """Run specified service."""
 
-    print("Hint: Log files can be found in your workspace's logs directory")
-    with yaspin(text="Starting runtime...", color="cyan") as spinner:
+    with yaspin(text=f"Starting service {service.id}", color="cyan") as spinner:
         try:
-            for service in get_services():
-                stop_service(service)
-                spinner.text = f"Starting {service.id}..."
-                spawned_processes[service.id] = run_service(service)
-                spinner.write(f"> {service.id} running")
-            spinner.text = "Runtime is ready to use!"
+            stop_service(service)
+            spawned_processes[service.id] = run_service(service)
             spinner.ok("✅")
         except RuntimeError as error:
             spinner.write(error.args)
@@ -45,7 +42,7 @@ def run_services() -> None:
             terminate_spawned_processes()
             print(f"Starting {service.id=} failed")
             with open(
-                get_log_file_name(service.id, "runtime-local"),
+                get_log_file_name(service.id, "runtime_local"),
                 mode="r",
                 encoding="utf-8",
             ) as log:
@@ -57,24 +54,17 @@ def run_services() -> None:
 def wait_while_processes_are_running():
     while len(spawned_processes) > 0:
         time.sleep(1)
-        for name, process in spawned_processes.items():
-            poll_result = process.poll()
-
-            if isinstance(poll_result, int):
-                print(f"Process terminated: {name!r} result: {poll_result}")
-                del spawned_processes[name]
-                break
+        for process in spawned_processes.values():
+            process.poll()
 
 
 def terminate_spawned_processes():
-    with yaspin(text="Stopping runtime...", color="cyan") as spinner:
+    with yaspin(text="Stopping service", color="cyan") as spinner:
         while len(spawned_processes) > 0:
             (service_id, process) = spawned_processes.popitem()
             process.terminate()
             stop_container(service_id, subprocess.DEVNULL)
-            spinner.write(
-                f"> {process.args[0]!r} (service_id={service_id!r}) terminated"
-            )
+            spinner.write(f"> {process.args[0]} (service-id='{service_id}') terminated")
         spinner.ok("✅")
 
 
@@ -82,8 +72,35 @@ def handler(_signum, _frame):  # noqa: U101 unused arguments
     terminate_spawned_processes()
 
 
+def main(service_id: str) -> bool:
+    service: Optional[Service] = None
+    try:
+        service = get_specific_service(service_id)
+    except RuntimeError as e:
+        print(f"Error: {e.__str__()}")
+        print("Available services:")
+        for service in get_services(verbose=False):
+            print(f" * {service.id!r}")
+        return False
+
+    run_specific_service(service)
+    wait_while_processes_are_running()
+    return True
+
+
 if __name__ == "__main__":
+    # The arguments we accept
+    parser = argparse.ArgumentParser(
+        description="Start the specified service as defined in runtime.json."
+    )
+    parser.add_argument(
+        "service_id",
+        type=str,
+        help="Id of the service to start - refers to 'id' key in runtime.json",
+    )
+    args = parser.parse_args()
+
     signal.signal(signal.SIGINT, handler)
     signal.signal(signal.SIGTERM, handler)
-    run_services()
-    wait_while_processes_are_running()
+
+    sys.exit(0 if main(args.service_id) else -1)
