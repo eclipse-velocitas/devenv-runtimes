@@ -8,9 +8,9 @@ A Velocitas CLI package containing all available and supported Velocitas runtime
 
 This package contains the following runtimes:
 
-* [Local](./runtime-local/README.md)
-* [Kubernetes (K3D)](./runtime-k3d/README.md)
-* [Kanto](./runtime-kanto/README.md)
+* [Local](./runtime_local/README.md)
+* [Kubernetes (K3D)](./runtime_k3d/README.md)
+* [Kanto](./runtime_kanto/README.md)
 
 ## Runtime Configuration: `runtime.json`
 
@@ -53,6 +53,12 @@ Available functions:
 Function | Description
 :---|:---
 `$pathInWorkspaceOrPackage( <relative_path> )` | Resolves a path dynamically either to the local project workspace, if the file is available or falls back to a file in the package repository. If none of these files is available an exception is raised.
+
+## Generators
+
+This package contains the following generators:
+
+* [Desired State Generator](./desired_state_generator/README.md)
 
 ## Development hints
 

@@ -14,6 +14,18 @@
 		"vscode": {
 			// Set *default* container specific settings.json values on container create.
 			"settings": {
+				"[python]": {
+					"editor.defaultFormatter": "ms-python.black-formatter"
+				},
+				"python.testing.pytestArgs": [
+					"--ignore=desired_state_generator/test/integration",
+					"--ignore=runtime_k3d/test/integration",
+					"--ignore=runtime_kanto/test/integration",
+					"--ignore=runtime_local/test/integration",
+					"."
+				],
+				"python.testing.unittestEnabled": false,
+				"python.testing.pytestEnabled": true,
 				"python.pythonPath": "/usr/bin/python3",
 				"python.defaultInterpreterPath": "/usr/bin/python3",
 				// Only Flake8 is used as linter and static code analyzer, as faster tool
@@ -33,12 +45,10 @@
 			},
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
-				"dbaeumer.vscode-eslint",
 				"ms-azuretools.vscode-dapr",
 				"ms-azuretools.vscode-docker",
 				"ms-python.python",
 				"cschleiden.vscode-github-actions",
-				"pspester.pester-test",
 				"rpdswtk.vsmqtt",
 				"dotjoshjohnson.xml",
 				"ms-kubernetes-tools.vscode-kubernetes-tools",
@@ -49,6 +59,7 @@
 			]
 		}
 	},
+	"onCreateCommand": "bash .devcontainer/scripts/post-create.sh",
 	// Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode"
 }

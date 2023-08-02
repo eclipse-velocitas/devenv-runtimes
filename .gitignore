@@ -1,10 +1,10 @@
 .DS_Store
 __pycache__
 
-runtime-k3d/src/runtime/deployment/config/helm/templates/values.yaml
+runtime_k3d/src/runtime/deployment/config/helm/templates/values.yaml
 *.egg-info
 dist
 build
 logs
 results
-helm
+.coverage

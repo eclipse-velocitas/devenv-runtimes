@@ -1,7 +1,0 @@
-[project]
-name = "velocitas_lib"
-version = "0.0.1"
-
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
