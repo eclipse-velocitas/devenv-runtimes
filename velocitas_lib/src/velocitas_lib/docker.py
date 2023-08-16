@@ -100,7 +100,9 @@ def push_docker_image_to_registry(
     )
 
 
-def container_exists(name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bool:
+def container_exists(
+    name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL
+) -> bool:
     """Check if a container with a given name exists.
 
     Args:

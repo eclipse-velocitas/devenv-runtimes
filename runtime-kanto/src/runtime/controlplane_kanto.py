@@ -95,7 +95,9 @@ def configure_controlplane(
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
     if container_exists("k3d-registry", log_output):
-        raise RuntimeError("K3D runtime seems to be up. Please stop all other runtimes first.")
+        raise RuntimeError(
+            "K3D runtime seems to be up. Please stop all other runtimes first."
+        )
 
     status = "> Checking Kanto registry... "
     if not container_exists("registry", log_output):
@@ -124,7 +126,7 @@ def reset_controlplane(
     """
 
     status = "> Stopping Kanto registry... "
-    if registry_exists(log_output):
+    if container_exists("registry", log_output):
         stop_registry(log_output)
         status = status + "stopped."
     else:
