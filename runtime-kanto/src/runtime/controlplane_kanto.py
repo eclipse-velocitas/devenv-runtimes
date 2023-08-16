@@ -19,6 +19,9 @@ from yaspin.core import Yaspin
 
 from velocitas_lib.docker import container_exists
 
+K3D_REGISTRY_NAME = "k3d-registry"
+KANTO_REGISTRY_NAME = "registry"
+
 
 def registry_running(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bool:
     """Check if the Kanto registry is running.
@@ -37,7 +40,7 @@ def registry_running(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bo
                 "inspect",
                 "-f",
                 "'{{.State.Running}}'",
-                "registry",
+                KANTO_REGISTRY_NAME,
             ],
             stderr=log_output,
         ),
@@ -52,7 +55,16 @@ def create_and_start_registry(log_output: TextIOWrapper | int = subprocess.DEVNU
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
     subprocess.check_call(
-        ["docker", "run", "-d", "-p", "12345:5000", "--name", "registry", "registry:2"],
+        [
+            "docker",
+            "run",
+            "-d",
+            "-p",
+            "12345:5000",
+            "--name",
+            KANTO_REGISTRY_NAME,
+            "registry:2",
+        ],
         stdout=log_output,
         stderr=log_output,
     )
@@ -65,7 +77,7 @@ def start_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
     subprocess.check_call(
-        ["docker", "start", "registry"],
+        ["docker", "start", KANTO_REGISTRY_NAME],
         stdout=log_output,
         stderr=log_output,
     )
@@ -78,7 +90,7 @@ def stop_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
     subprocess.check_call(
-        ["docker", "stop", "registry"],
+        ["docker", "stop", KANTO_REGISTRY_NAME],
         stdout=log_output,
         stderr=log_output,
     )
@@ -94,13 +106,13 @@ def configure_controlplane(
         spinner (Yaspin): The progress spinner to update.
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
-    if container_exists("k3d-registry", log_output):
+    if container_exists(K3D_REGISTRY_NAME, log_output):
         raise RuntimeError(
             "K3D runtime seems to be up. Please stop all other runtimes first."
         )
 
     status = "> Checking Kanto registry... "
-    if not container_exists("registry", log_output):
+    if not container_exists(KANTO_REGISTRY_NAME, log_output):
         spinner.write(status + "starting registry.")
         create_and_start_registry(log_output)
         spinner.write(status + "started.")
@@ -126,7 +138,7 @@ def reset_controlplane(
     """
 
     status = "> Stopping Kanto registry... "
-    if container_exists("registry", log_output):
+    if container_exists(KANTO_REGISTRY_NAME, log_output):
         stop_registry(log_output)
         status = status + "stopped."
     else:
