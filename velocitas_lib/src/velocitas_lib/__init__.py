@@ -83,7 +83,7 @@ def get_log_file_name(service_id: str, runtime_id: str) -> str:
     Returns:
         str: The log file name.
     """
-    return os.path.join(get_workspace_dir(), "logs", runtime_id, f"{service_id}.txt")
+    return os.path.join(get_workspace_dir(), "logs", runtime_id, f"{service_id}.log")
 
 
 def create_log_file(service_id: str, runtime_id: str) -> TextIOWrapper:
