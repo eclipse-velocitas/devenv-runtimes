@@ -17,9 +17,8 @@ import subprocess
 import sys
 from io import TextIOWrapper
 
-from yaspin.core import Yaspin
-
 from velocitas_lib.services import get_services
+from yaspin.core import Yaspin
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "runtime"))
 from deployment.gen_helm import gen_helm  # noqa: E402

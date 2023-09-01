@@ -16,8 +16,6 @@ import subprocess
 from io import TextIOWrapper
 
 from build_vehicleapp import build_vehicleapp
-from yaspin import yaspin
-
 from velocitas_lib import (
     create_log_file,
     get_app_manifest,
@@ -28,6 +26,7 @@ from velocitas_lib.docker import (
     is_docker_image_build_locally,
     push_docker_image_to_registry,
 )
+from yaspin import yaspin
 
 
 def is_vehicleapp_installed(

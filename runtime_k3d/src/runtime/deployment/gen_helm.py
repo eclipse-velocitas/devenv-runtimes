@@ -20,13 +20,11 @@ import sys
 from typing import Any
 
 import ruamel.yaml as yaml
-
 from velocitas_lib.services import Service, ServiceSpecConfig, get_services
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "deployment"))
 
 from lib import generate_nodeport  # noqa: E402
-
 from velocitas_lib import get_package_path, get_workspace_dir  # noqa: E402
 
 

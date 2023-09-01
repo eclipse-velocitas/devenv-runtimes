@@ -20,10 +20,9 @@ import time
 from typing import Dict, Optional
 
 from local_lib import run_service, stop_container, stop_service
-from yaspin import yaspin
-
 from velocitas_lib import get_log_file_name
 from velocitas_lib.services import Service, get_services, get_specific_service
+from yaspin import yaspin
 
 spawned_processes: Dict[str, subprocess.Popen] = {}
 

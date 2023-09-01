@@ -18,10 +18,9 @@ from io import TextIOWrapper
 from typing import List
 
 from deployment.lib import generate_nodeport
-from yaspin.core import Yaspin
-
 from velocitas_lib import get_package_path, require_env
 from velocitas_lib.services import get_services
+from yaspin.core import Yaspin
 
 
 def registry_exists(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bool:

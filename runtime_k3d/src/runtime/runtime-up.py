@@ -16,9 +16,8 @@ import argparse
 
 from controlplane import configure_controlplane
 from runtime import deploy_runtime
-from yaspin import yaspin
-
 from velocitas_lib import create_log_file
+from yaspin import yaspin
 
 
 def runtime_up(skip_services: bool):

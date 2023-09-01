@@ -18,7 +18,6 @@ import sys
 from typing import Optional
 
 import pytest
-
 from velocitas_lib.services import ServiceSpecConfig
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src/runtime"))

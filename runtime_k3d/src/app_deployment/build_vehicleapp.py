@@ -12,10 +12,9 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from yaspin import yaspin
-
 from velocitas_lib import create_log_file
 from velocitas_lib.docker import build_vehicleapp_image
+from yaspin import yaspin
 
 
 def build_vehicleapp():

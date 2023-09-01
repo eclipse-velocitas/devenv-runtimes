@@ -17,14 +17,13 @@ import subprocess
 import sys
 from io import TextIOWrapper
 
-from yaspin import yaspin
-
 from velocitas_lib import create_log_file, get_app_manifest
 from velocitas_lib.docker import (
     is_docker_image_build_locally,
     push_docker_image_to_registry,
 )
 from velocitas_lib.services import get_service_port
+from yaspin import yaspin
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "app_deployment"))
 from build_vehicleapp import build_vehicleapp  # noqa: E402

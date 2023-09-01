@@ -15,9 +15,8 @@
 import subprocess
 from io import TextIOWrapper
 
-from yaspin.core import Yaspin
-
 from velocitas_lib.docker import container_exists
+from yaspin.core import Yaspin
 
 K3D_REGISTRY_NAME = "k3d-registry"
 KANTO_REGISTRY_NAME = "registry"

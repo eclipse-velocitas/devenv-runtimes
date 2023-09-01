@@ -14,9 +14,8 @@
 
 from controlplane import reset_controlplane
 from runtime import undeploy_runtime
-from yaspin import yaspin
-
 from velocitas_lib import create_log_file
+from yaspin import yaspin
 
 
 def runtime_down():

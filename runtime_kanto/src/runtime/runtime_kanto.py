@@ -20,14 +20,13 @@ import time
 from io import TextIOWrapper
 from pathlib import Path
 
-from yaspin.core import Yaspin
-
 from velocitas_lib import (
     get_app_manifest,
     get_package_path,
     get_script_path,
     get_workspace_dir,
 )
+from yaspin.core import Yaspin
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "app_deployment"))
 from deploy_vehicleapp import remove_vehicleapp  # noqa: E402
