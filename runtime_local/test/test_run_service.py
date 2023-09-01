@@ -27,6 +27,7 @@ from run_service import main
 @pytest.fixture()
 def set_env_vars():
     os.environ["runtimeFilePath"] = "./runtime.json"
+    os.environ["VELOCITAS_PACKAGE_DIR"] = "."
     os.environ["VELOCITAS_WORKSPACE_DIR"] = "."
     os.environ["VELOCITAS_CACHE_DATA"] = '{"vspec_file_path":""}'
     os.environ["mockFilePath"] = "mock.py"
