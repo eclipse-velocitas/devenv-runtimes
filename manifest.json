@@ -281,6 +281,32 @@
                     "default": "mock.py"
                 }
             ]
+        },
+        {
+            "id": "pantaris-integration",
+            "alias": "pantaris",
+            "type": "generator",
+            "programs": [
+                {
+                    "id": "install-deps",
+                    "executable": "python3",
+                    "args": [
+                        "./pantaris_integration/src/install_deps.py"
+                    ]
+                },
+                {
+                    "id": "generate-desired-state",
+                    "executable": "python3",
+                    "args": [
+                        "./pantaris_integration/src/gen_desired_state.py"
+                    ]
+                }
+            ],
+            "onPostInit": [
+                {
+                    "ref": "install-deps"
+                }
+            ]
         }
     ]
 }
