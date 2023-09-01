@@ -81,3 +81,9 @@ def test_run_sevices_separately_successfully():
     assert run_command_until_logs_match(
         f"{command} run-service mockservice", regex_mockservice
     )
+
+
+if __name__ == "__main__":
+    import pytest
+
+    pytest.main([__file__])

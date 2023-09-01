@@ -117,3 +117,9 @@ def test_scripts_run_successfully():
     )
     assert check_container_is_running("sampleapp")
     assert run_command_until_logs_match(f"{BASE_COMMAND_RUNTIME} down", regex_stop)
+
+
+if __name__ == "__main__":
+    import pytest
+
+    pytest.main([__file__])

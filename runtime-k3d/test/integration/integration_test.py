@@ -92,3 +92,9 @@ def test_scripts_run_successfully():
     assert run_command(f"{BASE_COMMAND_DEPLOYMENT} deploy-vehicleapp")
     assert check_pods(pods_regs)
     assert run_command(f"{BASE_COMMAND_RUNTIME} down")
+
+
+if __name__ == "__main__":
+    import pytest
+
+    pytest.main([__file__])
