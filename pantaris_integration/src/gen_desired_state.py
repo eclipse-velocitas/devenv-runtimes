@@ -30,7 +30,7 @@ def parse_vehicle_signal_interface(config: Dict[str, Any]) -> List[str]:
         # assuming that databroker and vss have same version
         requirements.append(f"dataprovider-proto-grpc:{version}")
     else:
-        requirements.append(f"vss-source-custom-vss:latest")
+        requirements.append("vss-source-custom-vss:latest")
 
     datapoints = config["datapoints"]["required"]
     for datapoint in datapoints:
@@ -41,13 +41,13 @@ def parse_vehicle_signal_interface(config: Dict[str, Any]) -> List[str]:
     return requirements
 
 
-def parse_interfaces(interfaces, requirements):
+def parse_interfaces(interfaces):
     requirements = []
     for interface in interfaces:
         interface_type = interface["type"]
-        if interface_type is "vehicle-signal-interface":
-            requirements.append(parse_vehicle_signal_interface(interface["config"]))
-        elif interface_type is "pubsub":
+        if interface_type == "vehicle-signal-interface":
+            requirements += parse_vehicle_signal_interface(interface["config"])
+        elif interface_type == "pubsub":
             requirements.append("mqtt:v3")
 
     return requirements
@@ -81,7 +81,7 @@ def main():
     interfaces = app_manifest["interfaces"]
 
     requirements = []
-    requirements.append(parse_interfaces(interfaces))
+    requirements += parse_interfaces(interfaces)
 
     if output_file_path is None:
         output_file_path = velocitas_lib.get_workspace_dir()
@@ -91,7 +91,7 @@ def main():
         "name": appName,
         "source": source,
         "type": "binary/container",
-        "requires": [requirements],
+        "requires": requirements,
         "provides": [f"{imageName}:{version}"],
     }
     with open(
@@ -99,7 +99,7 @@ def main():
         "w",
         encoding="utf-8",
     ) as f:
-        f.write(json.dump(data))
+        json.dump(data, f)
 
 
 if __name__ == "__main__":
