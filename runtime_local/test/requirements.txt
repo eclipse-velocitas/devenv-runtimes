@@ -1,2 +1,2 @@
 pytest==7.2.1
-velocitas_lib
+git+https://github.com/eclipse-velocitas/velocitas-lib.git

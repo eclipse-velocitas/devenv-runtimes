@@ -18,7 +18,7 @@ from controlplane_kanto import configure_controlplane
 from runtime_down import runtime_down
 from yaspin import yaspin
 
-from runtime_kanto import is_kanto_running, start_kanto
+from .runtime_kanto import is_kanto_running, start_kanto
 from velocitas_lib import create_log_file
 
 

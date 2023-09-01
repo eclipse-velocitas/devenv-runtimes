@@ -36,12 +36,5 @@ def install_packages():
     pip(["install", "-r", f"{script_path}/requirements.txt"])
 
 
-def install_velocitas_lib():
-    """Install the velocitas lib."""
-    script_path = get_script_path()
-    pip(["install", "-e", f"{script_path}/../../velocitas_lib"])
-
-
 if __name__ == "__main__":
-    install_velocitas_lib()
     install_packages()

@@ -11,17 +11,3 @@
 # under the License.
 #
 # SPDX-License-Identifier: Apache-2.0
-
-from enum import Enum
-
-
-class MiddlewareType(Enum):
-    """Enumeration containing all possible middleware types."""
-
-    NATIVE = 0
-    DAPR = 1
-
-
-def get_middleware_type() -> MiddlewareType:
-    """Return the current middleware type."""
-    return MiddlewareType.DAPR

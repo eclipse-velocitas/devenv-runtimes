@@ -50,11 +50,9 @@ jobs:
 
       - name: Install required packages
         run: |
-          pip install -e velocitas_lib
           pip install -r runtime_k3d/src/requirements.txt
           pip install -r runtime_k3d/test/requirements.txt
           pip install -r runtime_local/test/requirements.txt
-          pip install -r velocitas_lib/test/requirements.txt
 
       - name: unit tests
         shell: bash
@@ -62,7 +60,7 @@ jobs:
           pytest --ignore-glob='*integration*' --override-ini junit_family=xunit1 --junit-xml=./results/UnitTest/junit.xml \
           --cov . \
           --cov-report=xml:results/CodeCoverage/cobertura-coverage.xml \
-          --cov-branch ./runtime_k3d/test ./runtime_local/test ./velocitas_lib/test
+          --cov-branch ./runtime_k3d/test ./runtime_local/test
 
       - name: Publish Unit Test Results
         uses: mikepenz/action-junit-report@v3

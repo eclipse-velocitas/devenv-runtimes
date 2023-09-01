@@ -15,7 +15,7 @@
 from controlplane_kanto import reset_controlplane
 from yaspin import yaspin
 
-from runtime_kanto import stop_kanto, undeploy_runtime
+from .runtime_kanto import stop_kanto, undeploy_runtime
 from velocitas_lib import create_log_file
 
 
