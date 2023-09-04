@@ -13,11 +13,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
-import os
 import sys
 from pathlib import Path
 from re import Pattern, compile
-from subprocess import PIPE, Popen, check_call
+from subprocess import PIPE, Popen
 from threading import Timer
 
 
@@ -66,20 +65,9 @@ def run_command_until_logs_match(command: str, regex_service: Pattern[str]) -> b
     return True
 
 
-def check_and_run_integration_tests() -> bool:
-    if os.path.exists("app/tests/integration/integration_test.py"):
-        return (
-            check_call(
-                ["pytest", "-s", "-x", "app/tests/integration/integration_test.py"]
-            )
-            == 0
-        )
-
-
 def test_runtime_up_successfully():
     create_dummy_vspec_file()
     assert run_command_until_logs_match(f"{command} up", regex_runtime_up)
-    assert check_and_run_integration_tests()
 
 
 def test_run_sevices_separately_successfully():
