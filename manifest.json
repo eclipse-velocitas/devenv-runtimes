@@ -43,15 +43,6 @@
                     "args": [
                         "./runtime-local/src/run-dapr-sidecar.py"
                     ]
-                },
-                {
-                    "id": "test",
-                    "executable": "pytest",
-                    "args": [
-                        "-s",
-                        "-x",
-                        "./runtime-local/test/integration/integration_test.py"
-                    ]
                 }
             ],
             "onPostInit": [
@@ -127,15 +118,6 @@
                     "executable": "python3",
                     "args": [
                         "./runtime-k3d/src/runtime/deployment/gen_helm.py"
-                    ]
-                },
-                {
-                    "id": "test",
-                    "executable": "pytest",
-                    "args": [
-                        "-s",
-                        "-x",
-                        "./runtime-k3d/test/integration/integration_test.py"
                     ]
                 }
             ],
@@ -236,15 +218,6 @@
                     "executable": "python3",
                     "args": [
                         "./runtime-kanto/src/runtime/runtime_down.py"
-                    ]
-                },
-                {
-                    "id": "test",
-                    "executable": "pytest",
-                    "args": [
-                        "-s",
-                        "-x",
-                        "./runtime-kanto/test/integration/integration_test.py"
                     ]
                 }
             ],

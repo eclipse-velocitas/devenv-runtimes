@@ -12,6 +12,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import os
 from re import Pattern, compile
 from subprocess import check_call, check_output
 
@@ -83,6 +84,16 @@ def run_command(command: str) -> bool:
     return check_call(command.split(" ")) == 0
 
 
+def check_and_run_integration_tests() -> bool:
+    if os.path.exists("app/tests/integration/integration_test.py"):
+        return (
+            check_call(
+                ["pytest", "-s", "-x", "app/tests/integration/integration_test.py"]
+            )
+            == 0
+        )
+
+
 def test_scripts_run_successfully():
     assert run_command(f"{BASE_COMMAND_RUNTIME} install-deps")
     assert run_command(f"{BASE_COMMAND_RUNTIME} up")
@@ -90,11 +101,6 @@ def test_scripts_run_successfully():
     assert run_command(f"{BASE_COMMAND_DEPLOYMENT} build-vehicleapp")
     assert check_image_if_created(image_reg)
     assert run_command(f"{BASE_COMMAND_DEPLOYMENT} deploy-vehicleapp")
+    assert check_and_run_integration_tests()
     assert check_pods(pods_regs)
     assert run_command(f"{BASE_COMMAND_RUNTIME} down")
-
-
-if __name__ == "__main__":
-    import pytest
-
-    pytest.main([__file__])

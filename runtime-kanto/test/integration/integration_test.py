@@ -19,7 +19,7 @@ import sys
 import time
 from pathlib import Path
 from re import Pattern, compile
-from subprocess import PIPE, Popen
+from subprocess import PIPE, Popen, check_call
 from threading import Timer
 
 BASE_COMMAND_RUNTIME = "velocitas exec runtime-kanto"
@@ -101,6 +101,16 @@ def wait_for_container_update():
             time.sleep(1)
 
 
+def check_and_run_integration_tests() -> bool:
+    if os.path.exists("app/tests/integration/integration_test.py"):
+        return (
+            check_call(
+                ["pytest", "-s", "-x", "app/tests/integration/integration_test.py"]
+            )
+            == 0
+        )
+
+
 def test_scripts_run_successfully():
     create_dummy_vspec_file()
     assert run_command_until_logs_match(f"{BASE_COMMAND_RUNTIME} up", regex_runtime_up)
@@ -116,10 +126,5 @@ def test_scripts_run_successfully():
         f"{BASE_COMMAND_DEPLOYMENT} deploy-vehicleapp", regex_deploy
     )
     assert check_container_is_running("sampleapp")
+    assert check_and_run_integration_tests()
     assert run_command_until_logs_match(f"{BASE_COMMAND_RUNTIME} down", regex_stop)
-
-
-if __name__ == "__main__":
-    import pytest
-
-    pytest.main([__file__])
