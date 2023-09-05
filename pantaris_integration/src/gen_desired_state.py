@@ -14,11 +14,37 @@
 
 import argparse
 import json
+import hashlib
+import re
+import requests
+
 from typing import Any, Dict, List
+
 import velocitas_lib
+import velocitas_lib.services
+
+
+def is_uri(path: str) -> bool:
+    """Check if the provided path is a URI.
+
+    Args:
+        path (str): The path to check.
+
+    Returns:
+        bool: True if the path is a URI. False otherwise.
+    """
+    return re.match(r"(\w+)\:\/\/(\w+)", path) is not None
 
 
 def parse_vehicle_signal_interface(config: Dict[str, Any]) -> List[str]:
+    """Parses the vehicle signal interface config.
+
+    Args:
+        config: The json-config of the interface, as defined in the appManifest.json.
+
+    Returns:
+        List[str]: A list of requirements defined by the config.
+    """
     requirements = []
     src = str(config["src"])
     vss_release_prefix = (
@@ -29,8 +55,10 @@ def parse_vehicle_signal_interface(config: Dict[str, Any]) -> List[str]:
         requirements.append(f"vss-source-default-vss:{version}")
         # assuming that databroker and vss have same version
         requirements.append(f"dataprovider-proto-grpc:{version}")
+    elif is_uri(src):
+        requirements.append(f"vss-source-custom-vss:{get_md5_from_uri(src)}")
     else:
-        requirements.append("vss-source-custom-vss:latest")
+        requirements.append(f"vss-source-custom-vss:{get_md5_for_file(src)}")
 
     datapoints = config["datapoints"]["required"]
     for datapoint in datapoints:
@@ -41,14 +69,83 @@ def parse_vehicle_signal_interface(config: Dict[str, Any]) -> List[str]:
     return requirements
 
 
-def parse_interfaces(interfaces):
+def parse_grpc_interface(config: Dict[str, Any]) -> str:
+    """Parses the grpc interface config.
+
+    Args:
+        config: The json-config of the interface, as defined in the appManifest.json.
+
+    Returns:
+        str: The requirement with md5-hash of the proto-file as version.
+    """
+    src = str(config["src"])
+
+    return f"dataprovider-proto-grpc:{get_md5_from_uri(src)}"
+
+
+def get_md5_from_uri(src: str) -> str:
+    """Get the md5-hash of a file defined by an URI.
+
+    Args:
+        str: The URI of the file.
+
+    Returns:
+        str: The md5-hash of the file.
+    """
+    md5 = hashlib.md5(usedforsecurity=False)
+    with requests.get(src) as source:
+        for chunk in source.iter_content(chunk_size=8192):
+            md5.update(chunk)
+
+    return md5.hexdigest()
+
+
+def get_md5_for_file(file_path: str):
+    """Get the md5-hash of a local file defined by a path.
+
+    Args:
+        str: The local path to the file.
+
+    Returns:
+        str: The md5-hash of the file.
+    """
+    md5 = hashlib.md5(usedforsecurity=False)
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            md5.update(chunk)
+
+    return md5.hexdigest()
+
+
+def get_mqtt_version() -> str:
+    """Get the version of the used mqtt-broker.
+
+    Returns:
+        str: The version of the mqtt-broker defined in the runtime.json.
+    """
+    mqtt_config = velocitas_lib.services.get_specific_service("mqtt-broker").config
+    mqtt_version = mqtt_config.image.split(":")[-1]
+    return mqtt_version
+
+
+def parse_interfaces(interfaces: List[Dict[str, Any]]) -> List[str]:
+    """Parses the defined interfaces.
+
+    Args:
+        interfaces: The json-array of interfaces, as defined in the appManifest.json.
+
+    Returns:
+        List[str]: A list of requirements defined by the interface definitions.
+    """
     requirements = []
     for interface in interfaces:
         interface_type = interface["type"]
         if interface_type == "vehicle-signal-interface":
             requirements += parse_vehicle_signal_interface(interface["config"])
         elif interface_type == "pubsub":
-            requirements.append("mqtt:v3")
+            requirements.append(f"mqtt:{get_mqtt_version()}")
+        elif interface_type == "grpc-interface":
+            requirements.append(parse_grpc_interface(interface["config"]))
 
     return requirements
 
