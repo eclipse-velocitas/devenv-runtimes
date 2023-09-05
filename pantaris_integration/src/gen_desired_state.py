@@ -54,7 +54,7 @@ def parse_vehicle_signal_interface(config: Dict[str, Any]) -> List[str]:
         version = src.removeprefix(vss_release_prefix).split("/")[0]
         requirements.append(f"vss-source-default-vss:{version}")
         # assuming that databroker and vss have same version
-        requirements.append(f"dataprovider-proto-grpc:{version}")
+        requirements.append(f"data-broker-grpc:{version}")
     elif is_uri(src):
         requirements.append(f"vss-source-custom-vss:{get_md5_from_uri(src)}")
     else:

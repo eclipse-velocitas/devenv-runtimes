@@ -302,6 +302,14 @@
                     ]
                 }
             ],
+            "variables": [
+                {
+                    "name": "runtimeFilePath",
+                    "type": "string",
+                    "description": "Path to the file describing your custom runtime configuration.",
+                    "default": "runtime.json"
+                }
+            ],
             "onPostInit": [
                 {
                     "ref": "install-deps"
