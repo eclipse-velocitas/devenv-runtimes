@@ -60,7 +60,7 @@ jobs:
           pytest --ignore-glob='*integration*' --override-ini junit_family=xunit1 --junit-xml=./results/UnitTest/junit.xml \
           --cov . \
           --cov-report=xml:results/CodeCoverage/cobertura-coverage.xml \
-          --cov-branch ./runtime_k3d/test ./runtime_local/test
+          --cov-branch ./runtime_k3d/test ./runtime_local/test ./pantaris_integration/test
 
       - name: Publish Unit Test Results
         uses: mikepenz/action-junit-report@v3
@@ -223,3 +223,44 @@ jobs:
           name: "Log files Kanto"
           path: |
             runtime_kanto/test/logs
+
+  run-pantaris-integration-tests:
+    name: Run Integration Tests for pantaris-integration
+    runs-on: ubuntu-22.04
+    env:
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Set commit id
+        run: |
+          NEW_CONFIG="$(jq --arg GITHUB_SHA "$GITHUB_SHA" '.packages[0].version |= $GITHUB_SHA' runtime_kanto/test/.velocitas.json)"
+          echo "${NEW_CONFIG}" > runtime_kanto/test/.velocitas.json
+
+      - name: Install required packages
+        run: |
+          sudo curl -L https://github.com/eclipse-velocitas/cli/releases/latest/download/velocitas-linux-x64 -o /usr/bin/velocitas
+          sudo chmod +x /usr/bin/velocitas
+
+      - name: Init velocitas project
+        run: |
+          cd pantaris_integration/test
+          velocitas init -v
+
+      - name: Run integration tests for kanto
+        run: |
+          cd pantaris_integration/test
+          pytest -s -x ./integration/integration_test.py
+
+      - name: Upload log files as artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: "Log files Pantaris-Integration"
+          path: |
+            pantaris_integration/test/test/logs

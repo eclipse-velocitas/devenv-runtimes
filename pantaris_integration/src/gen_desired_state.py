@@ -94,7 +94,7 @@ def get_md5_from_uri(src: str) -> str:
     """
     md5 = hashlib.md5(usedforsecurity=False)
     with requests.get(src) as source:
-        for chunk in source.iter_content(chunk_size=8192):
+        for chunk in source.iter_content(chunk_size=4096):
             md5.update(chunk)
 
     return md5.hexdigest()
