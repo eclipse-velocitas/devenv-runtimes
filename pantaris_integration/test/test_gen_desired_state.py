@@ -12,12 +12,13 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+from pathlib import Path
+
 from pantaris_integration.src.gen_desired_state import (
     get_md5_for_file,
     get_md5_from_uri,
     is_uri,
 )
-from pathlib import Path
 
 
 def test_get_md5_for_file():

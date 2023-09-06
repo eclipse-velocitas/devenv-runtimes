@@ -13,13 +13,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import argparse
-import json
 import hashlib
+import json
 import re
-import requests
-
 from typing import Any, Dict, List
 
+import requests
 import velocitas_lib
 import velocitas_lib.services
 

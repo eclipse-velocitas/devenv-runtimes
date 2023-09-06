@@ -12,10 +12,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from pathlib import Path
-import subprocess
 import json
 import os
+import subprocess
+from pathlib import Path
 
 
 def test_output():
