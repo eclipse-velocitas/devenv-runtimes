@@ -1,2 +1,2 @@
 requests==2.31.0
-git+https://github.com/eclipse-velocitas/velocitas-lib.git
+git+https://github.com/eclipse-velocitas/velocitas-lib.git@fix/get_script_path
