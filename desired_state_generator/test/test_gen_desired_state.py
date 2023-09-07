@@ -40,4 +40,4 @@ def test_is_uri__true():
 
 
 def test_is_uri__false():
-    assert not is_uri(f"{Path.cwd()}/pantaris_integration/test/__init__.py")
+    assert not is_uri(f"{Path.cwd()}/LICENSE")

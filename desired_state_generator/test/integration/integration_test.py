@@ -19,14 +19,14 @@ from pathlib import Path
 
 
 def test_output():
-    file_path = f"{Path.cwd()}/pantaris_integration/test/integration"
+    file_path = f"{Path.cwd()}/desired_state_generator/test/integration"
     file = f"{file_path}/sampleapp_manifest_v1.json"
     subprocess.run(
         [
             "velocitas",
             "exec",
             "pantaris-integration",
-            "generated-desired-state",
+            "generate-desired-state",
             "-s",
             "ghcr.io/eclipse-velocitas/vehicle-app-python-template/sampleapp:v1",
             "-o",

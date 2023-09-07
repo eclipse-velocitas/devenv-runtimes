@@ -291,14 +291,14 @@
                     "id": "install-deps",
                     "executable": "python3",
                     "args": [
-                        "./pantaris_integration/src/install_deps.py"
+                        "./desired_state_generator/src/install_deps.py"
                     ]
                 },
                 {
                     "id": "generate-desired-state",
                     "executable": "python3",
                     "args": [
-                        "./pantaris_integration/src/gen_desired_state.py"
+                        "./desired_state_generator/src/gen_desired_state.py"
                     ]
                 }
             ],

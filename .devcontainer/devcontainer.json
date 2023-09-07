@@ -18,7 +18,7 @@
 					"editor.defaultFormatter": "ms-python.black-formatter"
 				},
 				"python.testing.pytestArgs": [
-					"--ignore=pantaris_integration/test/integration",
+					"--ignore=desired_state_generator/test/integration",
 					"--ignore=runtime_k3d/test/integration",
 					"--ignore=runtime_kanto/test/integration",
 					"--ignore=runtime_local/test/integration",

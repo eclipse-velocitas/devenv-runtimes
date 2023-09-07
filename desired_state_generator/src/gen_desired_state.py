@@ -49,21 +49,24 @@ def parse_vehicle_signal_interface(config: Dict[str, Any]) -> List[str]:
     vss_release_prefix = (
         "https://github.com/COVESA/vehicle_signal_specification/releases/download/"
     )
+    version = ""
     if vss_release_prefix in src:
         version = src.removeprefix(vss_release_prefix).split("/")[0]
         requirements.append(f"vss-source-default-vss:{version}")
         # assuming that databroker and vss have same version
         requirements.append(f"data-broker-grpc:{version}")
     elif is_uri(src):
-        requirements.append(f"vss-source-custom-vss:{get_md5_from_uri(src)}")
+        version = get_md5_from_uri(src)
+        requirements.append(f"vss-source-custom-vss:{version}")
     else:
-        requirements.append(f"vss-source-custom-vss:{get_md5_for_file(src)}")
+        version = get_md5_for_file(src)
+        requirements.append(f"vss-source-custom-vss:{version}")
 
     datapoints = config["datapoints"]["required"]
     for datapoint in datapoints:
         path = str(datapoint["path"]).lower().replace(".", "-")
         access = datapoint["access"]
-        requirements.append(f"vss-{access}-{path}")
+        requirements.append(f"vss-{access}-{path}:{version}")
 
     return requirements
 
@@ -186,7 +189,7 @@ def main():
     data = {
         "name": appName,
         "source": source,
-        "type": "binary/container",
+        "type": "container",
         "requires": requirements,
         "provides": [f"{imageName}:{version}"],
     }

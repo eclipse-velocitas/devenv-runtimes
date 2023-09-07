@@ -60,7 +60,7 @@ jobs:
           pytest --ignore-glob='*integration*' --override-ini junit_family=xunit1 --junit-xml=./results/UnitTest/junit.xml \
           --cov . \
           --cov-report=xml:results/CodeCoverage/cobertura-coverage.xml \
-          --cov-branch ./runtime_k3d/test ./runtime_local/test ./pantaris_integration/test
+          --cov-branch ./runtime_k3d/test ./runtime_local/test ./desired_state_generator/test
 
       - name: Publish Unit Test Results
         uses: mikepenz/action-junit-report@v3
@@ -224,8 +224,8 @@ jobs:
           path: |
             runtime_kanto/test/logs
 
-  run-pantaris-integration-tests:
-    name: Run Integration Tests for pantaris-integration
+  run-desired-state-generator-tests:
+    name: Run Integration Tests for desired state generator
     runs-on: ubuntu-22.04
     env:
       DOCKER_BUILDKIT: 1
@@ -246,22 +246,22 @@ jobs:
         run: |
           sudo curl -L https://github.com/eclipse-velocitas/cli/releases/latest/download/velocitas-linux-x64 -o /usr/bin/velocitas
           sudo chmod +x /usr/bin/velocitas
-          pip install -r pantaris_integration/test/requirements.txt
+          pip install -r desired_state_generator/test/requirements.txt
 
       - name: Init velocitas project
         run: |
-          cd pantaris_integration/test
+          cd desired_state_generator/test
           velocitas init -v
 
       - name: Run integration tests for kanto
         run: |
-          cd pantaris_integration/test
+          cd desired_state_generator/test
           pytest -s -x ./integration/integration_test.py
 
       - name: Upload log files as artifacts
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: "Log files Pantaris-Integration"
+          name: "Log files Desired State Generator"
           path: |
-            pantaris_integration/test/test/logs
+            desired_state_generator/test/test/logs
