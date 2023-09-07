@@ -1,8 +1,0 @@
-{
-    "packages": [
-        {
-            "name": "devenv-runtimes",
-            "version": "hash_id"
-        }
-    ]
-}
