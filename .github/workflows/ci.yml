@@ -239,8 +239,8 @@ jobs:
 
       - name: Set commit id
         run: |
-          NEW_CONFIG="$(jq --arg GITHUB_SHA "$GITHUB_SHA" '.packages[0].version |= $GITHUB_SHA' runtime_kanto/test/.velocitas.json)"
-          echo "${NEW_CONFIG}" > runtime_kanto/test/.velocitas.json
+          NEW_CONFIG="$(jq --arg GITHUB_SHA "$GITHUB_SHA" '.packages[0].version |= $GITHUB_SHA' desired_state_generator/test/.velocitas.json)"
+          echo "${NEW_CONFIG}" > desired_state_generator/test/.velocitas.json
 
       - name: Install required packages
         run: |
@@ -253,7 +253,7 @@ jobs:
           cd desired_state_generator/test
           velocitas init -v
 
-      - name: Run integration tests for kanto
+      - name: Run integration tests for desired state generator
         run: |
           cd desired_state_generator/test
           pytest -s -x ./integration/integration_test.py
