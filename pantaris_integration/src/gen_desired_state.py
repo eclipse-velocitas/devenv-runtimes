@@ -92,7 +92,7 @@ def get_md5_from_uri(src: str) -> str:
         str: The md5-hash of the file.
     """
     md5 = hashlib.md5(usedforsecurity=False)
-    with requests.get(src) as source:
+    with requests.get(src, timeout=30) as source:
         for chunk in source.iter_content(chunk_size=4096):
             md5.update(chunk)
 

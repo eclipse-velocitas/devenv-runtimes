@@ -12,25 +12,27 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+# flake8: noqa: E402
+import os
+import sys
 from pathlib import Path
 
-from pantaris_integration.src.gen_desired_state import (
-    get_md5_for_file,
-    get_md5_from_uri,
-    is_uri,
-)
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
+from gen_desired_state import get_md5_for_file, get_md5_from_uri, is_uri
 
 
 def test_get_md5_for_file():
-    hash = get_md5_for_file(f"{Path.cwd()}/pantaris_integration/test/__init__.py")
-    assert hash == "a6527c69275a58815400058232b53e2e"
+    hash = get_md5_for_file(f"{Path.cwd()}/LICENSE")
+    # generated with https://emn178.github.io/online-tools/md5_checksum.html
+    assert hash == "86d3f3a95c324c9479bd8986968f4327"
 
 
 def test_get_md5_for_uri():
     hash = get_md5_from_uri(
-        "https://raw.githubusercontent.com/eclipse-velocitas/devenv-runtimes/main/pantaris_integration/test/__init__.py"
+        "https://raw.githubusercontent.com/eclipse-velocitas/devenv-runtimes/main/LICENSE"
     )
-    assert hash == "a6527c69275a58815400058232b53e2e"
+    # generated with https://emn178.github.io/online-tools/md5_checksum.html
+    assert hash == "86d3f3a95c324c9479bd8986968f4327"
 
 
 def test_is_uri__true():

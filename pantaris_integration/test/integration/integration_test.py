@@ -38,7 +38,7 @@ def test_output():
         data = json.load(f)
         assert data == {
             "name": "SampleApp",
-            "source": "ghcr.io/eclipse-velocitas/vehicle-app-python-template/sampleapp:v1",
+            "source": "ghcr.io/eclipse-velocitas/vehicle-app-python-template/sampleapp:v1",  # noqa E501
             "type": "binary/container",
             "requires": [
                 "vss-source-default-vss:v3.0",
