@@ -150,4 +150,4 @@ def reset_controlplane(
     else:
         status = status + "does not exist."
     spinner.write(status)
-    log_output.write(status+"\n")
+    log_output.write(status + "\n")
