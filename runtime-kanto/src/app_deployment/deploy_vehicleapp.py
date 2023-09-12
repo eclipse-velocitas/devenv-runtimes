@@ -30,11 +30,11 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", "app_deployment"))
 from build_vehicleapp import build_vehicleapp  # noqa: E402
 
 
-def is_vehicleapp_installed(
+def is_vehicleapp_in_kanto(
     app_name: str,
     log_output: TextIOWrapper | int = subprocess.DEVNULL,
 ) -> bool:
-    """Return whether the runtime is installed or not.
+    """Return whether the vehicleapp image is already in Kanto or not.
 
     Args:
         app_name (str): App name
@@ -50,6 +50,51 @@ def is_vehicleapp_installed(
     )
 
 
+def is_vehicleapp_in_containerd(
+    app_name: str,
+    log_output: TextIOWrapper | int = subprocess.DEVNULL,
+) -> bool:
+    """Return whether the vehicleapp image is already in containerd or not.
+
+    Args:
+        app_name (str): App name
+        log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
+    """
+    images = str(
+        subprocess.check_output(
+            [
+                "sudo",
+                "ctr",
+                "-a",
+                "/run/docker/containerd/containerd.sock",
+                "-n",
+                "kanto-cm",
+                "i",
+                "ls",
+                "-q",
+            ],
+            stderr=log_output,
+        ),
+        "utf-8",
+    )
+    return app_name in images
+
+
+def is_vehicleapp_installed(
+    app_name: str,
+    log_output: TextIOWrapper | int = subprocess.DEVNULL,
+) -> bool:
+    """Return whether the vehicleapp is already installed or not.
+
+    Args:
+        app_name (str): App name
+        log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
+    """
+    return is_vehicleapp_in_containerd(app_name, log_output) or is_vehicleapp_in_kanto(
+        app_name, log_output
+    )
+
+
 def remove_vehicleapp(
     app_name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL
 ):
@@ -59,11 +104,52 @@ def remove_vehicleapp(
         app_name (str): App name to remove container for
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
-    subprocess.call(
-        ["kanto-cm", "remove", "-f", "-n", app_name],
-        stdout=log_output,
-        stderr=log_output,
-    )
+    if is_vehicleapp_in_kanto(app_name):
+        log_output.write(f"Removing {app_name} container from Kanto\n")
+        subprocess.call(
+            ["kanto-cm", "remove", "-f", "-n", app_name],
+            stdout=log_output,
+            stderr=log_output,
+        )
+
+    if is_vehicleapp_in_containerd(app_name):
+        log_output.write(f"Removing {app_name} container from containerd\n")
+        ps = subprocess.Popen(
+            (
+                "sudo",
+                "ctr",
+                "-a",
+                "/run/docker/containerd/containerd.sock",
+                "-n",
+                "kanto-cm",
+                "i",
+                "ls",
+                "-q",
+            ),
+            stdout=subprocess.PIPE,
+        )
+        app_id = str(
+            subprocess.check_output(
+                ["grep", app_name], stdin=ps.stdout, stderr=log_output
+            ),
+            "utf-8",
+        )
+        ps.wait()
+        subprocess.call(
+            [
+                "sudo",
+                "ctr",
+                "-a",
+                "/run/docker/containerd/containerd.sock",
+                "-n",
+                "kanto-cm",
+                "i",
+                "rm",
+                app_id.strip(),
+            ],
+            stdout=log_output,
+            stderr=log_output,
+        )
 
 
 def create_container(
@@ -82,6 +168,7 @@ def create_container(
     mqtt_port = get_service_port("mqtt-broker")
     mqtt_address = "mqtt://127.0.0.1"
 
+    log_output.write(f"Creating new {app_name} container\n")
     subprocess.check_call(
         [
             "kanto-cm",
@@ -115,6 +202,7 @@ def start_container(
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
 
+    log_output.write(f"Starting {app_name} container\n")
     subprocess.check_call(
         [
             "kanto-cm",
