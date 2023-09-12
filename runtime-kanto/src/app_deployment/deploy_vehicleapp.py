@@ -47,6 +47,23 @@ def is_vehicleapp_installed(
             stderr=log_output,
         )
         == 0
+    ) or (
+        subprocess.check_output(
+            [
+                "sudo",
+                "ctr",
+                "-a",
+                "/run/docker/containerd/containerd.sock",
+                "-n",
+                "kanto-cm",
+                "i",
+                "ls",
+                "-q",
+                "| grep {app_name}",
+            ],
+            stderr=log_output,
+        )
+        != ""
     )
 
 
@@ -61,6 +78,36 @@ def remove_vehicleapp(
     """
     subprocess.call(
         ["kanto-cm", "remove", "-f", "-n", app_name],
+        stdout=log_output,
+        stderr=log_output,
+    )
+    app_id = subprocess.check_output(
+        [
+            "sudo",
+            "ctr",
+            "-a",
+            "/run/docker/containerd/containerd.sock",
+            "-n",
+            "kanto-cm",
+            "i",
+            "ls",
+            "-q",
+            "| grep {app_name}",
+        ],
+        stderr=log_output,
+    )
+    subprocess.call(
+        [
+            "sudo",
+            "ctr",
+            "-a",
+            "/run/docker/containerd/containerd.sock",
+            "-n",
+            "kanto-cm",
+            "i",
+            "rm",
+            app_id,
+        ],
         stdout=log_output,
         stderr=log_output,
     )
