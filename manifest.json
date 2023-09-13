@@ -27,7 +27,11 @@
                     "id": "install-deps",
                     "executable": "python3",
                     "args": [
-                        "./runtime_local/src/install_deps.py"
+                        "-m",
+                        "pip",
+                        "install",
+                        "-r",
+                        "./runtime_local/src/requirements.txt"
                     ]
                 },
                 {
@@ -89,7 +93,11 @@
                     "id": "install-deps",
                     "executable": "python3",
                     "args": [
-                        "./runtime_k3d/src/install_deps.py"
+                        "-m",
+                        "pip",
+                        "install",
+                        "-r",
+                        "./runtime_k3d/src/requirements.txt"
                     ]
                 },
                 {
@@ -203,7 +211,11 @@
                     "id": "install-deps",
                     "executable": "python3",
                     "args": [
-                        "./runtime_kanto/src/install_deps.py"
+                        "-m",
+                        "pip",
+                        "install",
+                        "-r",
+                        "./runtime_kanto/src/requirements.txt"
                     ]
                 },
                 {
@@ -285,13 +297,17 @@
         {
             "id": "pantaris-integration",
             "alias": "pantaris",
-            "type": "generator",
+            "type": "setup",
             "programs": [
                 {
                     "id": "install-deps",
                     "executable": "python3",
                     "args": [
-                        "./desired_state_generator/src/install_deps.py"
+                        "-m",
+                        "pip",
+                        "install",
+                        "-r",
+                        "./desired_state_generator/src/requirements.txt"
                     ]
                 },
                 {

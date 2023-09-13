@@ -18,36 +18,15 @@ echo "### Install python requirements                     ###"
 echo "#######################################################"
 # Update pip before installing requirements
 pip3 install --upgrade pip
-REQUIREMENTS="runtime_k3d/src/requirements.txt"
-if [ -f $REQUIREMENTS ]; then
-    pip3 install -r $REQUIREMENTS
-fi
-REQUIREMENTS="runtime_kanto/src/requirements.txt"
-if [ -f $REQUIREMENTS ]; then
-    pip3 install -r $REQUIREMENTS
-fi
-# Dependencies for the app
-REQUIREMENTS="runtime_local/src/requirements.txt"
-if [ -f $REQUIREMENTS ]; then
-    pip3 install -r $REQUIREMENTS
-fi
+for package in runtime_k3d runtime_kanto runtime_local desired_state_generator; do
 
+    REQUIREMENTS="$package/src/requirements.txt"
+    if [ -f $REQUIREMENTS ]; then
+        pip3 install -r $REQUIREMENTS
+    fi
+    REQUIREMENTS="$package/test/requirements.txt"
+    if [ -f $REQUIREMENTS ]; then
+        pip3 install -r $REQUIREMENTS
+    fi
 
-echo "#######################################################"
-echo "### Install test requirements                       ###"
-echo "#######################################################"
-# Update pip before installing requirements
-pip3 install --upgrade pip
-REQUIREMENTS="runtime_k3d/test/requirements.txt"
-if [ -f $REQUIREMENTS ]; then
-    pip3 install -r $REQUIREMENTS
-fi
-REQUIREMENTS="runtime_kanto/test/requirements.txt"
-if [ -f $REQUIREMENTS ]; then
-    pip3 install -r $REQUIREMENTS
-fi
-# Dependencies for the app
-REQUIREMENTS="runtime_local/test/requirements.txt"
-if [ -f $REQUIREMENTS ]; then
-    pip3 install -r $REQUIREMENTS
-fi
+done

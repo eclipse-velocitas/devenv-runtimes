@@ -54,7 +54,7 @@ Function | Description
 :---|:---
 `$pathInWorkspaceOrPackage( <relative_path> )` | Resolves a path dynamically either to the local project workspace, if the file is available or falls back to a file in the package repository. If none of these files is available an exception is raised.
 
-## Generators
+## Deployment spec generators
 
 This package contains the following generators:
 

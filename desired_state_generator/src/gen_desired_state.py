@@ -16,11 +16,21 @@ import argparse
 import hashlib
 import json
 import re
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
-import requests
 import velocitas_lib
 import velocitas_lib.services
+
+VSS_SOURCE_DEFAULT = "vss-source-default-vss"
+VSS_SOURCE_CUSTOM = "vss-source-custom-vss"
+DATABROKER_ID = "data-broker-grpc"
+GRPC_INTERFACE_ID = "dataprovider-proto-grpc"
+DATABROKER_PACKAGE_ID = "vehicledatabroker"
+MQTT_PACKAGE_ID = "mqtt-broker"
+
+VSS_INTERFACE = "vehicle-signal-interface"
+PUBSUB_INTERFACE = "pubsub"
+GRPC_INTERFACE = "grpc-interface"
 
 
 def is_uri(path: str) -> bool:
@@ -36,10 +46,11 @@ def is_uri(path: str) -> bool:
 
 
 def parse_vehicle_signal_interface(config: Dict[str, Any]) -> List[str]:
-    """Parses the vehicle signal interface config.
+    """Parse the vehicle signal interface config.
 
     Args:
-        config: The json-config of the interface, as defined in the appManifest.json.
+        config (Dict[str, Any]): The json-config of the interface,
+        as defined in the appManifest.json.
 
     Returns:
         List[str]: A list of requirements defined by the config.
@@ -52,15 +63,12 @@ def parse_vehicle_signal_interface(config: Dict[str, Any]) -> List[str]:
     version = ""
     if vss_release_prefix in src:
         version = src.removeprefix(vss_release_prefix).split("/")[0]
-        requirements.append(f"vss-source-default-vss:{version}")
-    elif is_uri(src):
-        version = get_md5_from_uri(src)
-        requirements.append(f"vss-source-custom-vss:{version}")
+        requirements.append(f"{VSS_SOURCE_DEFAULT}:{version}")
     else:
-        version = get_md5_for_file(src)
-        requirements.append(f"vss-source-custom-vss:{version}")
+        version = get_md5_from_file_content(src)
+        requirements.append(f"{VSS_SOURCE_CUSTOM}:{version}")
 
-    requirements.append(f"data-broker-grpc:{get_package_version('vehicledatabroker')}")
+    requirements.append(f"{DATABROKER_ID}:{get_package_version(DATABROKER_PACKAGE_ID)}")
 
     datapoints = config["datapoints"]["required"]
     for datapoint in datapoints:
@@ -72,45 +80,34 @@ def parse_vehicle_signal_interface(config: Dict[str, Any]) -> List[str]:
 
 
 def parse_grpc_interface(config: Dict[str, Any]) -> str:
-    """Parses the grpc interface config.
+    """Parse the grpc interface config.
 
     Args:
-        config: The json-config of the interface, as defined in the appManifest.json.
+        config (Dict[str, Any]): The json-config of the interface,
+        as defined in the appManifest.json.
 
     Returns:
         str: The requirement with md5-hash of the proto-file as version.
     """
     src = str(config["src"])
 
-    return f"dataprovider-proto-grpc:{get_md5_from_uri(src)}"
+    return f"{GRPC_INTERFACE_ID}:{get_md5_from_file_content(src)}"
 
 
-def get_md5_from_uri(src: str) -> str:
-    """Get the md5-hash of a file defined by an URI.
+def get_md5_from_file_content(src: str) -> str:
+    """Get the md5-hash of the contents of a file defined by a source.
 
     Args:
-        str: The URI of the file.
+        src (str): The source of the file. Can either be a local file-path or an URI
 
     Returns:
         str: The md5-hash of the file.
     """
-    md5 = hashlib.md5(usedforsecurity=False)
-    with requests.get(src, timeout=30) as source:
-        for chunk in source.iter_content(chunk_size=4096):
-            md5.update(chunk)
+    file_path = src
+    if is_uri(src):
+        file_path = "./tmp"
+        velocitas_lib.download_file(src, file_path)
 
-    return md5.hexdigest()
-
-
-def get_md5_for_file(file_path: str):
-    """Get the md5-hash of a local file defined by a path.
-
-    Args:
-        str: The local path to the file.
-
-    Returns:
-        str: The md5-hash of the file.
-    """
     md5 = hashlib.md5(usedforsecurity=False)
     with open(file_path, "rb") as f:
         for chunk in iter(lambda: f.read(4096), b""):
@@ -120,10 +117,13 @@ def get_md5_for_file(file_path: str):
 
 
 def get_package_version(package_id: str) -> str:
-    """Get the version of the used mqtt-broker.
+    """Get the version of the provided package.
+
+    Args:
+        package_id (str): The ID of the package
 
     Returns:
-        str: The version of the mqtt-broker defined in the runtime.json.
+        str: The version of the package defined in the runtime.json.
     """
     config = velocitas_lib.services.get_specific_service(package_id).config
     version = config.image.split(":")[-1]
@@ -131,10 +131,11 @@ def get_package_version(package_id: str) -> str:
 
 
 def parse_interfaces(interfaces: List[Dict[str, Any]]) -> List[str]:
-    """Parses the defined interfaces.
+    """Parse the defined interfaces.
 
     Args:
-        interfaces: The json-array of interfaces, as defined in the appManifest.json.
+        interfaces (List[Dict[str, Any]])): The json-array of interfaces,
+        as defined in the appManifest.json.
 
     Returns:
         List[str]: A list of requirements defined by the interface definitions.
@@ -142,36 +143,17 @@ def parse_interfaces(interfaces: List[Dict[str, Any]]) -> List[str]:
     requirements = []
     for interface in interfaces:
         interface_type = interface["type"]
-        if interface_type == "vehicle-signal-interface":
+        if interface_type == VSS_INTERFACE:
             requirements += parse_vehicle_signal_interface(interface["config"])
-        elif interface_type == "pubsub":
-            requirements.append(f"mqtt:{get_package_version('mqtt-broker')}")
-        elif interface_type == "grpc-interface":
+        elif interface_type == PUBSUB_INTERFACE:
+            requirements.append(f"mqtt:{get_package_version(MQTT_PACKAGE_ID)}")
+        elif interface_type == GRPC_INTERFACE:
             requirements.append(parse_grpc_interface(interface["config"]))
 
     return requirements
 
 
-def main():
-    parser = argparse.ArgumentParser("generate-desired-state")
-    parser.add_argument(
-        "-o",
-        "--output-file-path",
-        type=str,
-        required=False,
-        help="Path to the folder where the manifest should be placed.",
-    )
-    parser.add_argument(
-        "-s",
-        "--source",
-        type=str,
-        required=True,
-        help="The URL of the image including the tag.",
-    )
-    args = parser.parse_args()
-
-    output_file_path = args.output_file_path
-    source = args.source
+def main(source: str, output_file_path: Optional[str] = None):
     imageName = source.split(":")[0].split("/")[-1]
     version = source.split(":")[1]
 
@@ -202,4 +184,20 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser("generate-desired-state")
+    parser.add_argument(
+        "-o",
+        "--output-file-path",
+        type=str,
+        required=False,
+        help="Path to the folder where the manifest should be placed.",
+    )
+    parser.add_argument(
+        "-s",
+        "--source",
+        type=str,
+        required=True,
+        help="The URL of the image including the tag.",
+    )
+    args = parser.parse_args()
+    main(args.source, args.output_file_path)

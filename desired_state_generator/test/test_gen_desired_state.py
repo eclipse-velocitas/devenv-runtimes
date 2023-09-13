@@ -17,20 +17,21 @@ import os
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
-from gen_desired_state import get_md5_for_file, get_md5_from_uri, is_uri
+from gen_desired_state import get_md5_from_file_content, is_uri
 
 
-def test_get_md5_for_file():
-    hash = get_md5_for_file(f"{Path.cwd()}/LICENSE")
-    # generated with https://emn178.github.io/online-tools/md5_checksum.html
-    assert hash == "86d3f3a95c324c9479bd8986968f4327"
-
-
-def test_get_md5_for_uri():
-    hash = get_md5_from_uri(
-        "https://raw.githubusercontent.com/eclipse-velocitas/devenv-runtimes/main/LICENSE"
-    )
+@pytest.mark.parametrize(
+    "src",
+    [
+        f"{Path.cwd()}/LICENSE",
+        "https://raw.githubusercontent.com/eclipse-velocitas/devenv-runtimes/main/LICENSE",
+    ],
+)
+def test_get_md5_for_file(src):
+    hash = get_md5_from_file_content(src)
     # generated with https://emn178.github.io/online-tools/md5_checksum.html
     assert hash == "86d3f3a95c324c9479bd8986968f4327"
 
