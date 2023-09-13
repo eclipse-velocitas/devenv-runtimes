@@ -15,6 +15,7 @@
 import argparse
 import hashlib
 import json
+import os
 import re
 from typing import Any, Dict, List, Optional
 
@@ -184,6 +185,7 @@ def main(source: str, output_file_path: Optional[str] = None):
 
 
 if __name__ == "__main__":
+    os.environ["mockFilePath"] = "mock.py"
     parser = argparse.ArgumentParser("generate-desired-state")
     parser.add_argument(
         "-o",
