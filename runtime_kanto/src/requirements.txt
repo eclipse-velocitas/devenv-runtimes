@@ -1,0 +1,2 @@
+yaspin==2.3.0
+git+https://github.com/eclipse-velocitas/velocitas-lib.git@v0.0.2
