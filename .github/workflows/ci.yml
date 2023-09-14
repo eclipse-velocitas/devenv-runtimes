@@ -50,11 +50,9 @@ jobs:
 
       - name: Install required packages
         run: |
-          pip install -e velocitas_lib
-          pip install -r runtime-k3d/src/requirements.txt
-          pip install -r runtime-k3d/test/requirements.txt
-          pip install -r runtime-local/test/requirements.txt
-          pip install -r velocitas_lib/test/requirements.txt
+          pip install -r runtime_k3d/src/requirements.txt
+          pip install -r runtime_k3d/test/requirements.txt
+          pip install -r runtime_local/test/requirements.txt
 
       - name: unit tests
         shell: bash
@@ -62,7 +60,7 @@ jobs:
           pytest --ignore-glob='*integration*' --override-ini junit_family=xunit1 --junit-xml=./results/UnitTest/junit.xml \
           --cov . \
           --cov-report=xml:results/CodeCoverage/cobertura-coverage.xml \
-          --cov-branch ./runtime-k3d/test ./runtime-local/test ./velocitas_lib/test
+          --cov-branch ./runtime_k3d/test ./runtime_local/test ./desired_state_generator/test
 
       - name: Publish Unit Test Results
         uses: mikepenz/action-junit-report@v3
@@ -96,8 +94,8 @@ jobs:
 
       - name: Set commit id
         run: |
-          NEW_CONFIG="$(jq --arg GITHUB_SHA "$GITHUB_SHA" '.packages[0].version |= $GITHUB_SHA' runtime-local/test/.velocitas.json)"
-          echo "${NEW_CONFIG}" > runtime-local/test/.velocitas.json
+          NEW_CONFIG="$(jq --arg GITHUB_SHA "$GITHUB_SHA" '.packages[0].version |= $GITHUB_SHA' runtime_local/test/.velocitas.json)"
+          echo "${NEW_CONFIG}" > runtime_local/test/.velocitas.json
 
       - name: Install required packages
         run: |
@@ -106,12 +104,12 @@ jobs:
 
       - name: Init velocitas project
         run: |
-          cd runtime-local/test
+          cd runtime_local/test
           velocitas init -v
 
-      - name: Run integration tests for runtime-local
+      - name: Run integration tests for runtime_local
         run: |
-          cd runtime-local/test
+          cd runtime_local/test
           pip install -r requirements.txt
           pytest -s ./integration/integration_test.py
 
@@ -120,7 +118,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: "Log files local"
-          path: runtime-local/test/logs/runtime-local
+          path: runtime_local/test/logs
 
   run-k3d-integration-tests:
     name: Run Integration Tests for k3d
@@ -137,8 +135,8 @@ jobs:
 
       - name: Set commit id
         run: |
-          NEW_CONFIG="$(jq --arg GITHUB_SHA "$GITHUB_SHA" '.packages[0].version |= $GITHUB_SHA' runtime-k3d/test/.velocitas.json)"
-          echo "${NEW_CONFIG}" > runtime-k3d/test/.velocitas.json
+          NEW_CONFIG="$(jq --arg GITHUB_SHA "$GITHUB_SHA" '.packages[0].version |= $GITHUB_SHA' runtime_k3d/test/.velocitas.json)"
+          echo "${NEW_CONFIG}" > runtime_k3d/test/.velocitas.json
 
       - name: Install required packages
         run: |
@@ -149,12 +147,12 @@ jobs:
 
       - name: Init velocitas project
         run: |
-          cd runtime-k3d/test
+          cd runtime_k3d/test
           velocitas init -v
 
       - name: Run integration tests for k3d
         run: |
-          cd runtime-k3d/test
+          cd runtime_k3d/test
           pip install -r requirements.txt
           pytest -s ./integration/integration_test.py
 
@@ -163,7 +161,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: "Log files K3D"
-          path: runtime-k3d/test/logs/runtime-k3d
+          path: runtime_k3d/test/logs
 
   run-kanto-integration-tests:
     name: Run Integration Tests for kanto
@@ -180,8 +178,8 @@ jobs:
 
       - name: Set commit id
         run: |
-          NEW_CONFIG="$(jq --arg GITHUB_SHA "$GITHUB_SHA" '.packages[0].version |= $GITHUB_SHA' runtime-kanto/test/.velocitas.json)"
-          echo "${NEW_CONFIG}" > runtime-kanto/test/.velocitas.json
+          NEW_CONFIG="$(jq --arg GITHUB_SHA "$GITHUB_SHA" '.packages[0].version |= $GITHUB_SHA' runtime_kanto/test/.velocitas.json)"
+          echo "${NEW_CONFIG}" > runtime_kanto/test/.velocitas.json
 
       - name: Install required packages
         run: |
@@ -192,7 +190,7 @@ jobs:
           wget https://github.com/eclipse-kanto/kanto/releases/download/v0.1.0-M3/kanto_0.1.0-M3_linux_x86_64.deb && \
           sudo apt install ./kanto_0.1.0-M3_linux_x86_64.deb
 
-          pip install -r runtime-kanto/test/requirements.txt
+          pip install -r runtime_kanto/test/requirements.txt
 
       - name: Stop Kanto services
         run: |
@@ -208,12 +206,12 @@ jobs:
 
       - name: Init velocitas project
         run: |
-          cd runtime-kanto/test
+          cd runtime_kanto/test
           velocitas init -v
 
       - name: Run integration tests for kanto
         run: |
-          cd runtime-kanto/test
+          cd runtime_kanto/test
           # the socket on the ci is different to the devcontainer
           sudo ln -s /run/containerd/containerd.sock /run/docker/containerd/containerd.sock
           pytest -s -x ./integration/integration_test.py
@@ -224,4 +222,4 @@ jobs:
         with:
           name: "Log files Kanto"
           path: |
-            runtime-kanto/test/logs
+            runtime_kanto/test/logs
