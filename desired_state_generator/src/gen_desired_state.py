@@ -23,16 +23,14 @@ from typing import Any, Dict, List, Optional
 import velocitas_lib
 import velocitas_lib.services
 
-VSS_SOURCE_DEFAULT = "vss-source-default-vss"
-VSS_SOURCE_CUSTOM = "vss-source-custom-vss"
+VSS_SOURCE_DEFAULT_ID = "vss-source-default"
+VSS_SOURCE_CUSTOM_ID = "vss-source-custom"
 DATABROKER_ID = "data-broker-grpc"
-GRPC_INTERFACE_ID = "dataprovider-proto-grpc"
-DATABROKER_PACKAGE_ID = "vehicledatabroker"
-MQTT_PACKAGE_ID = "mqtt-broker"
+GRPC_INTERFACE_ID = "grpc-interface"
 
-VSS_INTERFACE = "vehicle-signal-interface"
-PUBSUB_INTERFACE = "pubsub"
-GRPC_INTERFACE = "grpc-interface"
+VELOCITAS_IF_TYPE_VSI = "vehicle-signal-interface"
+VELOCITAS_IF_PUBSUB = "pubsub"
+VELOCITAS_IF_GRPC = "grpc-interface"
 
 
 def is_uri(path: str) -> bool:
@@ -65,10 +63,10 @@ def parse_vehicle_signal_interface(config: Dict[str, Any]) -> List[str]:
     version = ""
     if vss_release_prefix in src:
         version = src.removeprefix(vss_release_prefix).split("/")[0]
-        requirements.append(f"{VSS_SOURCE_DEFAULT}:{version}")
+        requirements.append(f"{VSS_SOURCE_DEFAULT_ID}:{version}")
     else:
         version = get_md5_from_file_content(src)
-        requirements.append(f"{VSS_SOURCE_CUSTOM}:{version}")
+        requirements.append(f"{VSS_SOURCE_CUSTOM_ID}:{version}")
 
     requirements.append(f"{DATABROKER_ID}:v1")
 
@@ -131,11 +129,11 @@ def parse_interfaces(interfaces: List[Dict[str, Any]]) -> List[str]:
     requirements = []
     for interface in interfaces:
         interface_type = interface["type"]
-        if interface_type == VSS_INTERFACE:
+        if interface_type == VELOCITAS_IF_TYPE_VSI:
             requirements += parse_vehicle_signal_interface(interface["config"])
-        elif interface_type == PUBSUB_INTERFACE:
+        elif interface_type == VELOCITAS_IF_PUBSUB:
             requirements.append("mqtt:v5")
-        elif interface_type == GRPC_INTERFACE:
+        elif interface_type == VELOCITAS_IF_GRPC:
             requirements.append(parse_grpc_interface(interface["config"]))
 
     return requirements
