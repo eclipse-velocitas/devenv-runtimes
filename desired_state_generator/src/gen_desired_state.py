@@ -129,7 +129,7 @@ def parse_interfaces(interfaces: List[Dict[str, Any]]) -> List[str]:
     requirements = []
     for interface in interfaces:
         interface_type = interface["type"]
-        if interface_type == VELOCITAS_IF_TYPE_VSI:
+        if interface_type == VELOCITAS_IF_VSI:
             requirements += parse_vehicle_signal_interface(interface["config"])
         elif interface_type == VELOCITAS_IF_PUBSUB:
             requirements.append("mqtt:v5")
