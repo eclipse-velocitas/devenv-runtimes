@@ -28,7 +28,7 @@ VSS_SOURCE_CUSTOM_ID = "vss-source-custom"
 DATABROKER_ID = "data-broker-grpc"
 GRPC_INTERFACE_ID = "grpc-interface"
 
-VELOCITAS_IF_TYPE_VSI = "vehicle-signal-interface"
+VELOCITAS_IF_VSI = "vehicle-signal-interface"
 VELOCITAS_IF_PUBSUB = "pubsub"
 VELOCITAS_IF_GRPC = "grpc-interface"
 
