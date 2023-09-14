@@ -19,7 +19,7 @@ from runtime_down import runtime_down
 from velocitas_lib import create_log_file
 from yaspin import yaspin
 
-from .runtime_kanto import is_kanto_running, start_kanto
+from runtime_kanto import is_kanto_running, start_kanto
 
 
 def runtime_up():

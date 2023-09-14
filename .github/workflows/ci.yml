@@ -93,8 +93,10 @@ jobs:
           python-version: "3.10"
 
       - name: Set commit id
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         run: |
-          NEW_CONFIG="$(jq --arg GITHUB_SHA "$GITHUB_SHA" '.packages[0].version |= $GITHUB_SHA' runtime_local/test/.velocitas.json)"
+          NEW_CONFIG="$(jq --arg BRANCH "$BRANCH_NAME" '.packages[0].version |= $BRANCH' runtime_local/test/.velocitas.json)"
           echo "${NEW_CONFIG}" > runtime_local/test/.velocitas.json
 
       - name: Install required packages
@@ -134,8 +136,10 @@ jobs:
           python-version: "3.10"
 
       - name: Set commit id
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         run: |
-          NEW_CONFIG="$(jq --arg GITHUB_SHA "$GITHUB_SHA" '.packages[0].version |= $GITHUB_SHA' runtime_k3d/test/.velocitas.json)"
+          NEW_CONFIG="$(jq --arg BRANCH "$BRANCH_NAME" '.packages[0].version |= $BRANCH' runtime_k3d/test/.velocitas.json)"
           echo "${NEW_CONFIG}" > runtime_k3d/test/.velocitas.json
 
       - name: Install required packages
@@ -177,8 +181,10 @@ jobs:
           python-version: "3.10"
 
       - name: Set commit id
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         run: |
-          NEW_CONFIG="$(jq --arg GITHUB_SHA "$GITHUB_SHA" '.packages[0].version |= $GITHUB_SHA' runtime_kanto/test/.velocitas.json)"
+          NEW_CONFIG="$(jq --arg BRANCH "$BRANCH_NAME" '.packages[0].version |= $BRANCH' runtime_kanto/test/.velocitas.json)"
           echo "${NEW_CONFIG}" > runtime_kanto/test/.velocitas.json
 
       - name: Install required packages
@@ -223,3 +229,47 @@ jobs:
           name: "Log files Kanto"
           path: |
             runtime_kanto/test/logs
+
+  run-desired-state-generator-tests:
+    name: Run Integration Tests for desired state generator
+    runs-on: ubuntu-22.04
+    env:
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Set commit id
+        env:
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+        run: |
+          NEW_CONFIG="$(jq --arg BRANCH "$BRANCH_NAME" '.packages[0].version |= $BRANCH' desired_state_generator/test/.velocitas.json)"
+          echo "${NEW_CONFIG}" > desired_state_generator/test/.velocitas.json
+
+      - name: Install required packages
+        run: |
+          sudo curl -L https://github.com/eclipse-velocitas/cli/releases/latest/download/velocitas-linux-x64 -o /usr/bin/velocitas
+          sudo chmod +x /usr/bin/velocitas
+          pip install -r desired_state_generator/test/requirements.txt
+
+      - name: Init velocitas project
+        run: |
+          cd desired_state_generator/test
+          velocitas init -v
+
+      - name: Run integration tests for desired state generator
+        run: |
+          cd desired_state_generator/test
+          pytest -s -x ./integration/integration_test.py
+
+      - name: Upload log files as artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: "Log files Desired State Generator"
+          path: |
+            desired_state_generator/test/test/logs
