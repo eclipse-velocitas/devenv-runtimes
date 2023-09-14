@@ -17,6 +17,7 @@ import hashlib
 import json
 import os
 import re
+import tempfile
 from typing import Any, Dict, List, Optional
 
 import velocitas_lib
@@ -69,7 +70,7 @@ def parse_vehicle_signal_interface(config: Dict[str, Any]) -> List[str]:
         version = get_md5_from_file_content(src)
         requirements.append(f"{VSS_SOURCE_CUSTOM}:{version}")
 
-    requirements.append(f"{DATABROKER_ID}:{get_package_version(DATABROKER_PACKAGE_ID)}")
+    requirements.append(f"{DATABROKER_ID}:v1")
 
     datapoints = config["datapoints"]["required"]
     for datapoint in datapoints:
@@ -106,7 +107,7 @@ def get_md5_from_file_content(src: str) -> str:
     """
     file_path = src
     if is_uri(src):
-        file_path = "./tmp"
+        file_path = os.path.join(tempfile.TemporaryDirectory().name, "tmp")
         velocitas_lib.download_file(src, file_path)
 
     md5 = hashlib.md5(usedforsecurity=False)
@@ -115,20 +116,6 @@ def get_md5_from_file_content(src: str) -> str:
             md5.update(chunk)
 
     return md5.hexdigest()
-
-
-def get_package_version(package_id: str) -> str:
-    """Get the version of the provided package.
-
-    Args:
-        package_id (str): The ID of the package
-
-    Returns:
-        str: The version of the package defined in the runtime.json.
-    """
-    config = velocitas_lib.services.get_specific_service(package_id).config
-    version = config.image.split(":")[-1]
-    return version
 
 
 def parse_interfaces(interfaces: List[Dict[str, Any]]) -> List[str]:
@@ -147,7 +134,7 @@ def parse_interfaces(interfaces: List[Dict[str, Any]]) -> List[str]:
         if interface_type == VSS_INTERFACE:
             requirements += parse_vehicle_signal_interface(interface["config"])
         elif interface_type == PUBSUB_INTERFACE:
-            requirements.append(f"mqtt:{get_package_version(MQTT_PACKAGE_ID)}")
+            requirements.append("mqtt:v5")
         elif interface_type == GRPC_INTERFACE:
             requirements.append(parse_grpc_interface(interface["config"]))
 
