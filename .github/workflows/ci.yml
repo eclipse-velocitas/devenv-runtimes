@@ -88,29 +88,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v4
+      - name: Prepare integration Tests
+        uses: ./.github/actions/prepare-int-tests
         with:
-          python-version: "3.10"
-
-      - name: Set commit id
-        run: |
-          NEW_CONFIG="$(jq --arg GITHUB_SHA "$GITHUB_SHA" '.packages[0].version |= $GITHUB_SHA' runtime_local/test/.velocitas.json)"
-          echo "${NEW_CONFIG}" > runtime_local/test/.velocitas.json
-
-      - name: Install required packages
-        run: |
-          sudo curl -L https://github.com/eclipse-velocitas/cli/releases/latest/download/velocitas-linux-x64 -o /usr/bin/velocitas
-          sudo chmod +x /usr/bin/velocitas
-
-      - name: Init velocitas project
-        run: |
-          cd runtime_local/test
-          velocitas init -v
+          package: runtime_local
 
       - name: Run integration tests for runtime_local
         run: |
           cd runtime_local/test
-          pip install -r requirements.txt
           pytest -s ./integration/integration_test.py
 
       - name: Upload log files as artifacts
@@ -129,31 +114,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v4
+      - name: Prepare integration Tests
+        uses: ./.github/actions/prepare-int-tests
         with:
-          python-version: "3.10"
-
-      - name: Set commit id
-        run: |
-          NEW_CONFIG="$(jq --arg GITHUB_SHA "$GITHUB_SHA" '.packages[0].version |= $GITHUB_SHA' runtime_k3d/test/.velocitas.json)"
-          echo "${NEW_CONFIG}" > runtime_k3d/test/.velocitas.json
+          package: runtime_k3d
 
       - name: Install required packages
         run: |
-          sudo curl -L https://github.com/eclipse-velocitas/cli/releases/latest/download/velocitas-linux-x64 -o /usr/bin/velocitas
-          sudo chmod +x /usr/bin/velocitas
           curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
           sudo wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O - | /bin/bash -s 1.10.0
-
-      - name: Init velocitas project
-        run: |
-          cd runtime_k3d/test
-          velocitas init -v
 
       - name: Run integration tests for k3d
         run: |
           cd runtime_k3d/test
-          pip install -r requirements.txt
           pytest -s ./integration/integration_test.py
 
       - name: Upload log files as artifacts
@@ -172,25 +145,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v4
+      - name: Prepare integration Tests
+        uses: ./.github/actions/prepare-int-tests
         with:
-          python-version: "3.10"
-
-      - name: Set commit id
-        run: |
-          NEW_CONFIG="$(jq --arg GITHUB_SHA "$GITHUB_SHA" '.packages[0].version |= $GITHUB_SHA' runtime_kanto/test/.velocitas.json)"
-          echo "${NEW_CONFIG}" > runtime_kanto/test/.velocitas.json
+          package: runtime_kanto
 
       - name: Install required packages
         run: |
-          sudo curl -L https://github.com/eclipse-velocitas/cli/releases/latest/download/velocitas-linux-x64 -o /usr/bin/velocitas
-          sudo chmod +x /usr/bin/velocitas
-
           sudo apt-get update && sudo apt-get install -y mosquitto
           wget https://github.com/eclipse-kanto/kanto/releases/download/v0.1.0-M3/kanto_0.1.0-M3_linux_x86_64.deb && \
           sudo apt install ./kanto_0.1.0-M3_linux_x86_64.deb
-
-          pip install -r runtime_kanto/test/requirements.txt
 
       - name: Stop Kanto services
         run: |
@@ -203,11 +167,6 @@ jobs:
           system-metrics.service
 
           sudo pkill -f mosquitto
-
-      - name: Init velocitas project
-        run: |
-          cd runtime_kanto/test
-          velocitas init -v
 
       - name: Run integration tests for kanto
         run: |
@@ -223,3 +182,30 @@ jobs:
           name: "Log files Kanto"
           path: |
             runtime_kanto/test/logs
+
+  run-desired-state-generator-tests:
+    name: Run Integration Tests for desired state generator
+    runs-on: ubuntu-22.04
+    env:
+      DOCKER_BUILDKIT: 1
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Prepare integration Tests
+        uses: ./.github/actions/prepare-int-tests
+        with:
+          package: desired_state_generator
+
+      - name: Run integration tests for desired state generator
+        run: |
+          cd desired_state_generator/test
+          pytest -s -x ./integration/integration_test.py
+
+      - name: Upload log files as artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: "Log files Desired State Generator"
+          path: |
+            desired_state_generator/test/test/logs

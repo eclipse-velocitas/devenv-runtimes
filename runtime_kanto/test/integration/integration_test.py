@@ -82,7 +82,7 @@ def run_command_until_logs_match(command: str, regex_service: Pattern[str]) -> b
 
 
 def wait_for_container_update():
-    path = os.path.join(Path.cwd(), "logs/runtime-kanto/container-management.log")
+    path = os.path.join(Path.cwd(), "logs/runtime_kanto/container-management.log")
     f = open(path, "r")
     while True:
         line = f.readline()
