@@ -88,31 +88,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v4
+      - name: Prepare integration Tests
+        uses: ./.github/actions/prepare-int-tests
         with:
-          python-version: "3.10"
-
-      - name: Set commit id
-        env:
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
-        run: |
-          NEW_CONFIG="$(jq --arg BRANCH "$BRANCH_NAME" '.packages[0].version |= $BRANCH' runtime_local/test/.velocitas.json)"
-          echo "${NEW_CONFIG}" > runtime_local/test/.velocitas.json
-
-      - name: Install required packages
-        run: |
-          sudo curl -L https://github.com/eclipse-velocitas/cli/releases/latest/download/velocitas-linux-x64 -o /usr/bin/velocitas
-          sudo chmod +x /usr/bin/velocitas
-
-      - name: Init velocitas project
-        run: |
-          cd runtime_local/test
-          velocitas init -v
+          package: runtime_local
 
       - name: Run integration tests for runtime_local
         run: |
           cd runtime_local/test
-          pip install -r requirements.txt
           pytest -s ./integration/integration_test.py
 
       - name: Upload log files as artifacts
@@ -131,33 +114,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v4
+      - name: Prepare integration Tests
+        uses: ./.github/actions/prepare-int-tests
         with:
-          python-version: "3.10"
-
-      - name: Set commit id
-        env:
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
-        run: |
-          NEW_CONFIG="$(jq --arg BRANCH "$BRANCH_NAME" '.packages[0].version |= $BRANCH' runtime_k3d/test/.velocitas.json)"
-          echo "${NEW_CONFIG}" > runtime_k3d/test/.velocitas.json
+          package: runtime_k3d
 
       - name: Install required packages
         run: |
-          sudo curl -L https://github.com/eclipse-velocitas/cli/releases/latest/download/velocitas-linux-x64 -o /usr/bin/velocitas
-          sudo chmod +x /usr/bin/velocitas
           curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
           sudo wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O - | /bin/bash -s 1.10.0
-
-      - name: Init velocitas project
-        run: |
-          cd runtime_k3d/test
-          velocitas init -v
 
       - name: Run integration tests for k3d
         run: |
           cd runtime_k3d/test
-          pip install -r requirements.txt
           pytest -s ./integration/integration_test.py
 
       - name: Upload log files as artifacts
@@ -176,27 +145,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v4
+      - name: Prepare integration Tests
+        uses: ./.github/actions/prepare-int-tests
         with:
-          python-version: "3.10"
-
-      - name: Set commit id
-        env:
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
-        run: |
-          NEW_CONFIG="$(jq --arg BRANCH "$BRANCH_NAME" '.packages[0].version |= $BRANCH' runtime_kanto/test/.velocitas.json)"
-          echo "${NEW_CONFIG}" > runtime_kanto/test/.velocitas.json
+          package: runtime_kanto
 
       - name: Install required packages
         run: |
-          sudo curl -L https://github.com/eclipse-velocitas/cli/releases/latest/download/velocitas-linux-x64 -o /usr/bin/velocitas
-          sudo chmod +x /usr/bin/velocitas
-
           sudo apt-get update && sudo apt-get install -y mosquitto
           wget https://github.com/eclipse-kanto/kanto/releases/download/v0.1.0-M3/kanto_0.1.0-M3_linux_x86_64.deb && \
           sudo apt install ./kanto_0.1.0-M3_linux_x86_64.deb
-
-          pip install -r runtime_kanto/test/requirements.txt
 
       - name: Stop Kanto services
         run: |
@@ -209,11 +167,6 @@ jobs:
           system-metrics.service
 
           sudo pkill -f mosquitto
-
-      - name: Init velocitas project
-        run: |
-          cd runtime_kanto/test
-          velocitas init -v
 
       - name: Run integration tests for kanto
         run: |
@@ -239,27 +192,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v4
+      - name: Prepare integration Tests
+        uses: ./.github/actions/prepare-int-tests
         with:
-          python-version: "3.10"
-
-      - name: Set commit id
-        env:
-          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
-        run: |
-          NEW_CONFIG="$(jq --arg BRANCH "$BRANCH_NAME" '.packages[0].version |= $BRANCH' desired_state_generator/test/.velocitas.json)"
-          echo "${NEW_CONFIG}" > desired_state_generator/test/.velocitas.json
-
-      - name: Install required packages
-        run: |
-          sudo curl -L https://github.com/eclipse-velocitas/cli/releases/latest/download/velocitas-linux-x64 -o /usr/bin/velocitas
-          sudo chmod +x /usr/bin/velocitas
-          pip install -r desired_state_generator/test/requirements.txt
-
-      - name: Init velocitas project
-        run: |
-          cd desired_state_generator/test
-          velocitas init -v
+          package: desired_state_generator
 
       - name: Run integration tests for desired state generator
         run: |
