@@ -32,7 +32,7 @@ runs:
         NEW_CONFIG="$(jq --arg BRANCH "$BRANCH_NAME" '.packages[0].version |= $BRANCH'  ${{ inputs.package }}/test/.velocitas.json)"
         echo "${NEW_CONFIG}" >  ${{ inputs.package }}/test/.velocitas.json
 
-    - name: Install required packages
+    - name: Install Velocitas CLI and Python requirements
       shell: bash
       run: |
         sudo curl -L https://github.com/eclipse-velocitas/cli/releases/latest/download/velocitas-linux-x64 -o /usr/bin/velocitas
