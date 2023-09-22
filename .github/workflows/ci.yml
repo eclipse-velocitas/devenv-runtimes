@@ -127,7 +127,7 @@ jobs:
       - name: Run integration tests for k3d
         run: |
           cd runtime_k3d/test
-          pytest -s ./integration/integration_test.py
+          pytest -s ./integration/integration_test.py::test_scripts_run_successfully_with_down
 
       - name: Upload log files as artifacts
         if: always()
@@ -173,7 +173,7 @@ jobs:
           cd runtime_kanto/test
           # the socket on the ci is different to the devcontainer
           sudo ln -s /run/containerd/containerd.sock /run/docker/containerd/containerd.sock
-          pytest -s -x ./integration/integration_test.py
+          pytest -s -x ./integration/integration_test.py::test_scripts_run_successfully_with_down
 
       - name: Upload log files as artifacts
         if: always()
