@@ -111,3 +111,8 @@ def test_scripts_run_successfully():
         f"{BASE_COMMAND_DEPLOYMENT} deploy-vehicleapp", regex_deploy
     )
     assert check_container_is_running("sampleapp")
+
+
+def test_scripts_run_successfully_with_down():
+    test_scripts_run_successfully()
+    assert run_command_until_logs_match(f"{BASE_COMMAND_RUNTIME} down", regex_stop)

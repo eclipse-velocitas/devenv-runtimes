@@ -91,3 +91,8 @@ def test_scripts_run_successfully():
     assert check_image_if_created(image_reg)
     assert run_command(f"{BASE_COMMAND_DEPLOYMENT} deploy-vehicleapp")
     assert check_pods(pods_regs)
+
+
+def test_scripts_run_successfully_with_down():
+    test_scripts_run_successfully()
+    assert run_command(f"{BASE_COMMAND_RUNTIME} down")
