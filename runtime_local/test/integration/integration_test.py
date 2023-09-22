@@ -65,7 +65,7 @@ def run_command_until_logs_match(command: str, regex_service: Pattern[str]) -> b
     return True
 
 
-def test_runtime_up_successfully():
+def test_scripts_run_successfully():
     create_dummy_vspec_file()
     assert run_command_until_logs_match(f"{command} up", regex_runtime_up)
 
