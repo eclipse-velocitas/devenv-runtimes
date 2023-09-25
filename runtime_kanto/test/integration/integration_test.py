@@ -21,6 +21,7 @@ from pathlib import Path
 from re import Pattern, compile
 from subprocess import PIPE, Popen
 from threading import Timer
+from velocitas_lib import get_app_manifest
 
 BASE_COMMAND_RUNTIME = "velocitas exec runtime-kanto"
 BASE_COMMAND_DEPLOYMENT = "velocitas exec deployment-kanto"
@@ -110,7 +111,7 @@ def test_scripts_run_successfully():
     assert run_command_until_logs_match(
         f"{BASE_COMMAND_DEPLOYMENT} deploy-vehicleapp", regex_deploy
     )
-    assert check_container_is_running("sampleapp")
+    assert check_container_is_running(get_app_manifest()["name"].lower())
 
 
 def test_scripts_run_successfully_with_down():

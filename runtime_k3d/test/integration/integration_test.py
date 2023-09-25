@@ -14,34 +14,15 @@
 
 from re import Pattern, compile
 from subprocess import check_call, check_output
+from velocitas_lib import get_app_manifest
 
 BASE_COMMAND_RUNTIME = "velocitas exec runtime-k3d"
 BASE_COMMAND_DEPLOYMENT = "velocitas exec deployment-k3d"
 
-kubectl_regs = {
-    compile(r".*Kubernetes control plane is running"): False,
-    compile(r".*CoreDNS is running"): False,
-    compile(r".*Metrics-server is running"): False,
-}
 
-dapr_regs = {
-    compile(r".*dapr-placement-server\s+dapr-system\s+True\s+Running.*"): False,
-    compile(r".*dapr-dashboard\s+dapr-system\s+True\s+Running.*"): False,
-    compile(r".*dapr-sentry\s+dapr-system\s+True\s+Running.*"): False,
-    compile(r".*dapr-sidecar-injector\s+dapr-system\s+True\s+Running.*"): False,
-    compile(r".*dapr-operator\s+dapr-system\s+True\s+Running.*"): False,
-}
-
-image_reg = {compile(r"localhost:12345/sampleapp\s+local.+"): False}
-
-pods_regs = {
-    compile(r".*mqttbroker-.+-.+\s+1/1\s+Running.*"): False,
-    compile(r".*bash-.+-.+\s+1/1\s+Running.*"): False,
-    compile(r".*mockservice-.+-.+\s+2/2\s+Running.*"): False,
-    compile(r".*vehicledatabroker-.+-.+\s+2/2\s+Running.*"): False,
-    compile(r".*zipkin-.+-.+\s+1/1\s+Running.*"): False,
-    compile(r".*sampleapp-.+-.+\s+2/2\s+Running.*"): False,
-}
+def get_app_name() -> str:
+    manifest = get_app_manifest()
+    return manifest["name"].lower()
 
 
 def escape_ansi(line):
@@ -60,7 +41,20 @@ def matches_any_regex(regex_dict: dict[Pattern, bool], input: str) -> bool:
     return final_flag
 
 
-def check_cluster_status_and_dapr(kubectl_regs: dict, dapr_regs: dict) -> bool:
+def check_cluster_status_and_dapr() -> bool:
+    kubectl_regs = {
+        compile(r".*Kubernetes control plane is running"): False,
+        compile(r".*CoreDNS is running"): False,
+        compile(r".*Metrics-server is running"): False,
+    }
+    dapr_regs = {
+        compile(r".*dapr-placement-server\s+dapr-system\s+True\s+Running.*"): False,
+        compile(r".*dapr-dashboard\s+dapr-system\s+True\s+Running.*"): False,
+        compile(r".*dapr-sentry\s+dapr-system\s+True\s+Running.*"): False,
+        compile(r".*dapr-sidecar-injector\s+dapr-system\s+True\s+Running.*"): False,
+        compile(r".*dapr-operator\s+dapr-system\s+True\s+Running.*"): False,
+    }
+
     command_logs_kubectl = check_output(["kubectl", "cluster-info"]).decode()
     command_logs_dapr = check_output(["dapr", "status", "-k"]).decode()
     command_logs_kubectl = escape_ansi(command_logs_kubectl)
@@ -69,12 +63,23 @@ def check_cluster_status_and_dapr(kubectl_regs: dict, dapr_regs: dict) -> bool:
     )
 
 
-def check_image_if_created(image_reg: Pattern) -> bool:
+def check_image_if_created() -> bool:
+    image_reg = {
+        compile(rf"localhost:12345/{get_app_name()}\s+local.+"): False,
+    }
     command_get_images_logs = check_output(["docker", "images"]).decode()
     return matches_any_regex(image_reg, command_get_images_logs)
 
 
-def check_pods(pods_regs: dict) -> bool:
+def check_pods() -> bool:
+    pods_regs = {
+        compile(r".*mqttbroker-.+-.+\s+1/1\s+Running.*"): False,
+        compile(r".*bash-.+-.+\s+1/1\s+Running.*"): False,
+        compile(r".*mockservice-.+-.+\s+2/2\s+Running.*"): False,
+        compile(r".*vehicledatabroker-.+-.+\s+2/2\s+Running.*"): False,
+        compile(r".*zipkin-.+-.+\s+1/1\s+Running.*"): False,
+        compile(rf".*{get_app_name()}-.+-.+\s+2/2\s+Running.*"): False,
+    }
     command_get_pods_logs = check_output(["kubectl", "get", "pods"]).decode()
     return matches_any_regex(pods_regs, command_get_pods_logs)
 
@@ -86,11 +91,11 @@ def run_command(command: str) -> bool:
 def test_scripts_run_successfully():
     assert run_command(f"{BASE_COMMAND_RUNTIME} install-deps")
     assert run_command(f"{BASE_COMMAND_RUNTIME} up")
-    assert check_cluster_status_and_dapr(kubectl_regs, dapr_regs)
+    assert check_cluster_status_and_dapr()
     assert run_command(f"{BASE_COMMAND_DEPLOYMENT} build-vehicleapp")
-    assert check_image_if_created(image_reg)
+    assert check_image_if_created()
     assert run_command(f"{BASE_COMMAND_DEPLOYMENT} deploy-vehicleapp")
-    assert check_pods(pods_regs)
+    assert check_pods()
 
 
 def test_scripts_run_successfully_with_down():
