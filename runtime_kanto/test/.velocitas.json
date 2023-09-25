@@ -3,6 +3,13 @@
         {
             "name": "devenv-runtimes",
             "version": "hash_id"
+        },
+        {
+            "name": "devenv-devcontainer-setup",
+            "version": "v1.4.0"
         }
-    ]
+    ],
+    "variables": {
+        "language": "python"
+    }
 }

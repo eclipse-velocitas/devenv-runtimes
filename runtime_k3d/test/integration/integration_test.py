@@ -14,6 +14,7 @@
 
 from re import Pattern, compile
 from subprocess import check_call, check_output
+
 from velocitas_lib import get_app_manifest
 
 BASE_COMMAND_RUNTIME = "velocitas exec runtime-k3d"

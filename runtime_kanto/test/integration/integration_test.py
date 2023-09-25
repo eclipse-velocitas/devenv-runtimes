@@ -21,6 +21,7 @@ from pathlib import Path
 from re import Pattern, compile
 from subprocess import PIPE, Popen
 from threading import Timer
+
 from velocitas_lib import get_app_manifest
 
 BASE_COMMAND_RUNTIME = "velocitas exec runtime-kanto"

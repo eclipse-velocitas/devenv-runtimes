@@ -6,7 +6,7 @@
         },
         {
             "name": "devenv-devcontainer-setup",
-            "version": "v1.1.11"
+            "version": "v1.4.0"
         }
     ],
     "variables": {
