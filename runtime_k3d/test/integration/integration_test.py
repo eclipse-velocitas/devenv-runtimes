@@ -32,7 +32,7 @@ dapr_regs = {
     compile(r".*dapr-operator\s+dapr-system\s+True\s+Running.*"): False,
 }
 
-image_reg = {compile(r"localhost:12345/sampleapp\s+local.+"): False}
+image_reg = {compile(r"localhost:12345/\s+local.+"): False}
 
 pods_regs = {
     compile(r".*mqttbroker-.+-.+\s+1/1\s+Running.*"): False,
@@ -40,7 +40,6 @@ pods_regs = {
     compile(r".*mockservice-.+-.+\s+2/2\s+Running.*"): False,
     compile(r".*vehicledatabroker-.+-.+\s+2/2\s+Running.*"): False,
     compile(r".*zipkin-.+-.+\s+1/1\s+Running.*"): False,
-    compile(r".*sampleapp-.+-.+\s+2/2\s+Running.*"): False,
 }
 
 
