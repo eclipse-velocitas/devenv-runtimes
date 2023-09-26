@@ -15,7 +15,8 @@
 import json
 import sys
 from pathlib import Path
-from re import Pattern, compile
+from re import Pattern
+from re import compile as re_compile
 from subprocess import PIPE, Popen
 from threading import Timer
 
@@ -29,7 +30,7 @@ def create_dummy_vspec_file():
     cache_paths = Path("~/.velocitas/projects").expanduser().rglob("cache.json")
     for cache_path in cache_paths:
         vspec_path = cache_path.parent / "dummy_vspec.json"
-        with open(vspec_path, "w") as dummy_vspec_file:
+        with open(vspec_path, "w", encoding="utf-8") as dummy_vspec_file:
             dummy_vspec_file.write("{}\n")
         with open(cache_path, mode="r", encoding="utf-8") as cache_file:
             cache = json.load(cache_file)
@@ -39,16 +40,18 @@ def create_dummy_vspec_file():
 
 
 command: str = "velocitas exec runtime-local"
-regex_runtime_up: Pattern[str] = compile(r"✅.* Runtime is ready to use!")
-regex_mqtt: Pattern[str] = compile(r"✅.* Starting service mqtt")
-regex_vdb: Pattern[str] = compile(r"✅.* Starting service vehicledatabroker")
-regex_seatservice: Pattern[str] = compile(r"✅.* Starting service seatservice")
-regex_feedercan: Pattern[str] = compile(r"✅.* Starting service feedercan")
-regex_mockservice: Pattern[str] = compile(r"✅.* Starting service mockservice")
-timeout_sec: float = 180
+regex_runtime_up: Pattern[str] = re_compile(r"✅.* Runtime is ready to use!")
+regex_mqtt: Pattern[str] = re_compile(r"✅.* Starting service mqtt")
+regex_vdb: Pattern[str] = re_compile(r"✅.* Starting service vehicledatabroker")
+regex_seatservice: Pattern[str] = re_compile(r"✅.* Starting service seatservice")
+regex_feedercan: Pattern[str] = re_compile(r"✅.* Starting service feedercan")
+regex_mockservice: Pattern[str] = re_compile(r"✅.* Starting service mockservice")
+DEFAULT_TIMEOUT_SEC: float = 180
 
 
-def run_command_until_logs_match(command: str, regex_service: Pattern[str]) -> bool:
+def run_command_until_logs_match(
+    command: str, regex_service: Pattern[str], timeout_sec=DEFAULT_TIMEOUT_SEC
+) -> bool:
     proc: Popen[str] = Popen(
         command.split(" "), stdout=PIPE, bufsize=1, universal_newlines=True
     )
