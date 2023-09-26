@@ -32,7 +32,7 @@ dapr_regs = {
     compile(r".*dapr-operator\s+dapr-system\s+True\s+Running.*"): False,
 }
 
-image_reg = {compile(r"localhost:12345/\s+local.+"): False}
+image_reg = {compile(r"localhost:12345/(.*)\s+local.+"): False}
 
 pods_regs = {
     compile(r".*mqttbroker-.+-.+\s+1/1\s+Running.*"): False,
