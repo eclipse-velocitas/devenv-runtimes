@@ -25,6 +25,7 @@ from velocitas_lib import (
     get_package_path,
     get_script_path,
     get_workspace_dir,
+    get_cache_data,
 )
 from yaspin.core import Yaspin
 
@@ -96,7 +97,26 @@ def adapt_mockservice_deployment_file():
         encoding="utf-8",
     ) as f:
         data = json.load(f)
-        data["mount_points"][0]["source"] = os.path.join(get_package_path(), "mock.py")
+        source = os.path.join(get_package_path(), "mock.py")
+        # use mock.py from repo root if available
+        if os.path.isfile(os.path.join(get_workspace_dir(), "mock.py")):
+            source = os.path.join(get_workspace_dir(), "mock.py")
+
+        data["mount_points"][0]["source"] = source
+        f.seek(0)
+        json.dump(data, f, indent=4)
+
+
+def adapt_databroker_deployment_file():
+    """Update the mockservice config with the correct mount path."""
+    with open(
+        os.path.join(get_script_path(), "deployment", "databroker.json"),
+        "r+",
+        encoding="utf-8",
+    ) as f:
+        data = json.load(f)
+        cache = get_cache_data()
+        data["mount_points"][0]["source"] = cache["vspec_file_path"]
         f.seek(0)
         json.dump(data, f, indent=4)
 
@@ -173,6 +193,7 @@ def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DE
     """
     adapt_feedercan_deployment_file()
     adapt_mockservice_deployment_file()
+    adapt_databroker_deployment_file()
     log_output.write("Starting Kanto runtime\n")
     kanto = subprocess.Popen(
         [
