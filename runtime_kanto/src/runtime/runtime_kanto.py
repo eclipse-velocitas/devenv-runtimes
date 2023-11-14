@@ -76,8 +76,13 @@ def remove_container(log_output: TextIOWrapper | int = subprocess.DEVNULL):
 
 def adapt_feedercan_deployment_file():
     """Update the feedercan config with the correct mount path."""
+
+    file_path = os.path.join(get_script_path(), "deployment", "feedercan.json")
+    if not os.path.isfile(file_path):
+        return
+
     with open(
-        os.path.join(get_script_path(), "deployment", "feedercan.json"),
+        file_path,
         "r+",
         encoding="utf-8",
     ) as f:
@@ -91,8 +96,13 @@ def adapt_feedercan_deployment_file():
 
 def adapt_mockservice_deployment_file():
     """Update the mockservice config with the correct mount path."""
+
+    file_path = os.path.join(get_script_path(), "deployment", "mockservice.json")
+    if not os.path.isfile(file_path):
+        return
+
     with open(
-        os.path.join(get_script_path(), "deployment", "mockservice.json"),
+        file_path,
         "r+",
         encoding="utf-8",
     ) as f:
@@ -108,9 +118,14 @@ def adapt_mockservice_deployment_file():
 
 
 def adapt_databroker_deployment_file():
-    """Update the mockservice config with the correct mount path."""
+    """Update the databroker config with the correct mount path."""
+
+    file_path = os.path.join(get_script_path(), "deployment", "databroker.json")
+    if not os.path.isfile(file_path):
+        return
+
     with open(
-        os.path.join(get_script_path(), "deployment", "databroker.json"),
+        file_path,
         "r+",
         encoding="utf-8",
     ) as f:
