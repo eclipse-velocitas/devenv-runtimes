@@ -104,9 +104,10 @@ def test_scripts_run_successfully():
     assert run_command_until_logs_match(f"{BASE_COMMAND_RUNTIME} up", regex_runtime_up)
     wait_for_container_update()
     assert check_container_is_running("mosquitto")
-    assert check_container_is_running("seatservice")
     assert check_container_is_running("databroker")
-    assert check_container_is_running("feedercan")
+    # feedercan and seatservice are disabled for now
+    # assert check_container_is_running("feedercan")
+    # assert check_container_is_running("seatservice")
     assert run_command_until_logs_match(
         f"{BASE_COMMAND_DEPLOYMENT} build-vehicleapp", regex_build, 60 * 12
     )

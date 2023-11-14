@@ -22,10 +22,10 @@ from pathlib import Path
 
 from velocitas_lib import (
     get_app_manifest,
+    get_cache_data,
     get_package_path,
     get_script_path,
     get_workspace_dir,
-    get_cache_data,
 )
 from yaspin.core import Yaspin
 
