@@ -3,6 +3,13 @@
     "image": {
         "name": "ghcr.io/eclipse/kuksa.val/databroker:0.3.0"
     },
+    "mount_points": [
+        {
+            "destination": "vspec.json",
+            "source": "",
+            "propagation_mode": "rprivate"
+        }
+    ],
     "host_config": {
         "devices": [],
         "network_mode": "host",
@@ -15,7 +22,8 @@
     },
     "config": {
         "env": [
-            "KUKSA_DATA_BROKER_PORT=55555"
+            "KUKSA_DATA_BROKER_PORT=55555",
+            "KUKSA_DATA_BROKER_METADATA_FILE=vspec.json"
         ]
     }
 }

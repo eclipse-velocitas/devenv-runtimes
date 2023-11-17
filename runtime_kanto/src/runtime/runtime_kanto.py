@@ -22,6 +22,7 @@ from pathlib import Path
 
 from velocitas_lib import (
     get_app_manifest,
+    get_cache_data,
     get_package_path,
     get_script_path,
     get_workspace_dir,
@@ -75,8 +76,13 @@ def remove_container(log_output: TextIOWrapper | int = subprocess.DEVNULL):
 
 def adapt_feedercan_deployment_file():
     """Update the feedercan config with the correct mount path."""
+
+    file_path = os.path.join(get_script_path(), "deployment", "feedercan.json")
+    if not os.path.isfile(file_path):
+        return
+
     with open(
-        os.path.join(get_script_path(), "deployment", "feedercan.json"),
+        file_path,
         "r+",
         encoding="utf-8",
     ) as f:
@@ -90,13 +96,42 @@ def adapt_feedercan_deployment_file():
 
 def adapt_mockservice_deployment_file():
     """Update the mockservice config with the correct mount path."""
+
+    file_path = os.path.join(get_script_path(), "deployment", "mockservice.json")
+    if not os.path.isfile(file_path):
+        return
+
     with open(
-        os.path.join(get_script_path(), "deployment", "mockservice.json"),
+        file_path,
         "r+",
         encoding="utf-8",
     ) as f:
         data = json.load(f)
-        data["mount_points"][0]["source"] = os.path.join(get_package_path(), "mock.py")
+        source = os.path.join(get_package_path(), "mock.py")
+        # use mock.py from repo root if available
+        if os.path.isfile(os.path.join(get_workspace_dir(), "mock.py")):
+            source = os.path.join(get_workspace_dir(), "mock.py")
+
+        data["mount_points"][0]["source"] = source
+        f.seek(0)
+        json.dump(data, f, indent=4)
+
+
+def adapt_databroker_deployment_file():
+    """Update the databroker config with the correct mount path."""
+
+    file_path = os.path.join(get_script_path(), "deployment", "databroker.json")
+    if not os.path.isfile(file_path):
+        return
+
+    with open(
+        file_path,
+        "r+",
+        encoding="utf-8",
+    ) as f:
+        data = json.load(f)
+        cache = get_cache_data()
+        data["mount_points"][0]["source"] = cache["vspec_file_path"]
         f.seek(0)
         json.dump(data, f, indent=4)
 
@@ -173,6 +208,7 @@ def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DE
     """
     adapt_feedercan_deployment_file()
     adapt_mockservice_deployment_file()
+    adapt_databroker_deployment_file()
     log_output.write("Starting Kanto runtime\n")
     kanto = subprocess.Popen(
         [
