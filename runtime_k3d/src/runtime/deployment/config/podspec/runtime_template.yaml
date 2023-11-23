@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Robert Bosch GmbH and Microsoft Corporation
+# Copyright (c) 2022-2023 Contributors to the Eclipse Foundation
 #
 # This program and the accompanying materials are made available under the
 # terms of the Apache License, Version 2.0 which is available at
@@ -22,12 +22,12 @@ spec:
       persistentVolumeClaim:
         claimName: pv-claim
   containers:
-  - image: busybox
-    name: bash
-    volumeMounts:
-      - mountPath: "/data"
-        name: pv-storage
-    command: ["ping", "127.0.0.1"]
+    - image: busybox
+      name: bash
+      volumeMounts:
+        - mountPath: "/data"
+          name: pv-storage
+      command: ["ping", "127.0.0.1"]
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -73,17 +73,17 @@ spec:
         app: mqtt-broker
     spec:
       containers:
-          - name: mqtt
-            image: eclipse-mosquitto:2.0.14
-            imagePullPolicy: IfNotPresent
-            args: [ "mosquitto", "-c", "/mosquitto-no-auth.conf" ]
-            ports:
-              - name: default
-                containerPort: 1883
-                protocol: TCP
-              - name: websocket
-                containerPort: 9001
-                protocol: TCP
+        - name: mqtt
+          image: eclipse-mosquitto:2.0.14
+          imagePullPolicy: IfNotPresent
+          args: ["mosquitto", "-c", "/mosquitto-no-auth.conf"]
+          ports:
+            - name: default
+              containerPort: 1883
+              protocol: TCP
+            - name: websocket
+              containerPort: 9001
+              protocol: TCP
 ---
 apiVersion: v1
 kind: Service
@@ -114,14 +114,14 @@ spec:
   type: pubsub.mqtt
   version: v1
   metadata:
-  - name: url
-    value: "tcp://{{.Values.imageMqttbroker.name}}.default.svc.cluster.local:1883"
-  - name: qos
-    value: 1
-  - name: retain
-    value: "false"
-  - name: cleanSession
-    value: "false"
+    - name: url
+      value: "tcp://{{.Values.imageMqttbroker.name}}.default.svc.cluster.local:1883"
+    - name: qos
+      value: 1
+    - name: retain
+      value: "false"
+    - name: cleanSession
+      value: "false"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -167,10 +167,9 @@ spec:
             - name: DBC_FILE
               value: "/data/dbcfileDefault.dbc"
           volumeMounts:
-          - mountPath: "/data"
-            name: pv-storage
+            - mountPath: "/data"
+              name: pv-storage
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -245,12 +244,12 @@ spec:
           image: ghcr.io/eclipse/kuksa.val.services/seat_service:v0.1.0
           imagePullPolicy: Always
           ports:
-          - name: default
-            containerPort: 50051
-            protocol: TCP
+            - name: default
+              containerPort: 50051
+              protocol: TCP
           env:
-          - name: VEHICLEDATABROKER_DAPR_APP_ID
-            value: vehicledatabroker
+            - name: VEHICLEDATABROKER_DAPR_APP_ID
+              value: vehicledatabroker
 ---
 apiVersion: v1
 kind: Service
@@ -300,5 +299,5 @@ spec:
             - name: VEHICLEDATABROKER_DAPR_APP_ID
               value: vehicledatabroker
           volumeMounts:
-          - mountPath: "/data"
-            name: pv-storage
+            - mountPath: "/data"
+              name: pv-storage
