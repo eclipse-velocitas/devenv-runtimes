@@ -260,7 +260,7 @@ def generate_nodeport_service(service_id: str, port: str) -> dict[str, Any]:
         service_config: The parsed configuration from the runtime.json
         port: The port to be published
     """
-    nodeport_spec = {
+    nodeport_spec: dict[str, Any] = {
         "apiVersion": "v1",
         "kind": "Service",
         "metadata": {"name": f"{service_id}-nodeport{port}"},

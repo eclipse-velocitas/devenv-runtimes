@@ -182,7 +182,8 @@ def spawn_process(
                 time.sleep(0.1)
                 continue
             patterns[:] = filterfalse(
-                lambda pattern: pattern.search(line), patterns  # noqa: B023
+                lambda pattern: pattern.search(line),
+                patterns,
             )
             if len(patterns) == 0:
                 timer.cancel()

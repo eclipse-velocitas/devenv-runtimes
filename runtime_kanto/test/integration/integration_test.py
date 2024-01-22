@@ -72,6 +72,8 @@ def run_command_until_logs_match(
     )
     timer: Timer = Timer(timeout_sec, proc.kill)
     timer.start()
+    if not proc.stdout:
+        return False
     for line in iter(proc.stdout.readline, b""):
         if proc.poll() is not None:
             print(f"Timeout reached after {timeout_sec} seconds, process killed!")

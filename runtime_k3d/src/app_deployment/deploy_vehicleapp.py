@@ -29,9 +29,7 @@ from velocitas_lib.docker import (
 from yaspin import yaspin
 
 
-def is_vehicleapp_installed(
-    log_output: TextIOWrapper | int = subprocess.DEVNULL,
-) -> bool:
+def is_vehicleapp_installed(log_output: TextIOWrapper) -> bool:
     """Return whether the runtime is installed or not.
 
     Args:
@@ -47,7 +45,7 @@ def is_vehicleapp_installed(
     )
 
 
-def uninstall_vehicleapp(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+def uninstall_vehicleapp(log_output: TextIOWrapper):
     """Uninstall VehicleApp helm chart
 
     Args:
@@ -60,9 +58,7 @@ def uninstall_vehicleapp(log_output: TextIOWrapper | int = subprocess.DEVNULL):
     )
 
 
-def install_vehicleapp(
-    app_name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL
-):
+def install_vehicleapp(app_name: str, log_output: TextIOWrapper):
     """Install VehicleApp helm chart
 
     Args:

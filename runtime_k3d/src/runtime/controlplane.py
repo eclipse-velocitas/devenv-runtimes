@@ -23,7 +23,7 @@ from velocitas_lib.services import get_services
 from yaspin.core import Yaspin
 
 
-def registry_exists(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bool:
+def registry_exists(log_output: TextIOWrapper) -> bool:
     """Check if the K3D registry exists.
 
     Args:
@@ -42,7 +42,7 @@ def registry_exists(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> boo
     )
 
 
-def create_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+def create_registry(log_output: TextIOWrapper):
     """Create the K3D registry.
 
     Args:
@@ -55,7 +55,7 @@ def create_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
     )
 
 
-def delete_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+def delete_registry(log_output: TextIOWrapper):
     """Delete the K3D registry.
 
     Args:
@@ -68,7 +68,7 @@ def delete_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
     )
 
 
-def cluster_exists(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bool:
+def cluster_exists(log_output: TextIOWrapper) -> bool:
     """Check if the K3D cluster exists.
 
     Args:
@@ -100,11 +100,7 @@ def append_proxy_var_if_set(proxy_args: List[str], var_name: str):  # noqa: U100
         proxy_args += ["-e", f"{var_name}={var_content}@server:0"]
 
 
-def create_cluster(
-    spinner: Yaspin,
-    config_dir_path: str,
-    log_output: TextIOWrapper | int = subprocess.DEVNULL,
-):
+def create_cluster(spinner: Yaspin, config_dir_path: str, log_output: TextIOWrapper):
     """Create the cluster with the given config dir.
 
     Args:
@@ -154,7 +150,7 @@ def generate_ports_to_expose() -> List[str]:
     return exposed_services
 
 
-def delete_cluster(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+def delete_cluster(log_output: TextIOWrapper):
     """Delete the K3D cluster.
 
     Args:
@@ -167,9 +163,7 @@ def delete_cluster(log_output: TextIOWrapper | int = subprocess.DEVNULL):
     )
 
 
-def deployment_exists(
-    deployment_name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL
-) -> bool:
+def deployment_exists(deployment_name: str, log_output: TextIOWrapper) -> bool:
     """Check if the deployment of a given name exists.
 
     Args:
@@ -189,7 +183,7 @@ def deployment_exists(
     )
 
 
-def deploy_zipkin(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+def deploy_zipkin(log_output: TextIOWrapper):
     """Deploy zipkin to the cluster.
 
     Args:
@@ -218,9 +212,7 @@ def deploy_zipkin(log_output: TextIOWrapper | int = subprocess.DEVNULL):
     )
 
 
-def dapr_is_initialized_with_k3d(
-    log_output: TextIOWrapper | int = subprocess.DEVNULL,
-) -> bool:
+def dapr_is_initialized_with_k3d(log_output: TextIOWrapper) -> bool:
     """Check if dapr is initialized with k3d.
 
     Args:
@@ -237,9 +229,7 @@ def dapr_is_initialized_with_k3d(
 
 
 def initialize_dapr_with_k3d(
-    dapr_runtime_version: str,
-    dapr_config_dir_path: str,
-    log_output: TextIOWrapper | int = subprocess.DEVNULL,
+    dapr_runtime_version: str, dapr_config_dir_path: str, log_output: TextIOWrapper
 ):
     """Initialize dapr with K3D.
 
@@ -270,9 +260,7 @@ def initialize_dapr_with_k3d(
     )
 
 
-def configure_controlplane(
-    spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DEVNULL
-):
+def configure_controlplane(spinner: Yaspin, log_output: TextIOWrapper):
     """Configure the K3D control plane and display the progress
     using the given spinner.
 
@@ -325,9 +313,7 @@ def configure_controlplane(
     spinner.write(status)
 
 
-def reset_controlplane(
-    spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DEVNULL
-):
+def reset_controlplane(spinner: Yaspin, log_output: TextIOWrapper):
     """Reset the K3D control plane and display the progress
     using the given spinner.
 

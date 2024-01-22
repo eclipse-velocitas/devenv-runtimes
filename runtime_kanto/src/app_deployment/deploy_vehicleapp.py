@@ -29,10 +29,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", "app_deployment"))
 from build_vehicleapp import build_vehicleapp  # noqa: E402
 
 
-def is_vehicleapp_in_kanto(
-    app_name: str,
-    log_output: TextIOWrapper | int = subprocess.DEVNULL,
-) -> bool:
+def is_vehicleapp_in_kanto(app_name: str, log_output: TextIOWrapper) -> bool:
     """Return whether the vehicleapp image is already in Kanto or not.
 
     Args:
@@ -49,10 +46,7 @@ def is_vehicleapp_in_kanto(
     )
 
 
-def is_vehicleapp_in_containerd(
-    app_name: str,
-    log_output: TextIOWrapper | int = subprocess.DEVNULL,
-) -> bool:
+def is_vehicleapp_in_containerd(app_name: str, log_output: TextIOWrapper) -> bool:
     """Return whether the vehicleapp image is already in containerd or not.
 
     Args:
@@ -79,10 +73,7 @@ def is_vehicleapp_in_containerd(
     return app_name in images
 
 
-def is_vehicleapp_installed(
-    app_name: str,
-    log_output: TextIOWrapper | int = subprocess.DEVNULL,
-) -> bool:
+def is_vehicleapp_installed(app_name: str, log_output: TextIOWrapper) -> bool:
     """Return whether the vehicleapp is already installed or not.
 
     Args:
@@ -94,16 +85,14 @@ def is_vehicleapp_installed(
     )
 
 
-def remove_vehicleapp(
-    app_name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL
-):
+def remove_vehicleapp(app_name: str, log_output: TextIOWrapper):
     """Uninstall VehicleApp container
 
     Args:
         app_name (str): App name to remove container for
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
-    if is_vehicleapp_in_kanto(app_name):
+    if is_vehicleapp_in_kanto(app_name, log_output):
         log_output.write(f"Removing {app_name} container from Kanto\n")
         subprocess.call(
             ["kanto-cm", "remove", "-f", "-n", app_name],
@@ -111,7 +100,7 @@ def remove_vehicleapp(
             stderr=log_output,
         )
 
-    if is_vehicleapp_in_containerd(app_name):
+    if is_vehicleapp_in_containerd(app_name, log_output):
         log_output.write(f"Removing {app_name} container from containerd\n")
         ps = subprocess.Popen(
             (
@@ -151,9 +140,7 @@ def remove_vehicleapp(
         )
 
 
-def create_container(
-    app_name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL
-):
+def create_container(app_name: str, log_output: TextIOWrapper):
     """Create kanto container
 
     Args:
@@ -191,9 +178,7 @@ def create_container(
     )
 
 
-def start_container(
-    app_name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL
-):
+def start_container(app_name: str, log_output: TextIOWrapper):
     """Start VehicleApp container
 
     Args:

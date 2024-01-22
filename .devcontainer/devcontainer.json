@@ -15,7 +15,12 @@
 			// Set *default* container specific settings.json values on container create.
 			"settings": {
 				"[python]": {
-					"editor.defaultFormatter": "ms-python.black-formatter"
+					"editor.formatOnSave": true,
+					"editor.codeActionsOnSave": {
+						"source.fixAll": true,
+						"source.organizeImports": true
+					},
+					"editor.defaultFormatter": "charliermarsh.ruff"
 				},
 				"python.testing.pytestArgs": [
 					"--ignore=desired_state_generator/test/integration",
@@ -28,14 +33,11 @@
 				"python.testing.pytestEnabled": true,
 				"python.pythonPath": "/usr/bin/python3",
 				"python.defaultInterpreterPath": "/usr/bin/python3",
-				// Only Flake8 is used as linter and static code analyzer, as faster tool
-				"python.linting.enabled": true,
-				"python.linting.flake8Enabled": true,
-				// Style Formatter
-				"python.formatting.provider": "black",
-				// Security Linter
-				"python.linting.banditEnabled": true,
 				"python.disableInstallationCheck": true,
+				"python.analysis.typeCheckingMode": "basic",
+				// Strong Type Checker
+				"mypy.enabled": true,
+				"mypy.runUsingActiveInterpreter": true,
 				"terminal.integrated.defaultProfile.linux": "zsh",
 				"terminal.integrated.profiles.linux": {
 					"zsh": {
@@ -48,14 +50,11 @@
 				"ms-azuretools.vscode-dapr",
 				"ms-azuretools.vscode-docker",
 				"ms-python.python",
-				"cschleiden.vscode-github-actions",
 				"rpdswtk.vsmqtt",
-				"dotjoshjohnson.xml",
 				"ms-kubernetes-tools.vscode-kubernetes-tools",
 				"matangover.mypy",
-				"augustocdias.tasks-shell-input",
-				"ms-python.isort",
-				"ms-python.flake8"
+				"ms-python.mypy-type-checker",
+				"charliermarsh.ruff"
 			]
 		}
 	},

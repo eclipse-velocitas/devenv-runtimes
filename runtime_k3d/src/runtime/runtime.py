@@ -24,7 +24,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", "runtime"))
 from deployment.gen_helm import gen_helm  # noqa: E402
 
 
-def is_runtime_installed(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bool:
+def is_runtime_installed(log_output: TextIOWrapper) -> bool:
     """Return whether the runtime is installed or not.
 
     Args:
@@ -48,9 +48,7 @@ def is_runtime_installed(log_output: TextIOWrapper | int = subprocess.DEVNULL) -
     return False
 
 
-def retag_docker_image(
-    image_name: str, log_output: TextIOWrapper | int = subprocess.DEVNULL
-):
+def retag_docker_image(image_name: str, log_output: TextIOWrapper):
     """Retag the given docker image to be available in K8S.
 
     Args:
@@ -74,7 +72,7 @@ def retag_docker_image(
     )
 
 
-def retag_docker_images(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+def retag_docker_images(log_output: TextIOWrapper):
     """Retag docker images of all defined services from runtime.json
 
     Args:
@@ -85,7 +83,7 @@ def retag_docker_images(log_output: TextIOWrapper | int = subprocess.DEVNULL):
         retag_docker_image(service.config.image, log_output)
 
 
-def create_config_maps(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+def create_config_maps(log_output: TextIOWrapper):
     """Create config maps for all services.
 
     Args:
@@ -121,9 +119,7 @@ def create_config_maps(log_output: TextIOWrapper | int = subprocess.DEVNULL):
                 )
 
 
-def install_runtime(
-    helm_chart_path: str, log_output: TextIOWrapper | int = subprocess.DEVNULL
-):
+def install_runtime(helm_chart_path: str, log_output: TextIOWrapper):
     """Install the runtime from the given helm chart.
 
     Args:
@@ -149,7 +145,7 @@ def install_runtime(
     )
 
 
-def uninstall_runtime(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+def uninstall_runtime(log_output: TextIOWrapper):
     """Uninstall the runtime.
 
     Args:
@@ -162,9 +158,7 @@ def uninstall_runtime(log_output: TextIOWrapper | int = subprocess.DEVNULL):
     )
 
 
-def deploy_runtime(
-    spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DEVNULL
-):
+def deploy_runtime(spinner: Yaspin, log_output: TextIOWrapper):
     """Deploy the runtime and display the progress using the given spinner.
 
     Args:
@@ -183,9 +177,7 @@ def deploy_runtime(
     spinner.write(status)
 
 
-def undeploy_runtime(
-    spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DEVNULL
-):
+def undeploy_runtime(spinner: Yaspin, log_output: TextIOWrapper):
     """Undeploy/remove the runtime and display the progress
     using the given spinner.
 

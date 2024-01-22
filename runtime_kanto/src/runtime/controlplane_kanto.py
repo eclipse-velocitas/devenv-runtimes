@@ -22,7 +22,7 @@ K3D_REGISTRY_NAME = "k3d-registry"
 KANTO_REGISTRY_NAME = "registry"
 
 
-def registry_running(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bool:
+def registry_running(log_output: TextIOWrapper) -> bool:
     """Check if the Kanto registry is running.
 
     Args:
@@ -47,7 +47,7 @@ def registry_running(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bo
     )
 
 
-def create_and_start_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+def create_and_start_registry(log_output: TextIOWrapper):
     """Create and start the Kanto registry.
 
     Args:
@@ -70,7 +70,7 @@ def create_and_start_registry(log_output: TextIOWrapper | int = subprocess.DEVNU
     )
 
 
-def start_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+def start_registry(log_output: TextIOWrapper):
     """Start the Kanto registry.
 
     Args:
@@ -84,7 +84,7 @@ def start_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
     )
 
 
-def stop_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+def stop_registry(log_output: TextIOWrapper):
     """Stop the Kanto registry.
 
     Args:
@@ -98,9 +98,7 @@ def stop_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
     )
 
 
-def configure_controlplane(
-    spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DEVNULL
-):
+def configure_controlplane(spinner: Yaspin, log_output: TextIOWrapper):
     """Configure the Kanto control plane and display the progress
     using the given spinner.
 
@@ -131,9 +129,7 @@ def configure_controlplane(
             log_output.write(status + "started.\n")
 
 
-def reset_controlplane(
-    spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DEVNULL
-):
+def reset_controlplane(spinner: Yaspin, log_output: TextIOWrapper):
     """Reset the K3D control plane and display the progress
     using the given spinner.
 

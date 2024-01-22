@@ -68,7 +68,7 @@ def check_cluster_status_and_dapr(kubectl_regs: dict, dapr_regs: dict) -> bool:
     )
 
 
-def check_image_if_created(image_reg: Pattern) -> bool:
+def check_image_if_created() -> bool:
     command_get_images_logs = check_output(["docker", "images"]).decode()
     return matches_any_regex(image_reg, command_get_images_logs)
 
@@ -87,7 +87,7 @@ def test_scripts_run_successfully():
     assert run_command(f"{BASE_COMMAND_RUNTIME} up")
     assert check_cluster_status_and_dapr(kubectl_regs, dapr_regs)
     assert run_command(f"{BASE_COMMAND_DEPLOYMENT} build-vehicleapp")
-    assert check_image_if_created(image_reg)
+    assert check_image_if_created()
     assert run_command(f"{BASE_COMMAND_DEPLOYMENT} deploy-vehicleapp")
     assert check_pods(pods_regs)
 

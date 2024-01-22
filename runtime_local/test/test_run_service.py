@@ -12,8 +12,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-# flake8: noqa: U100 unused argument (because of pytest.fixture)
-
 import os
 import sys
 
@@ -21,7 +19,7 @@ import pytest
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from run_service import main
+from run_service import main  # noqa: E402
 
 
 @pytest.fixture()
