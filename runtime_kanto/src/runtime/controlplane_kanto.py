@@ -53,7 +53,7 @@ def create_and_start_registry(log_output: TextIOWrapper | int = subprocess.DEVNU
     Args:
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
-    log_output.write("Creating and starting Kanto registry container\n")
+    log_output.write("Creating and starting Kanto registry container\n")  # type: ignore
     subprocess.check_call(
         [
             "docker",
@@ -76,7 +76,7 @@ def start_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
     Args:
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
-    log_output.write("Starting Kanto registry container\n")
+    log_output.write("Starting Kanto registry container\n")  # type: ignore
     subprocess.check_call(
         ["docker", "start", KANTO_REGISTRY_NAME],
         stdout=log_output,
@@ -90,7 +90,7 @@ def stop_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
     Args:
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
-    log_output.write("Stopping Kanto registry container\n")
+    log_output.write("Stopping Kanto registry container\n")  # type: ignore
     subprocess.check_call(
         ["docker", "stop", KANTO_REGISTRY_NAME],
         stdout=log_output,
@@ -118,17 +118,17 @@ def configure_controlplane(
         spinner.write(status + "starting registry.")
         create_and_start_registry(log_output)
         spinner.write(status + "started.")
-        log_output.write(status + "started.\n")
+        log_output.write(status + "started.\n")  # type: ignore
     else:
         spinner.write(status + "registry already exists.")
         if registry_running(log_output):
             spinner.write(status + "registry already started.")
-            log_output.write(status + "registry already started.\n")
+            log_output.write(status + "registry already started.\n")  # type: ignore
         else:
             spinner.write(status + "starting registry.")
             start_registry(log_output)
             spinner.write(status + "started.")
-            log_output.write(status + "started.\n")
+            log_output.write(status + "started.\n")  # type: ignore
 
 
 def reset_controlplane(
@@ -149,4 +149,4 @@ def reset_controlplane(
     else:
         status = status + "does not exist."
     spinner.write(status)
-    log_output.write(status + "\n")
+    log_output.write(status + "\n")  # type: ignore

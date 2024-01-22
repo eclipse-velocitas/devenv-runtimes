@@ -13,10 +13,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from controlplane_kanto import reset_controlplane
+from runtime import stop_kanto, undeploy_runtime
 from velocitas_lib import create_log_file
 from yaspin import yaspin
-
-from runtime_kanto import stop_kanto, undeploy_runtime
 
 
 def runtime_down():

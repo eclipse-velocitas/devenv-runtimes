@@ -104,7 +104,7 @@ def remove_vehicleapp(
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
     if is_vehicleapp_in_kanto(app_name):
-        log_output.write(f"Removing {app_name} container from Kanto\n")
+        log_output.write(f"Removing {app_name} container from Kanto\n")  # type: ignore
         subprocess.call(
             ["kanto-cm", "remove", "-f", "-n", app_name],
             stdout=log_output,
@@ -112,7 +112,7 @@ def remove_vehicleapp(
         )
 
     if is_vehicleapp_in_containerd(app_name):
-        log_output.write(f"Removing {app_name} container from containerd\n")
+        log_output.write(f"Removing {app_name} container from containerd\n")  # type: ignore
         ps = subprocess.Popen(
             (
                 "sudo",
@@ -167,7 +167,7 @@ def create_container(
     mqtt_port = get_service_port("mqtt-broker")
     mqtt_address = "mqtt://127.0.0.1"
 
-    log_output.write(f"Creating new {app_name} container\n")
+    log_output.write(f"Creating new {app_name} container\n")  # type: ignore
     subprocess.check_call(
         [
             "kanto-cm",
@@ -201,7 +201,7 @@ def start_container(
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
 
-    log_output.write(f"Starting {app_name} container\n")
+    log_output.write(f"Starting {app_name} container\n")  # type: ignore
     subprocess.check_call(
         [
             "kanto-cm",

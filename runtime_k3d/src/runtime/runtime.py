@@ -43,7 +43,7 @@ def is_runtime_installed(log_output: TextIOWrapper | int = subprocess.DEVNULL) -
         if key == "STATUS" and value == "deployed":
             return True
 
-    log_output.write(process.stdout)
+    log_output.write(process.stdout)  # type: ignore
 
     return False
 
