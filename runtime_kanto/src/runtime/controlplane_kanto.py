@@ -22,7 +22,7 @@ K3D_REGISTRY_NAME = "k3d-registry"
 KANTO_REGISTRY_NAME = "registry"
 
 
-def registry_running(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bool:
+def registry_running(log_output: TextIOWrapper) -> bool:
     """Check if the Kanto registry is running.
 
     Args:
@@ -47,13 +47,13 @@ def registry_running(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bo
     )
 
 
-def create_and_start_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+def create_and_start_registry(log_output: TextIOWrapper):
     """Create and start the Kanto registry.
 
     Args:
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
-    log_output.write("Creating and starting Kanto registry container\n")  # type: ignore
+    log_output.write("Creating and starting Kanto registry container\n")
     subprocess.check_call(
         [
             "docker",
@@ -70,13 +70,13 @@ def create_and_start_registry(log_output: TextIOWrapper | int = subprocess.DEVNU
     )
 
 
-def start_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+def start_registry(log_output: TextIOWrapper):
     """Start the Kanto registry.
 
     Args:
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
-    log_output.write("Starting Kanto registry container\n")  # type: ignore
+    log_output.write("Starting Kanto registry container\n")
     subprocess.check_call(
         ["docker", "start", KANTO_REGISTRY_NAME],
         stdout=log_output,
@@ -84,13 +84,13 @@ def start_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
     )
 
 
-def stop_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+def stop_registry(log_output: TextIOWrapper):
     """Stop the Kanto registry.
 
     Args:
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
-    log_output.write("Stopping Kanto registry container\n")  # type: ignore
+    log_output.write("Stopping Kanto registry container\n")
     subprocess.check_call(
         ["docker", "stop", KANTO_REGISTRY_NAME],
         stdout=log_output,
@@ -98,9 +98,7 @@ def stop_registry(log_output: TextIOWrapper | int = subprocess.DEVNULL):
     )
 
 
-def configure_controlplane(
-    spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DEVNULL
-):
+def configure_controlplane(spinner: Yaspin, log_output: TextIOWrapper):
     """Configure the Kanto control plane and display the progress
     using the given spinner.
 
@@ -118,22 +116,20 @@ def configure_controlplane(
         spinner.write(status + "starting registry.")
         create_and_start_registry(log_output)
         spinner.write(status + "started.")
-        log_output.write(status + "started.\n")  # type: ignore
+        log_output.write(status + "started.\n")
     else:
         spinner.write(status + "registry already exists.")
         if registry_running(log_output):
             spinner.write(status + "registry already started.")
-            log_output.write(status + "registry already started.\n")  # type: ignore
+            log_output.write(status + "registry already started.\n")
         else:
             spinner.write(status + "starting registry.")
             start_registry(log_output)
             spinner.write(status + "started.")
-            log_output.write(status + "started.\n")  # type: ignore
+            log_output.write(status + "started.\n")
 
 
-def reset_controlplane(
-    spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DEVNULL
-):
+def reset_controlplane(spinner: Yaspin, log_output: TextIOWrapper):
     """Reset the K3D control plane and display the progress
     using the given spinner.
 
@@ -149,4 +145,4 @@ def reset_controlplane(
     else:
         status = status + "does not exist."
     spinner.write(status)
-    log_output.write(status + "\n")  # type: ignore
+    log_output.write(status + "\n")

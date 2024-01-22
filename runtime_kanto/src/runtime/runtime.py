@@ -33,44 +33,44 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "..", "app_deployment"))
 from deploy_vehicleapp import remove_vehicleapp  # noqa: E402
 
 
-def remove_container(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+def remove_container(log_output: TextIOWrapper):
     """Uninstall the runtime.
 
     Args:
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
-    log_output.write("Removing databroker container\n")  # type: ignore
+    log_output.write("Removing databroker container\n")
     subprocess.call(
         ["kanto-cm", "remove", "-f", "-n", "databroker"],
         stdout=log_output,
         stderr=log_output,
     )
-    log_output.write("Removing mosquitto container\n")  # type: ignore
+    log_output.write("Removing mosquitto container\n")
     subprocess.call(
         ["kanto-cm", "remove", "-f", "-n", "mosquitto"],
         stdout=log_output,
         stderr=log_output,
     )
-    log_output.write("Removing feedercan container\n")  # type: ignore
+    log_output.write("Removing feedercan container\n")
     subprocess.call(
         ["kanto-cm", "remove", "-f", "-n", "feedercan"],
         stdout=log_output,
         stderr=log_output,
     )
-    log_output.write("Removing seatservice container\n")  # type: ignore
+    log_output.write("Removing seatservice container\n")
     subprocess.call(
         ["kanto-cm", "remove", "-f", "-n", "seatservice"],
         stdout=log_output,
         stderr=log_output,
     )
-    log_output.write("Removing mockservice container\n")  # type: ignore
+    log_output.write("Removing mockservice container\n")
     subprocess.call(
         ["kanto-cm", "remove", "-f", "-n", "mockservice"],
         stdout=log_output,
         stderr=log_output,
     )
     app_name = get_app_manifest()["name"].lower()
-    log_output.write(f"Removing {app_name} container\n")  # type: ignore
+    log_output.write(f"Removing {app_name} container\n")
     remove_vehicleapp(app_name, log_output)
 
 
@@ -136,9 +136,7 @@ def adapt_databroker_deployment_file():
         json.dump(data, f, indent=4)
 
 
-def undeploy_runtime(
-    spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DEVNULL
-):
+def undeploy_runtime(spinner: Yaspin, log_output: TextIOWrapper):
     """Undeploy/remove the runtime and display the progress
     using the given spinner.
 
@@ -152,7 +150,7 @@ def undeploy_runtime(
     spinner.write(status)
 
 
-def is_kanto_running(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bool:
+def is_kanto_running(log_output: TextIOWrapper) -> bool:
     """Check if Kanto is already running.
 
     Args:
@@ -180,7 +178,7 @@ def is_kanto_running(log_output: TextIOWrapper | int = subprocess.DEVNULL) -> bo
     return True
 
 
-def adapt_socket(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+def adapt_socket(log_output: TextIOWrapper):
     """Adapt the access rights for the Kanto socket.
 
     Args:
@@ -199,7 +197,7 @@ def adapt_socket(log_output: TextIOWrapper | int = subprocess.DEVNULL):
     )
 
 
-def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DEVNULL):
+def start_kanto(spinner: Yaspin, log_output: TextIOWrapper):
     """Starting the Kanto process in background
 
     Args:
@@ -209,7 +207,7 @@ def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DE
     adapt_feedercan_deployment_file()
     adapt_mockservice_deployment_file()
     adapt_databroker_deployment_file()
-    log_output.write("Starting Kanto runtime\n")  # type: ignore
+    log_output.write("Starting Kanto runtime\n")
     kanto = subprocess.Popen(
         [
             "sudo",
@@ -246,13 +244,13 @@ def start_kanto(spinner: Yaspin, log_output: TextIOWrapper | int = subprocess.DE
     kanto.wait()
 
 
-def stop_kanto(log_output: TextIOWrapper | int = subprocess.DEVNULL):
+def stop_kanto(log_output: TextIOWrapper):
     """Stopping the Kanto process.
 
     Args:
         log_output (TextIOWrapper | int): Logfile to write or DEVNULL by default.
     """
-    log_output.write("Stopping Kanto runtime\n")  # type: ignore
+    log_output.write("Stopping Kanto runtime\n")
     subprocess.check_call(
         [
             "sudo",
