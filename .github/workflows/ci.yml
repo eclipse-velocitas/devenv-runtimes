@@ -34,7 +34,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install required packages
         run: |
@@ -50,7 +50,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install required packages
         run: |
@@ -90,7 +90,7 @@ jobs:
       DAPR_HOST_IP: 127.0.0.1
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Prepare integration Tests
         uses: ./.github/actions/prepare-int-tests
@@ -116,7 +116,7 @@ jobs:
       DAPR_HOST_IP: 127.0.0.1
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Prepare integration Tests
         uses: ./.github/actions/prepare-int-tests
@@ -147,7 +147,7 @@ jobs:
       DOCKER_BUILDKIT: 1
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Prepare integration Tests
         uses: ./.github/actions/prepare-int-tests
@@ -194,7 +194,7 @@ jobs:
       DOCKER_BUILDKIT: 1
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Prepare integration Tests
         uses: ./.github/actions/prepare-int-tests

@@ -10,6 +10,10 @@
                     "executable": "./runtime_local/src/ensure-dapr.sh"
                 },
                 {
+                    "id": "run-vehicledatabroker-cli",
+                    "executable": "./runtime_local/src/run-vehicledatabroker-cli.sh"
+                },
+                {
                     "id": "run-service",
                     "executable": "python3",
                     "args": [
