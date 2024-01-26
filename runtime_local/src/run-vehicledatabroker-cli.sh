@@ -18,6 +18,12 @@ echo "### Running VehicleDataBroker CLI                   ###"
 echo "#######################################################"
 
 SCRIPT_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+ROOT_DIRECTORY=$( realpath "$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )/../../" )
+CONFIG=$(cat $ROOT_DIRECTORY/runtime.json | jq '.[]| select(.id == "vehicledatabroker").config')
+
+DATABROKER_IMAGE=$(echo $CONFIG | jq '.[] | select(.key == "image").value')
+temp=${DATABROKER_IMAGE#*:}
+DATABROKER_TAG=${temp:0:5}
 
 # Needed because of how the databroker release is tagged
 DATABROKER_ASSET_FOLDER="$SCRIPT_PATH/../assets/databroker/$DATABROKER_TAG"
