@@ -42,7 +42,7 @@ def run_services() -> None:
             spinner.write(error.args)
             spinner.fail("💥")
             terminate_spawned_processes()
-            print(f"Starting {service.id=} failed")
+            print(f"Starting {service.id} failed")
             with open(
                 get_log_file_name(service.id, "runtime_local"),
                 mode="r",

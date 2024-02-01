@@ -24,7 +24,14 @@
                     "id": "up",
                     "executable": "python3",
                     "args": [
-                        "./runtime_local/src/runtime-up.py"
+                        "./runtime_local/src/runtime_up.py"
+                    ]
+                },
+                {
+                    "id": "up",
+                    "executable": "python3",
+                    "args": [
+                        "./runtime_local/src/runtime_down.py"
                     ]
                 },
                 {
