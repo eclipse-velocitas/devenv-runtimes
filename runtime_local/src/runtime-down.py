@@ -12,7 +12,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-from runtime_up import terminate_spawned_processes
+from local_lib import stop_service
+from velocitas_lib.services import get_services
 from yaspin import yaspin
 
 
@@ -21,10 +22,18 @@ def runtime_down():
 
     print("Hint: Log files can be found in your workspace's logs directory")
     with yaspin(text="Stopping local runtime...", color="cyan") as spinner:
-        try:
-            terminate_spawned_processes()
-        except Exception:
-            spinner.fail("💥")
+        for service in get_services():
+            try:
+                spinner.text = f"Stopping {service.id}..."
+                stop_service(service)
+                spinner.write(f"> {service.id} stopped")
+            except Exception as error:
+                spinner.write(error.args)
+                spinner.fail("💥")
+                print(f"Stopping {service.id} failed")
+
+        spinner.text = "Stopped local runtime!"
+        spinner.ok("✅")
 
 
 if __name__ == "__main__":
