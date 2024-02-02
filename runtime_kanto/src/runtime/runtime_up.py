@@ -22,7 +22,7 @@ from yaspin import yaspin
 
 
 def runtime_up():
-    """Start up the K3D runtime."""
+    """Start up the Kanto runtime."""
 
     print("Hint: Log files can be found in your workspace's logs directory")
     log_output = create_log_file("runtime-up", "runtime_kanto")

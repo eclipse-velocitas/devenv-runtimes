@@ -28,6 +28,13 @@
                     ]
                 },
                 {
+                    "id": "down",
+                    "executable": "python3",
+                    "args": [
+                        "./runtime_local/src/runtime-down.py"
+                    ]
+                },
+                {
                     "id": "install-deps",
                     "executable": "python3",
                     "args": [
