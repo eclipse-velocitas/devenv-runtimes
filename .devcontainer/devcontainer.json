@@ -15,7 +15,7 @@
 			// Set *default* container specific settings.json values on container create.
 			"settings": {
 				"[python]": {
-					"editor.formatOnSave": false,
+					"editor.formatOnSave": true,
 					"editor.codeActionsOnSave": {
 						"source.fixAll": "explicit",
 						"source.organizeImports": "explicit"
