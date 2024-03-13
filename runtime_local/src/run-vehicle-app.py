@@ -32,11 +32,13 @@ def run_app(
 ):
     program_args = [executable_path, *args]
     envs = dict()
-    for service in get_services():
-        service_id = service.id
-        envs[get_dapr_app_id(service_id)] = service_id
 
-    if get_middleware_type() == MiddlewareType.DAPR:
+    if get_middleware_type() == MiddlewareType.NATIVE:
+        envs["SDV_MIDDLEWARE_TYPE"] = "native"
+    elif get_middleware_type() == MiddlewareType.DAPR:
+        for service in get_services():
+            service_id = service.id
+            envs[get_dapr_app_id(service_id)] = service_id
         if not app_id:
             app_id = "vehicleapp"
         dapr_args, dapr_env = get_dapr_sidecar_args(app_id, app_port=app_port)
@@ -44,7 +46,7 @@ def run_app(
         envs.update(dapr_env)
         program_args = dapr_args + program_args
 
-    subprocess.check_call(program_args)
+    subprocess.check_call(program_args, env=envs)
 
 
 if __name__ == "__main__":
