@@ -17,7 +17,6 @@ import subprocess
 from typing import Optional
 
 from local_lib import MiddlewareType, get_dapr_sidecar_args, get_middleware_type
-from velocitas_lib.services import get_services
 
 
 def get_dapr_app_id(service_id: str) -> str:
@@ -31,22 +30,18 @@ def run_app(
     app_port: Optional[str] = None,
 ):
     program_args = [executable_path, *args]
-    envs = dict()
 
     if get_middleware_type() == MiddlewareType.NATIVE:
+        envs = dict()
         envs["SDV_MIDDLEWARE_TYPE"] = "native"
+        subprocess.check_call(program_args, env=envs)
     elif get_middleware_type() == MiddlewareType.DAPR:
-        for service in get_services():
-            service_id = service.id
-            envs[get_dapr_app_id(service_id)] = service_id
         if not app_id:
             app_id = "vehicleapp"
         dapr_args, dapr_env = get_dapr_sidecar_args(app_id, app_port=app_port)
         dapr_args = dapr_args + ["--"]
-        envs.update(dapr_env)
         program_args = dapr_args + program_args
-
-    subprocess.check_call(program_args, env=envs)
+        subprocess.check_call(program_args)
 
 
 if __name__ == "__main__":
