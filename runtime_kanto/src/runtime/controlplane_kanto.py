@@ -130,7 +130,7 @@ def configure_controlplane(spinner: Yaspin, log_output: TextIOWrapper):
 
 
 def reset_controlplane(spinner: Yaspin, log_output: TextIOWrapper):
-    """Reset the K3D control plane and display the progress
+    """Reset the Kanto control plane and display the progress
     using the given spinner.
 
     Args:

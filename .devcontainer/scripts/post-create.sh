@@ -18,7 +18,7 @@ echo "### Install python requirements                     ###"
 echo "#######################################################"
 # Update pip before installing requirements
 pip3 install --upgrade pip
-for package in runtime_k3d runtime_kanto runtime_local desired_state_generator; do
+for package in runtime_kanto runtime_local desired_state_generator; do
 
     REQUIREMENTS="$package/src/requirements.txt"
     if [ -f $REQUIREMENTS ]; then
