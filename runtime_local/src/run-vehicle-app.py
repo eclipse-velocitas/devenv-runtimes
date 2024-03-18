@@ -42,6 +42,8 @@ def run_app(
         dapr_args = dapr_args + ["--"]
         program_args = dapr_args + program_args
         subprocess.check_call(program_args)
+    else:
+        raise NotImplementedError("Unsupported middleware type!")
 
 
 if __name__ == "__main__":
