@@ -17,6 +17,7 @@ import subprocess
 from typing import Optional
 
 from local_lib import MiddlewareType, get_dapr_sidecar_args, get_middleware_type
+from velocitas_lib.services import get_service_port
 
 
 def get_dapr_app_id(service_id: str) -> str:
@@ -34,6 +35,12 @@ def run_app(
     if get_middleware_type() == MiddlewareType.NATIVE:
         envs = dict()
         envs["SDV_MIDDLEWARE_TYPE"] = "native"
+        vdb_port = get_service_port("vehicledatabroker")
+        vdb_address = "grpc://127.0.0.1"
+        envs["SDV_VEHICLEDATABROKER_ADDRESS"] = f"{vdb_address}:{vdb_port}"
+        mqtt_port = get_service_port("mqtt-broker")
+        mqtt_address = "mqtt://127.0.0.1"
+        envs["SDV_MQTT_ADDRESS"] = f"{mqtt_address}:{mqtt_port}"
         subprocess.check_call(program_args, env=envs)
     elif get_middleware_type() == MiddlewareType.DAPR:
         if not app_id:

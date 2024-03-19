@@ -101,7 +101,7 @@
             },
             {
                 "key": "env",
-                "value": "VEHICLEDATABROKER_DAPR_APP_ID=vehicledatabroker"
+                "value": "BROKER_ADDR=localhost:55555"
             },
             {
                 "key": "env",
@@ -131,7 +131,7 @@
             },
             {
                 "key": "env",
-                "value": "VEHICLEDATABROKER_DAPR_APP_ID=vehicledatabroker"
+                "value": "VDB_ADDRESS=127.0.0.1:55555"
             },
             {
                 "key": "env",
@@ -185,7 +185,7 @@
             },
             {
                 "key": "env",
-                "value": "VEHICLEDATABROKER_DAPR_APP_ID=vehicledatabroker"
+                "value": "VDB_ADDRESS=127.0.0.1:55555"
             },
             {
                 "key": "mount",
