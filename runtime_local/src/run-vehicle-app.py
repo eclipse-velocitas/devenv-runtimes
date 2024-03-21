@@ -15,7 +15,7 @@
 import argparse
 import subprocess
 
-from local_lib import MiddlewareType, get_middleware_type
+from velocitas_lib.middleware import MiddlewareType, get_middleware_type
 from velocitas_lib.services import get_service_port
 
 
