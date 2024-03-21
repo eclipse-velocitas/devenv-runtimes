@@ -146,9 +146,9 @@ jobs:
         run: |
           cd runtime_kanto/test
           # the socket on the ci is different to the devcontainer
-          # sudo ls -al /run/docker/
+          sudo ls -al /run/docker/
           # sudo ls -al /run/docker/containerd
-          # sudo ln -s /run/containerd/containerd.sock /run/docker/containerd/containerd.sock
+          sudo ln -s /run/containerd/containerd.sock /run/docker/containerd/containerd.sock
           pytest -s -x ./integration/integration_test.py::test_scripts_run_successfully_with_down
 
       - name: Upload log files as artifacts
