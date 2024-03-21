@@ -146,6 +146,8 @@ jobs:
         run: |
           cd runtime_kanto/test
           # the socket on the ci is different to the devcontainer
+          # create dir as it does not exist at this point of time
+          sudo mkdir -p /run/docker/containerd
           sudo ln -s /run/containerd/containerd.sock /run/docker/containerd/containerd.sock
           pytest -s -x ./integration/integration_test.py::test_scripts_run_successfully_with_down
 
