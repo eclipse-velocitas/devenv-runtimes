@@ -146,11 +146,7 @@ jobs:
         run: |
           cd runtime_kanto/test
           # the socket on the ci is different to the devcontainer
-          docker --version
-          docker info
-          docker run -d -p 8080:80 nginx
-          docker --version
-          docker info
+          sudo systemctl start containerd
           sudo ls -al /run/docker/
           # sudo ls -al /run/docker/containerd
           sudo ln -s /run/containerd/containerd.sock /run/docker/containerd/containerd.sock
