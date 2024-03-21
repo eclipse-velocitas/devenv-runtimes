@@ -5,8 +5,7 @@
 #    pip-compile
 #
 aiohttp==3.9.2
-    # via
-    #   -r requirements.in
+    # via -r requirements.in
 aiosignal==1.3.1
     # via aiohttp
 async-timeout==4.0.3
@@ -22,8 +21,7 @@ frozenlist==1.4.0
     #   aiohttp
     #   aiosignal
 grpcio==1.59.0
-    # via
-    #   -r requirements.in
+    # via -r requirements.in
 idna==3.4
     # via yarl
 multidict==6.0.4
@@ -33,9 +31,6 @@ multidict==6.0.4
 packaging==23.2
     # via deprecation
 protobuf==4.24.4
-    # via
-    #   -r requirements.in
-six==1.16.0
-    # via python-dateutil
+    # via -r requirements.in
 yarl==1.9.2
     # via aiohttp
