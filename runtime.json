@@ -6,10 +6,6 @@
         ],
         "config": [
             {
-                "key": "no-dapr",
-                "value": true
-            },
-            {
                 "key": "image",
                 "value": "eclipse-mosquitto:2.0.14"
             },

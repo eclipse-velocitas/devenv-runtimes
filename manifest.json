@@ -6,10 +6,6 @@
             "type": "runtime",
             "programs": [
                 {
-                    "id": "ensure-dapr",
-                    "executable": "./runtime_local/src/ensure-dapr.sh"
-                },
-                {
                     "id": "run-vehicledatabroker-cli",
                     "executable": "./runtime_local/src/run-vehicledatabroker-cli.sh"
                 },
@@ -51,36 +47,14 @@
                     "args": [
                         "./runtime_local/src/run-vehicle-app.py"
                     ]
-                },
-                {
-                    "id": "run-dapr-sidecar",
-                    "executable": "python3",
-                    "args": [
-                        "./runtime_local/src/run-dapr-sidecar.py"
-                    ]
                 }
             ],
             "onPostInit": [
                 {
                     "ref": "install-deps"
-                },
-                {
-                    "ref": "ensure-dapr"
                 }
             ],
             "variables": [
-                {
-                    "name": "daprRuntimeVersion",
-                    "type": "string",
-                    "description": "Version of the dapr.io runtime to use.",
-                    "default": "1.10.3"
-                },
-                {
-                    "name": "daprCliVersion",
-                    "type": "string",
-                    "description": "Version of the dapr.io CLI to use.",
-                    "default": "1.10.0"
-                },
                 {
                     "name": "runtimeFilePath",
                     "type": "string",
