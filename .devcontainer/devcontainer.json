@@ -24,7 +24,6 @@
 				},
 				"python.testing.pytestArgs": [
 					"--ignore=desired_state_generator/test/integration",
-					"--ignore=runtime_k3d/test/integration",
 					"--ignore=runtime_kanto/test/integration",
 					"--ignore=runtime_local/test/integration",
 					"."
@@ -47,11 +46,9 @@
 			},
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
-				"ms-azuretools.vscode-dapr",
 				"ms-azuretools.vscode-docker",
 				"ms-python.python",
 				"rpdswtk.vsmqtt",
-				"ms-kubernetes-tools.vscode-kubernetes-tools",
 				"matangover.mypy",
 				"ms-python.mypy-type-checker",
 				"charliermarsh.ruff"

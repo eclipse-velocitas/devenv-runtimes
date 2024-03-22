@@ -14,9 +14,6 @@
         }
     },
     "config": {
-        "env": [
-            "KUKSA_DATA_BROKER_PORT=55555"
-        ],
         "cmd": [
             "mosquitto",
             "-c",

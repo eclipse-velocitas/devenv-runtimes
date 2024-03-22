@@ -6,10 +6,6 @@
             "type": "runtime",
             "programs": [
                 {
-                    "id": "ensure-dapr",
-                    "executable": "./runtime_local/src/ensure-dapr.sh"
-                },
-                {
                     "id": "run-vehicledatabroker-cli",
                     "executable": "./runtime_local/src/run-vehicledatabroker-cli.sh"
                 },
@@ -51,36 +47,14 @@
                     "args": [
                         "./runtime_local/src/run-vehicle-app.py"
                     ]
-                },
-                {
-                    "id": "run-dapr-sidecar",
-                    "executable": "python3",
-                    "args": [
-                        "./runtime_local/src/run-dapr-sidecar.py"
-                    ]
                 }
             ],
             "onPostInit": [
                 {
                     "ref": "install-deps"
-                },
-                {
-                    "ref": "ensure-dapr"
                 }
             ],
             "variables": [
-                {
-                    "name": "daprRuntimeVersion",
-                    "type": "string",
-                    "description": "Version of the dapr.io runtime to use.",
-                    "default": "1.10.3"
-                },
-                {
-                    "name": "daprCliVersion",
-                    "type": "string",
-                    "description": "Version of the dapr.io CLI to use.",
-                    "default": "1.10.0"
-                },
                 {
                     "name": "runtimeFilePath",
                     "type": "string",
@@ -92,124 +66,6 @@
                     "type": "string",
                     "description": "Path to the mocking configuration for the mock service",
                     "default": "mock.py"
-                }
-            ]
-        },
-        {
-            "id": "runtime-k3d",
-            "alias": "k3d",
-            "type": "runtime",
-            "programs": [
-                {
-                    "id": "install-deps",
-                    "executable": "python3",
-                    "args": [
-                        "-m",
-                        "pip",
-                        "install",
-                        "-r",
-                        "./runtime_k3d/src/requirements.txt"
-                    ]
-                },
-                {
-                    "id": "up",
-                    "executable": "python3",
-                    "args": [
-                        "./runtime_k3d/src/runtime/runtime-up.py"
-                    ]
-                },
-                {
-                    "id": "down",
-                    "executable": "python3",
-                    "args": [
-                        "./runtime_k3d/src/runtime/runtime-down.py"
-                    ]
-                },
-                {
-                    "id": "generate-podspec",
-                    "executable": "python3",
-                    "args": [
-                        "./runtime_k3d/src/runtime/deployment/gen_podspec.py"
-                    ]
-                },
-                {
-                    "id": "generate-helm",
-                    "executable": "python3",
-                    "args": [
-                        "./runtime_k3d/src/runtime/deployment/gen_helm.py"
-                    ]
-                }
-            ],
-            "onPostInit": [
-                {
-                    "ref": "install-deps"
-                }
-            ],
-            "variables": [
-                {
-                    "name": "daprRuntimeVersion",
-                    "type": "string",
-                    "description": "Version of the dapr.io runtime to use.",
-                    "default": "1.10.3"
-                },
-                {
-                    "name": "daprCliVersion",
-                    "type": "string",
-                    "description": "Version of the dapr.io CLI to use.",
-                    "default": "1.10.0"
-                },
-                {
-                    "name": "runtimeFilePath",
-                    "type": "string",
-                    "description": "Path to the file describing your custom runtime configuration.",
-                    "default": "runtime.json"
-                },
-                {
-                    "name": "mockFilePath",
-                    "type": "string",
-                    "description": "Path to the mocking configuration for the mock service",
-                    "default": "mock.py"
-                }
-            ]
-        },
-        {
-            "id": "deployment-k3d",
-            "alias": "k3d",
-            "type": "deployment",
-            "programs": [
-                {
-                    "id": "build-vehicleapp",
-                    "executable": "python3",
-                    "args": [
-                        "./runtime_k3d/src/app_deployment/build_vehicleapp.py"
-                    ]
-                },
-                {
-                    "id": "deploy-vehicleapp",
-                    "executable": "python3",
-                    "args": [
-                        "./runtime_k3d/src/app_deployment/deploy_vehicleapp.py"
-                    ]
-                },
-                {
-                    "name": "mockFilePath",
-                    "type": "string",
-                    "description": "Path to the mocking configuration for the mock service",
-                    "default": "mock.py"
-                }
-            ],
-            "variables": [
-                {
-                    "name": "dockerfilePath",
-                    "type": "string",
-                    "description": "Path of Dockerfile to use",
-                    "default": "./app/Dockerfile"
-                },
-                {
-                    "name": "vehicleAppPort",
-                    "type": "number",
-                    "description": "Port of VehicleApp to use",
-                    "default": 50008
                 }
             ]
         },

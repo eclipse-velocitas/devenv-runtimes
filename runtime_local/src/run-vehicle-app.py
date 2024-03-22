@@ -14,55 +14,37 @@
 
 import argparse
 import subprocess
-from typing import Optional
 
-from local_lib import MiddlewareType, get_dapr_sidecar_args, get_middleware_type
-from velocitas_lib.services import get_services
-
-
-def get_dapr_app_id(service_id: str) -> str:
-    return f"{service_id.upper()}_DAPR_APP_ID"
+from velocitas_lib.middleware import MiddlewareType, get_middleware_type
+from velocitas_lib.services import get_service_port
 
 
 def run_app(
     executable_path: str,
     args: list[str],
-    app_id: Optional[str] = None,
-    app_port: Optional[str] = None,
 ):
     program_args = [executable_path, *args]
-    envs = dict()
-    for service in get_services():
-        service_id = service.id
-        envs[get_dapr_app_id(service_id)] = service_id
 
-    if get_middleware_type() == MiddlewareType.DAPR:
-        if not app_id:
-            app_id = "vehicleapp"
-        dapr_args, dapr_env = get_dapr_sidecar_args(app_id, app_port=app_port)
-        dapr_args = dapr_args + ["--"]
-        envs.update(dapr_env)
-        program_args = dapr_args + program_args
+    if get_middleware_type() == MiddlewareType.NATIVE:
+        vdb_address = "grpc://127.0.0.1"
+        vdb_port = get_service_port("vehicledatabroker")
+        mqtt_address = "mqtt://127.0.0.1"
+        mqtt_port = get_service_port("mqtt-broker")
 
-    subprocess.check_call(program_args)
+        middleware_config = {
+            "SDV_MIDDLEWARE_TYPE": "native",
+            "SDV_VEHICLEDATABROKER_ADDRESS": f"{vdb_address}:{vdb_port}",
+            "SDV_MQTT_ADDRESS": f"{mqtt_address}:{mqtt_port}",
+        }
+        subprocess.check_call(program_args, env=middleware_config)
+    else:
+        raise NotImplementedError("Unsupported middleware type!")
 
 
 if __name__ == "__main__":
     # The arguments we accept
-    parser = argparse.ArgumentParser(
-        description="Starts the Dapr sidecar for the app to debug."
-    )
+    parser = argparse.ArgumentParser(description="Starts the app to debug.")
     # Add para to name package
-    parser.add_argument(
-        "--dapr-app-id",
-        type=str,
-        help="The Dapr app-id of the app being debugged.",
-    )
-    parser.add_argument(
-        "--dapr-app-port",
-        type=str,
-        help="The port where the app is listening on.",
-    )
     parser.add_argument(
         "executable_path", type=str, help="Path to the executable to be invoked."
     )
@@ -72,6 +54,4 @@ if __name__ == "__main__":
     run_app(
         args.executable_path,
         args.app_args,
-        app_id=args.dapr_app_id,
-        app_port=args.dapr_app_port,
     )

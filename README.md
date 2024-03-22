@@ -9,8 +9,9 @@ A Velocitas CLI package containing all available and supported Velocitas runtime
 This package contains the following runtimes:
 
 * [Local](./runtime_local/README.md)
-* [Kubernetes (K3D)](./runtime_k3d/README.md)
 * [Kanto](./runtime_kanto/README.md)
+
+**Note**: Support for Kubernetes (K3D) runtime has recently been removed.
 
 ## Runtime Configuration: `runtime.json`
 
@@ -23,7 +24,6 @@ For config values, here is a list of supported key-value pairs:
 
 | Key | Value examples | Description |
 |:----|:--|:------|
-`no-dapr` | `"true"`, `"false"` | If set to `"true"` the service will not use dapr when middleware is configured to dapr. Useful for enabling services like MQTT or a database.
 `enabled` | `"true"`, `"false"` | If set to `"false"` the service will not be started by the runtimes. Defaults to `"true"`.
 `image` | `ghcr.io/eclipse/kuksa.val.feeders/dbc2val:v0.1.1` | A fully qualified URI to a OCI compliant container image located within a container registry
 `arg` | `-c` | Argument to be passed to the spawned service. Can be passed multiple times for multiple arguments; arguments are forwarded in the order of definition in that case.

@@ -241,7 +241,6 @@ def start_kanto(spinner: Yaspin, log_output: TextIOWrapper):
 
     spinner.text = "Kanto is ready to use!"
     spinner.ok("✅")
-    kanto.wait()
 
 
 def stop_kanto(log_output: TextIOWrapper):

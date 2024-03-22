@@ -46,7 +46,7 @@ jobs:
   unit-test:
     name: "Run unit tests"
     runs-on: ubuntu-22.04
-    container: ghcr.io/eclipse-velocitas/devcontainer-base-images/python:v0.1
+    container: ghcr.io/eclipse-velocitas/devcontainer-base-images/python:v0.3
 
     steps:
       - name: Checkout repository
@@ -54,8 +54,9 @@ jobs:
 
       - name: Install required packages
         run: |
-          pip install -r runtime_k3d/src/requirements.txt
-          pip install -r runtime_k3d/test/requirements.txt
+          pip install -r desired_state_generator/src/requirements.txt
+          pip install -r desired_state_generator/test/requirements.txt
+          pip install -r runtime_local/src/requirements.txt
           pip install -r runtime_local/test/requirements.txt
 
       - name: unit tests
@@ -64,7 +65,7 @@ jobs:
           pytest --ignore-glob='*integration*' --override-ini junit_family=xunit1 --junit-xml=./results/UnitTest/junit.xml \
           --cov . \
           --cov-report=xml:results/CodeCoverage/cobertura-coverage.xml \
-          --cov-branch ./runtime_k3d/test ./runtime_local/test ./desired_state_generator/test
+          --cov-branch ./runtime_local/test ./desired_state_generator/test
 
       - name: Publish Unit Test Results
         uses: mikepenz/action-junit-report@v3
@@ -109,37 +110,6 @@ jobs:
           name: "Log files local"
           path: runtime_local/test/logs
 
-  run-k3d-integration-tests:
-    name: Run Integration Tests for k3d
-    runs-on: ubuntu-22.04
-    env:
-      DAPR_HOST_IP: 127.0.0.1
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Prepare integration Tests
-        uses: ./.github/actions/prepare-int-tests
-        with:
-          package: runtime_k3d
-
-      - name: Install required packages
-        run: |
-          curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
-          sudo wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O - | /bin/bash -s 1.10.0
-
-      - name: Run integration tests for k3d
-        run: |
-          cd runtime_k3d/test
-          pytest -s ./integration/integration_test.py::test_scripts_run_successfully_with_down
-
-      - name: Upload log files as artifacts
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: "Log files K3D"
-          path: runtime_k3d/test/logs
-
   run-kanto-integration-tests:
     name: Run Integration Tests for kanto
     runs-on: ubuntu-22.04
@@ -176,6 +146,8 @@ jobs:
         run: |
           cd runtime_kanto/test
           # the socket on the ci is different to the devcontainer
+          # create dir as it does not exist at this point of time
+          sudo mkdir -p /run/docker/containerd
           sudo ln -s /run/containerd/containerd.sock /run/docker/containerd/containerd.sock
           pytest -s -x ./integration/integration_test.py::test_scripts_run_successfully_with_down
 
