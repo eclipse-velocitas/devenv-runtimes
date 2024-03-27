@@ -1,11 +1,11 @@
 {
     "container_name": "mockservice",
     "image": {
-        "name": "ghcr.io/boschglobal/kuksa.val.services/mock_service:latest"
+        "name": "ghcr.io/eclipse-kuksa/kuksa-mock-provider/mock-provider:0.4.0"
     },
     "mount_points": [
         {
-            "destination": "mock.py",
+            "destination": "/mock/mock.py",
             "source": "/workspaces/vehicle-app-python-template/mock.py",
             "propagation_mode": "rprivate"
         }
