@@ -177,7 +177,7 @@
         "config": [
             {
                 "key": "image",
-                "value": "ghcr.io/boschglobal/kuksa.val.services/mock_service:latest"
+                "value": "ghcr.io/eclipse-kuksa/kuksa-mock-provider/mock-provider:0.4.0"
             },
             {
                 "key": "env",
@@ -185,11 +185,11 @@
             },
             {
                 "key": "mount",
-                "value": "$pathInWorkspaceOrPackage( ${{ mockFilePath }} ):/mock.py"
+                "value": "$pathInWorkspaceOrPackage( ${{ mockFilePath }} ):/mock/mock.py"
             },
             {
                 "key": "start-pattern",
-                "value": ".*[cC]onnected to data broker.*"
+                "value": ".*Databroker connected!*"
             }
         ]
     }
