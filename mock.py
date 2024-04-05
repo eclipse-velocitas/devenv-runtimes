@@ -39,7 +39,7 @@ mock_datapoint(
 )
 
 mock_datapoint(
-    path="Vehicle.Cabin.Seat.Row1.Pos1.Position",
+    path="Vehicle.Cabin.Seat.Row1.DriverSide.Position",
     initial_value=0,
     behaviors=[
         create_behavior(

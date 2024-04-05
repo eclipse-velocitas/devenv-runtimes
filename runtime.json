@@ -109,7 +109,7 @@
             },
             {
                 "key": "start-pattern",
-                "value": ".*[cC]onnected to data broker.*"
+                "value": ".*[cC]onnected to data ?broker.*"
             }
         ]
     },

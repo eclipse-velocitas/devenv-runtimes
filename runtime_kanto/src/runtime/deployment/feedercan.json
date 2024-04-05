@@ -30,7 +30,7 @@
             "dbcfeeder=info",
             "CANDUMP_FILE=/data/candumpDefault.log",
             "DBC_FILE=/data/dbcfileDefault.dbc",
-            "MAPPING_FILE=/data/mappingDefault.yml"
+            "MAPPING_FILE=/data/vss_dbc.json"
         ]
     }
 }
