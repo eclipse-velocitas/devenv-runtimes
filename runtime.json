@@ -85,7 +85,7 @@
         "config": [
             {
                 "key": "enabled",
-                "value": "true"
+                "value": "false"
             },
             {
                 "key": "image",
@@ -119,7 +119,7 @@
         "config": [
             {
                 "key": "enabled",
-                "value": "true"
+                "value": "false"
             },
             {
                 "key": "image",
