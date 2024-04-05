@@ -40,7 +40,7 @@ def test_output():
             "source": "ghcr.io/eclipse-velocitas/vehicle-app-python-template/sampleapp:v1",  # noqa E501
             "type": "container",
             "requires": [
-                "vss-source-default:v3.0",
+                "vss-source-default:v4.0",
                 "data-broker-grpc:v1",
                 "mqtt:v5",
             ],
