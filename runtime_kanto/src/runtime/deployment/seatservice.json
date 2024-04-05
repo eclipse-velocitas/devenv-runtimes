@@ -1,7 +1,7 @@
 {
     "container_name": "seatservice",
     "image": {
-        "name": "ghcr.io/eclipse/kuksa.val.services/seat_service:v0.2.0"
+        "name": "ghcr.io/eclipse-kuksa/kuksa-incubation/seat_service:0.4.0"
     },
     "host_config": {
         "devices": [],

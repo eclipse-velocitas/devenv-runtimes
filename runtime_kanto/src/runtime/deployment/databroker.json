@@ -1,7 +1,7 @@
 {
     "container_name": "databroker",
     "image": {
-        "name": "ghcr.io/eclipse/kuksa.val/databroker:0.3.0"
+        "name": "ghcr.io/eclipse-kuksa/kuksa-databroker:0.4.4"
     },
     "mount_points": [
         {

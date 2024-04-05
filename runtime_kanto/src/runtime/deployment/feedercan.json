@@ -1,7 +1,7 @@
 {
     "container_name": "feedercan",
     "image": {
-        "name": "ghcr.io/eclipse/kuksa.val.feeders/dbc2val:v0.1.1"
+        "name": "ghcr.io/eclipse-kuksa/kuksa-can-provider/can-provider:0.4.2"
     },
     "mount_points": [
         {
