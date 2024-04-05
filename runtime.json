@@ -159,7 +159,7 @@
             },
             {
                 "key": "env",
-                "value": "MAPPING_FILE=/data/mappingDefault.yml"
+                "value": "MAPPING_FILE=/data/vss_dbc.json"
             },
             {
                 "key": "mount",
