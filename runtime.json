@@ -53,7 +53,7 @@
         "config": [
             {
                 "key": "image",
-                "value": "ghcr.io/eclipse/kuksa.val/databroker:0.3.0"
+                "value": "ghcr.io/eclipse-kuksa/kuksa-databroker:0.4.4"
             },
             {
                 "key": "port",
@@ -85,11 +85,11 @@
         "config": [
             {
                 "key": "enabled",
-                "value": "false"
+                "value": "true"
             },
             {
                 "key": "image",
-                "value": "ghcr.io/eclipse/kuksa.val.services/seat_service:v0.2.0"
+                "value": "ghcr.io/eclipse-kuksa/kuksa-incubation/seat_service:0.4.0"
             },
             {
                 "key": "port",
@@ -119,11 +119,11 @@
         "config": [
             {
                 "key": "enabled",
-                "value": "false"
+                "value": "true"
             },
             {
                 "key": "image",
-                "value": "ghcr.io/eclipse/kuksa.val.feeders/dbc2val:v0.1.1"
+                "value": "ghcr.io/eclipse-kuksa/kuksa-can-provider/can-provider:0.4.2"
             },
             {
                 "key": "env",
