@@ -6,7 +6,7 @@
     "mount_points": [
         {
             "destination": "/mock/mock.py",
-            "source": "/workspaces/vehicle-app-python-template/mock.py",
+            "source": "",
             "propagation_mode": "rprivate"
         }
     ],

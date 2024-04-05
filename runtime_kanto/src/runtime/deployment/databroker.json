@@ -22,8 +22,8 @@
     },
     "config": {
         "env": [
-            "KUKSA_DATA_BROKER_PORT=55555",
-            "KUKSA_DATA_BROKER_METADATA_FILE=vspec.json"
+            "KUKSA_DATABROKER_PORT=55555",
+            "KUKSA_DATABROKER_METADATA_FILE=vspec.json"
         ]
     }
 }

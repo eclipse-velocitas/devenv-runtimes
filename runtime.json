@@ -61,11 +61,11 @@
             },
             {
                 "key": "env",
-                "value": "KUKSA_DATA_BROKER_METADATA_FILE=${{ builtin.cache.vspec_file_path }}"
+                "value": "KUKSA_DATABROKER_METADATA_FILE=${{ builtin.cache.vspec_file_path }}"
             },
             {
                 "key": "env",
-                "value": "KUKSA_DATA_BROKER_PORT=55555"
+                "value": "KUKSA_DATABROKER_PORT=55555"
             },
             {
                 "key": "mount",
