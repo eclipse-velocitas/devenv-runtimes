@@ -1,7 +1,7 @@
 {
     "container_name": "databroker",
     "image": {
-        "name": "ghcr.io/eclipse/kuksa.val/databroker:0.3.0"
+        "name": "ghcr.io/eclipse-kuksa/kuksa-databroker:0.4.4"
     },
     "mount_points": [
         {
@@ -22,8 +22,8 @@
     },
     "config": {
         "env": [
-            "KUKSA_DATA_BROKER_PORT=55555",
-            "KUKSA_DATA_BROKER_METADATA_FILE=vspec.json"
+            "KUKSA_DATABROKER_PORT=55555",
+            "KUKSA_DATABROKER_METADATA_FILE=vspec.json"
         ]
     }
 }

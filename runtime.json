@@ -53,7 +53,7 @@
         "config": [
             {
                 "key": "image",
-                "value": "ghcr.io/eclipse/kuksa.val/databroker:0.3.0"
+                "value": "ghcr.io/eclipse-kuksa/kuksa-databroker:0.4.4"
             },
             {
                 "key": "port",
@@ -61,11 +61,11 @@
             },
             {
                 "key": "env",
-                "value": "KUKSA_DATA_BROKER_METADATA_FILE=${{ builtin.cache.vspec_file_path }}"
+                "value": "KUKSA_DATABROKER_METADATA_FILE=${{ builtin.cache.vspec_file_path }}"
             },
             {
                 "key": "env",
-                "value": "KUKSA_DATA_BROKER_PORT=55555"
+                "value": "KUKSA_DATABROKER_PORT=55555"
             },
             {
                 "key": "mount",
@@ -89,7 +89,7 @@
             },
             {
                 "key": "image",
-                "value": "ghcr.io/eclipse/kuksa.val.services/seat_service:v0.2.0"
+                "value": "ghcr.io/eclipse-kuksa/kuksa-incubation/seat_service:0.4.0"
             },
             {
                 "key": "port",
@@ -109,7 +109,7 @@
             },
             {
                 "key": "start-pattern",
-                "value": ".*[cC]onnected to data broker.*"
+                "value": ".*[cC]onnected to data ?broker.*"
             }
         ]
     },
@@ -123,7 +123,7 @@
             },
             {
                 "key": "image",
-                "value": "ghcr.io/eclipse/kuksa.val.feeders/dbc2val:v0.1.1"
+                "value": "ghcr.io/eclipse-kuksa/kuksa-can-provider/can-provider:0.4.2"
             },
             {
                 "key": "env",
@@ -159,7 +159,7 @@
             },
             {
                 "key": "env",
-                "value": "MAPPING_FILE=/data/mappingDefault.yml"
+                "value": "MAPPING_FILE=/data/vss_dbc.json"
             },
             {
                 "key": "mount",
