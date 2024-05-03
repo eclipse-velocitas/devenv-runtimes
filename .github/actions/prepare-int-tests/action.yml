@@ -30,8 +30,9 @@ runs:
       shell: bash
       env:
         BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+        BRANCH_NAME_PREFIX: "@"
       run: |
-        NEW_CONFIG="$(jq --arg BRANCH "$BRANCH_NAME" '.packages[0].version |= $BRANCH'  ${{ inputs.package }}/test/.velocitas.json)"
+        NEW_CONFIG="$(jq --arg BRANCH "$BRANCH_NAME_PREFIX$BRANCH_NAME" '.packages[0].version |= $BRANCH'  ${{ inputs.package }}/test/.velocitas.json)"
         echo "${NEW_CONFIG}" >  ${{ inputs.package }}/test/.velocitas.json
 
     - name: Install Velocitas CLI and Python requirements
