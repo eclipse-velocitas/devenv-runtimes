@@ -29,17 +29,17 @@ def set_env_vars():
         os.path.dirname(__file__), "..", "..", "manifest.json"
     )
     manifest_dict = json.load(open(manifest_file_path))
-    component_dict = manifest_dict["components"][0]
+    local_runtime_variables = manifest_dict["components"][0]["variables"]
     os.environ["VELOCITAS_PACKAGE_DIR"] = "."
     os.environ["VELOCITAS_WORKSPACE_DIR"] = "."
     os.environ["VELOCITAS_CACHE_DATA"] = '{"vspec_file_path":""}'
-    os.environ["runtimeFilePath"] = component_dict["variables"][0]["default"]
-    os.environ["mockFilePath"] = component_dict["variables"][1]["default"]
-    os.environ["mqttBrokerImage"] = component_dict["variables"][2]["default"]
-    os.environ["vehicleDatabrokerImage"] = component_dict["variables"][3]["default"]
-    os.environ["seatServiceImage"] = component_dict["variables"][4]["default"]
-    os.environ["feederCanImage"] = component_dict["variables"][5]["default"]
-    os.environ["mockServiceImage"] = component_dict["variables"][6]["default"]
+    os.environ["runtimeFilePath"] = local_runtime_variables[0]["default"]
+    os.environ["mockFilePath"] = local_runtime_variables[1]["default"]
+    os.environ["mqttBrokerImage"] = local_runtime_variables[2]["default"]
+    os.environ["vehicleDatabrokerImage"] = local_runtime_variables[3]["default"]
+    os.environ["seatServiceImage"] = local_runtime_variables[4]["default"]
+    os.environ["feederCanImage"] = local_runtime_variables[5]["default"]
+    os.environ["mockServiceImage"] = local_runtime_variables[6]["default"]
 
 
 def test_run_service__invalid_service_id__prints_available_services(
