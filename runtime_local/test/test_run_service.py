@@ -12,6 +12,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import json
 import os
 import sys
 
@@ -24,11 +25,21 @@ from run_service import main  # noqa: E402
 
 @pytest.fixture()
 def set_env_vars():
-    os.environ["runtimeFilePath"] = "./runtime.json"
+    manifest_file_path = os.path.join(
+        os.path.dirname(__file__), "..", "..", "manifest.json"
+    )
+    manifest_dict = json.load(open(manifest_file_path))
+    component_dict = manifest_dict["components"][0]
     os.environ["VELOCITAS_PACKAGE_DIR"] = "."
     os.environ["VELOCITAS_WORKSPACE_DIR"] = "."
     os.environ["VELOCITAS_CACHE_DATA"] = '{"vspec_file_path":""}'
-    os.environ["mockFilePath"] = "mock.py"
+    os.environ["runtimeFilePath"] = component_dict["variables"][0]["default"]
+    os.environ["mockFilePath"] = component_dict["variables"][1]["default"]
+    os.environ["mqttBrokerImage"] = component_dict["variables"][2]["default"]
+    os.environ["vehicleDatabrokerImage"] = component_dict["variables"][3]["default"]
+    os.environ["seatServiceImage"] = component_dict["variables"][4]["default"]
+    os.environ["feederCanImage"] = component_dict["variables"][5]["default"]
+    os.environ["mockServiceImage"] = component_dict["variables"][6]["default"]
 
 
 def test_run_service__invalid_service_id__prints_available_services(

@@ -7,7 +7,7 @@
         "config": [
             {
                 "key": "image",
-                "value": "eclipse-mosquitto:2.0.14"
+                "value": "${{ mqttBrokerImage }}"
             },
             {
                 "key": "port",
@@ -53,7 +53,7 @@
         "config": [
             {
                 "key": "image",
-                "value": "ghcr.io/eclipse-kuksa/kuksa-databroker:0.4.4"
+                "value": "${{ vehicleDatabrokerImage }}"
             },
             {
                 "key": "port",
@@ -89,7 +89,7 @@
             },
             {
                 "key": "image",
-                "value": "ghcr.io/eclipse-kuksa/kuksa-incubation/seat_service:0.4.0"
+                "value": "${{ seatServiceImage }}"
             },
             {
                 "key": "port",
@@ -123,7 +123,7 @@
             },
             {
                 "key": "image",
-                "value": "ghcr.io/eclipse-kuksa/kuksa-can-provider/can-provider:0.4.2"
+                "value": "${{ feederCanImage }}"
             },
             {
                 "key": "env",
@@ -177,7 +177,7 @@
         "config": [
             {
                 "key": "image",
-                "value": "ghcr.io/eclipse-kuksa/kuksa-mock-provider/mock-provider:0.4.0"
+                "value": "${{ mockServiceImage }}"
             },
             {
                 "key": "env",
