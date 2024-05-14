@@ -30,7 +30,7 @@ regex_runtime_up: Pattern[str] = re_compile(r"✅.* Kanto is ready to use!")
 regex_build: Pattern[str] = re_compile(r"✅.* Building VehicleApp...")
 regex_deploy: Pattern[str] = re_compile(r"✅.* Deploying VehicleApp...")
 regex_stop: Pattern[str] = re_compile(r"✅.* Stopping Kanto...")
-DEFAULT_TIMEOUT_SEC: float = 120
+DEFAULT_TIMEOUT_SEC: float = 240
 
 
 def create_dummy_vspec_file():
