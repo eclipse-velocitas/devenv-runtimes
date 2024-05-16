@@ -26,6 +26,7 @@ from velocitas_lib import (
     get_package_path,
     get_script_path,
     get_workspace_dir,
+    require_env,
 )
 from yaspin.core import Yaspin
 
@@ -87,6 +88,7 @@ def adapt_feedercan_deployment_file():
         encoding="utf-8",
     ) as f:
         data = json.load(f)
+        data["image"]["name"] = require_env("feederCanImage")
         data["mount_points"][0]["source"] = os.path.join(
             get_package_path(), "config", "feedercan"
         )
@@ -112,6 +114,7 @@ def adapt_mockservice_deployment_file():
         if os.path.isfile(os.path.join(get_workspace_dir(), "mock.py")):
             source = os.path.join(get_workspace_dir(), "mock.py")
 
+        data["image"]["name"] = require_env("mockServiceImage")
         data["mount_points"][0]["source"] = source
         f.seek(0)
         json.dump(data, f, indent=4)
@@ -131,7 +134,26 @@ def adapt_databroker_deployment_file():
     ) as f:
         data = json.load(f)
         cache = get_cache_data()
+        data["image"]["name"] = require_env("vehicleDatabrokerImage")
         data["mount_points"][0]["source"] = cache["vspec_file_path"]
+        f.seek(0)
+        json.dump(data, f, indent=4)
+
+
+def adapt_mosquitto_deployment_file():
+    """Update the databroker config with the correct mount path."""
+
+    file_path = os.path.join(get_script_path(), "deployment", "mosquitto.json")
+    if not os.path.isfile(file_path):
+        return
+
+    with open(
+        file_path,
+        "r+",
+        encoding="utf-8",
+    ) as f:
+        data = json.load(f)
+        data["image"]["name"] = require_env("mqttBrokerImage")
         f.seek(0)
         json.dump(data, f, indent=4)
 
@@ -207,6 +229,7 @@ def start_kanto(spinner: Yaspin, log_output: TextIOWrapper):
     adapt_feedercan_deployment_file()
     adapt_mockservice_deployment_file()
     adapt_databroker_deployment_file()
+    adapt_mosquitto_deployment_file()
     log_output.write("Starting Kanto runtime\n")
     kanto = subprocess.Popen(
         [
