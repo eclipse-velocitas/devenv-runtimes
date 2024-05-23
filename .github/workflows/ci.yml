@@ -68,7 +68,7 @@ jobs:
           --cov-branch ./runtime_local/test ./desired_state_generator/test
 
       - name: Publish Unit Test Results
-        uses: mikepenz/action-junit-report@v3
+        uses: mikepenz/action-junit-report@v4
         if: always()
         with:
           report_paths: ./results/UnitTest/junit.xml
@@ -155,7 +155,7 @@ jobs:
 
       - name: Upload log files as artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "Log files Kanto"
           path: |
@@ -182,7 +182,7 @@ jobs:
 
       - name: Upload log files as artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "Log files Desired State Generator"
           path: |
