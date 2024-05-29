@@ -23,6 +23,8 @@ from typing import Any, Dict, List, Optional
 import velocitas_lib
 import velocitas_lib.services
 
+from velocitas_lib import get_workspace_dir
+
 VSS_SOURCE_DEFAULT_ID = "vss-source-default"
 VSS_SOURCE_CUSTOM_ID = "vss-source-custom"
 DATABROKER_ID = "data-broker-grpc"
@@ -65,7 +67,7 @@ def parse_vehicle_signal_interface(config: Dict[str, Any]) -> List[str]:
         version = src.removeprefix(vss_release_prefix).split("/")[0]
         requirements.append(f"{VSS_SOURCE_DEFAULT_ID}:{version}")
     else:
-        version = get_md5_from_file_content(src)
+        version = get_md5_from_file_content(os.path.join(get_workspace_dir(), os.path.normpath(src)))
         requirements.append(f"{VSS_SOURCE_CUSTOM_ID}:{version}")
 
     requirements.append(f"{DATABROKER_ID}:v1")
