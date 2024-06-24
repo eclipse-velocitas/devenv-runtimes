@@ -107,7 +107,7 @@ jobs:
 
       - name: Upload log files as artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "Log files local"
           path: runtime_local/test/logs
