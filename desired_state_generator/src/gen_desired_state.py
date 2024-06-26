@@ -67,7 +67,9 @@ def parse_vehicle_signal_interface(config: Dict[str, Any]) -> List[str]:
         version = src.removeprefix(vss_release_prefix).split("/")[0]
         requirements.append(f"{VSS_SOURCE_DEFAULT_ID}:{version}")
     else:
-        version = get_md5_from_file_content(os.path.join(get_workspace_dir(), os.path.normpath(src)))
+        version = get_md5_from_file_content(
+            os.path.join(get_workspace_dir(), os.path.normpath(src))
+        )
         requirements.append(f"{VSS_SOURCE_CUSTOM_ID}:{version}")
 
     requirements.append(f"{DATABROKER_ID}:v1")
