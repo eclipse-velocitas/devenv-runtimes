@@ -19,10 +19,7 @@ from velocitas_lib.middleware import MiddlewareType, get_middleware_type
 from velocitas_lib.services import get_service_port
 
 
-def run_app(
-    executable_path: str,
-    args: list[str],
-):
+def run_app(executable_path: str, args: list[str], envs: list[str]):
     program_args = [executable_path, *args]
 
     if get_middleware_type() == MiddlewareType.NATIVE:
@@ -36,6 +33,8 @@ def run_app(
             "SDV_VEHICLEDATABROKER_ADDRESS": f"{vdb_address}:{vdb_port}",
             "SDV_MQTT_ADDRESS": f"{mqtt_address}:{mqtt_port}",
         }
+        middleware_config.update({env.split("=")[0]: env.split("=")[1] for env in envs})
+
         subprocess.check_call(program_args, env=middleware_config)
     else:
         raise NotImplementedError("Unsupported middleware type!")
@@ -49,9 +48,9 @@ if __name__ == "__main__":
         "executable_path", type=str, help="Path to the executable to be invoked."
     )
     parser.add_argument("app_args", nargs="*")
+    parser.add_argument(
+        "-e", "--env", help="Environment variable to pass to the app.", action="append"
+    )
 
     args = parser.parse_args()
-    run_app(
-        args.executable_path,
-        args.app_args,
-    )
+    run_app(args.executable_path, args.app_args, args.env)
