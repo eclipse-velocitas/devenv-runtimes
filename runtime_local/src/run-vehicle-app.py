@@ -34,7 +34,9 @@ def run_app(executable_path: str, args: list[str], envs: list[str]):
             "SDV_MQTT_ADDRESS": f"{mqtt_address}:{mqtt_port}",
         }
         if envs:
-            middleware_config.update({env.split("=")[0]: env.split("=")[1] for env in envs})
+            middleware_config.update(
+                {env.split("=")[0]: env.split("=")[1] for env in envs}
+            )
 
         subprocess.check_call(program_args, env=middleware_config)
     else:
