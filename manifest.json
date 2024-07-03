@@ -80,6 +80,12 @@
                     "default": "ghcr.io/eclipse-kuksa/kuksa-databroker:0.4.4"
                 },
                 {
+                    "name": "vehicleDatabrokerCliImage",
+                    "type": "string",
+                    "description": "Docker image for vehicle databroker CLI",
+                    "default": "ghcr.io/eclipse-kuksa/kuksa-databroker-cli:0.4.4"
+                },
+                {
                     "name": "seatServiceImage",
                     "type": "string",
                     "description": "Docker image for seat service",
