@@ -1,5 +1,4 @@
-#!/bin/bash
-# Copyright (c) 2022-2024 Contributors to the Eclipse Foundation
+# Copyright (c) 2024 Contributors to the Eclipse Foundation
 #
 # This program and the accompanying materials are made available under the
 # terms of the Apache License, Version 2.0 which is available at
@@ -13,8 +12,25 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-echo "#######################################################"
-echo "### Running VehicleDataBroker CLI                   ###"
-echo "#######################################################"
+import subprocess
 
-docker run -it --rm --network host $vehicleDatabrokerCliImage
+from local_lib import get_container_runtime_executable
+from velocitas_lib import require_env
+
+
+def run_databroker_cli():
+    databroker_cli_image = require_env("vehicleDatabrokerCliImage")
+    program_args = [
+        get_container_runtime_executable(),
+        "run",
+        "-it",
+        "--rm",
+        "--network",
+        "host",
+        databroker_cli_image,
+    ]
+    subprocess.check_call(program_args)
+
+
+if __name__ == "__main__":
+    run_databroker_cli()

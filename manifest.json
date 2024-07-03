@@ -7,7 +7,10 @@
             "programs": [
                 {
                     "id": "run-vehicledatabroker-cli",
-                    "executable": "./runtime_local/src/run-vehicledatabroker-cli.sh"
+                    "executable": "python3",
+                    "args": [
+                        "./runtime_local/src/run-vehicledatabroker-cli.py"
+                    ]
                 },
                 {
                     "id": "run-service",
