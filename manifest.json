@@ -10,7 +10,8 @@
                     "executable": "python3",
                     "args": [
                         "./runtime_local/src/run-vehicledatabroker-cli.py"
-                    ]
+                    ],
+                    "interactive": true
                 },
                 {
                     "id": "run-service",
