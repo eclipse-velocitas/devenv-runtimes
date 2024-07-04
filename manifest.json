@@ -7,7 +7,11 @@
             "programs": [
                 {
                     "id": "run-vehicledatabroker-cli",
-                    "executable": "./runtime_local/src/run-vehicledatabroker-cli.sh"
+                    "executable": "python3",
+                    "args": [
+                        "./runtime_local/src/run-vehicledatabroker-cli.py"
+                    ],
+                    "interactive": true
                 },
                 {
                     "id": "run-service",
@@ -78,6 +82,12 @@
                     "type": "string",
                     "description": "Docker image for vehicle databroker",
                     "default": "ghcr.io/eclipse-kuksa/kuksa-databroker:0.4.4"
+                },
+                {
+                    "name": "vehicleDatabrokerCliImage",
+                    "type": "string",
+                    "description": "Docker image for vehicle databroker CLI",
+                    "default": "ghcr.io/eclipse-kuksa/kuksa-databroker-cli:0.4.4"
                 },
                 {
                     "name": "seatServiceImage",
