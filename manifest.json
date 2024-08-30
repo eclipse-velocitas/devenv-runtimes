@@ -6,6 +6,17 @@
             "type": "runtime",
             "programs": [
                 {
+                    "id": "install-deps",
+                    "executable": "python3",
+                    "args": [
+                        "-m",
+                        "pip",
+                        "install",
+                        "-r",
+                        "./runtime_local/src/requirements.txt"
+                    ]
+                },
+                {
                     "id": "run-vehicledatabroker-cli",
                     "executable": "python3",
                     "args": [
@@ -32,17 +43,6 @@
                     "executable": "python3",
                     "args": [
                         "./runtime_local/src/runtime-down.py"
-                    ]
-                },
-                {
-                    "id": "install-deps",
-                    "executable": "python3",
-                    "args": [
-                        "-m",
-                        "pip",
-                        "install",
-                        "-r",
-                        "./runtime_local/src/requirements.txt"
                     ]
                 },
                 {
@@ -196,6 +196,17 @@
             "type": "deployment",
             "programs": [
                 {
+                    "id": "install-deps",
+                    "executable": "python3",
+                    "args": [
+                        "-m",
+                        "pip",
+                        "install",
+                        "-r",
+                        "./runtime_kanto/src/requirements.txt"
+                    ]
+                },
+                {
                     "id": "build-vehicleapp",
                     "executable": "python3",
                     "args": [
@@ -208,6 +219,11 @@
                     "args": [
                         "./runtime_kanto/src/app_deployment/deploy_vehicleapp.py"
                     ]
+                }
+            ],
+            "onPostInit": [
+                {
+                    "ref": "install-deps"
                 }
             ],
             "variables": [
