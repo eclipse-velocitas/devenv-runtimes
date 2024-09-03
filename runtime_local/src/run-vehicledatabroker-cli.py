@@ -13,6 +13,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Workaround fix begin: Databroker CLI is not reactive if started via CLI in Python venv.
+# Bug ticket: https://github.com/eclipse-velocitas/cli/issues/320
 # With this fix in this file only standard libs are used avoiding the need for a venv.
 
 # from local_lib import get_container_runtime_executable
