@@ -12,10 +12,39 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+# Workaround fix begin: Databroker CLI is not reactive if started via CLI in Python venv.
+# With this fix in this file only standard libs are used avoiding the need for a venv.
+
+# from local_lib import get_container_runtime_executable
+# from velocitas_lib import require_env
+import os
 import subprocess
 
-from local_lib import get_container_runtime_executable
-from velocitas_lib import require_env
+
+def require_env(name: str) -> str:
+    """Require and return an environment variable.
+
+    Args:
+        name (str): The name of the variable.
+
+    Raises:
+        ValueError: In case the environment variable is not set.
+
+    Returns:
+        str: The value of the variable.
+    """
+    var = os.getenv(name)
+    if not var:
+        raise ValueError(f"Environment variable {name!r} not set!")
+    return var
+
+
+def get_container_runtime_executable() -> str:
+    """Return the current container runtime executable. E.g. docker."""
+    return "docker"
+
+
+# Workaround fix end: Databroker CLI is not reactive if started via CLI in Python venv
 
 
 def run_databroker_cli():

@@ -18,7 +18,7 @@
                 },
                 {
                     "id": "run-vehicledatabroker-cli",
-                    "executable": "python3",
+                    "executable": "/usr/bin/python3",
                     "args": [
                         "./runtime_local/src/run-vehicledatabroker-cli.py"
                     ],
