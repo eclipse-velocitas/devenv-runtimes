@@ -1,7 +1,7 @@
 {
     "container_name": "mockservice",
     "image": {
-        "name": "ghcr.io/eclipse-kuksa/kuksa-mock-provider/mock-provider:0.4.0"
+        "name": "ghcr.io/eclipse-kuksa/kuksa-mock-provider/mock-provider:0.4.1"
     },
     "mount_points": [
         {

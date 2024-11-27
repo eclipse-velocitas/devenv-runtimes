@@ -74,6 +74,10 @@
             {
                 "key": "start-pattern",
                 "value": ".*Listening on \\d+\\.\\d+\\.\\d+\\.\\d+:\\d+"
+            },
+            {
+                "key": "arg",
+                "value": "--enable-databroker-v1"
             }
         ]
     },
